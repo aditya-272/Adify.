@@ -430,6 +430,10 @@
                 document.getElementById("p-email").innerText = currentUser.email || "user@adify.com";
                 document.getElementById("p-phone").innerText = currentUser.phone ? "+91 " + currentUser.phone : "+91 98765 43210";
                 if (currentUser.age) document.getElementById("p-age").innerText = currentUser.age + " Years";
+                if (currentUser.photo) {
+                    document.getElementById('main-pfp').src = currentUser.photo;
+                    document.getElementById('homeProfileImg').src = currentUser.photo;
+                }
             }
         }
         function closeProfile() { document.getElementById("profileScreen").classList.remove("active"); }
@@ -524,6 +528,10 @@
                     if (user.password === lpass) {
                         currentUser = user;
                         localStorage.setItem('adify_current_session', JSON.stringify(user));
+                        if (currentUser.photo) {
+                            document.getElementById('main-pfp').src = currentUser.photo;
+                            document.getElementById('homeProfileImg').src = currentUser.photo;
+                        }
                         showPopup(`WELCOME BACK, ${user.name.toUpperCase()}`, "success");
                         setTimeout(openHome, 1000);
                     } else { showPopup("WRONG PASSWORD", "error"); }
@@ -704,13 +712,22 @@
             const newName = document.getElementById('edit-name').value;
             const newAge = document.getElementById('edit-age').value;
             if (newName && newAge) {
-                document.getElementById('display-name').innerText = newName;
-                document.getElementById('p-gender').innerText = selectedGenderProfile;
-                document.getElementById('p-age').innerText = newAge + " Years";
+                currentUser.name = newName;
+                currentUser.age = newAge;
+                currentUser.gender = selectedGenderProfile;
                 if (currentPhoto) {
+                    currentUser.photo = currentPhoto;
                     document.getElementById('main-pfp').src = currentPhoto;
                     document.getElementById('homeProfileImg').src = currentPhoto;
                 }
+                localStorage.setItem(currentUser.email, JSON.stringify(currentUser));
+                if (currentUser.phone) {
+                    localStorage.setItem(currentUser.phone, JSON.stringify(currentUser));
+                }
+                localStorage.setItem('adify_current_session', JSON.stringify(currentUser));
+                document.getElementById('display-name').innerText = newName;
+                document.getElementById('p-gender').innerText = selectedGenderProfile;
+                document.getElementById('p-age').innerText = newAge + " Years";
                 closeEdit();
                 const t = document.getElementById('toast');
                 t.style.display = 'block';
@@ -726,6 +743,10 @@
             if (savedSession) {
                 try {
                     currentUser = JSON.parse(savedSession);
+                    if (currentUser.photo) {
+                        document.getElementById('main-pfp').src = currentUser.photo;
+                        document.getElementById('homeProfileImg').src = currentUser.photo;
+                    }
                     showPopup("WELCOME BACK, " + (currentUser.name || "USER").toUpperCase(), "success");
                     setTimeout(openHome, 800);
                     return;
