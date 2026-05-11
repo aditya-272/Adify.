@@ -634,6 +634,81 @@
             document.getElementById('switch-text').innerHTML = isReg ? 'Already a member? <span onclick="toggleAuth(false)">Log In</span>' : 'New here? <span onclick="toggleAuth(true)">Create Account</span>';
         }
 
+        // ===== CROSS-DEVICE LOGIN HELPERS (NEW) =====
+        function findUserLocal(lid) {
+            let savedData = localStorage.getItem(lid);
+            if (savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    if (parsed && parsed.password) return parsed;
+                } catch(e) {}
+            }
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.includes('@')) {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        if (data && (data.email === lid || data.phone === lid)) {
+                            return data;
+                        }
+                    } catch(e) {}
+                }
+            }
+            return null;
+        }
+
+        function tryFirebaseLogin(lid, lpass) {
+            return new Promise((resolve) => {
+                if (!db) { resolve(null); return; }
+                
+                const checkUser = (user) => {
+                    if (!user) return resolve(null);
+                    if (user.password === lpass) {
+                        localStorage.setItem(user.email, JSON.stringify(user));
+                        if (user.phone) localStorage.setItem(user.phone, JSON.stringify(user));
+                        resolve(user);
+                    } else {
+                        resolve({ error: "WRONG PASSWORD" });
+                    }
+                };
+                
+                if (lid.includes('@')) {
+                    db.ref('users/' + lid.replace(/\./g, '_')).once('value')
+                        .then(snap => checkUser(snap.val()))
+                        .catch(() => resolve(null));
+                } else {
+                    db.ref('users').once('value')
+                        .then(snap => {
+                            const users = snap.val();
+                            if (!users) return resolve(null);
+                            for (let key in users) {
+                                if (users[key].phone === lid) return checkUser(users[key]);
+                            }
+                            resolve(null);
+                        })
+                        .catch(() => resolve(null));
+                }
+            });
+        }
+
+        function finalizeLogin(user) {
+            currentUser = user;
+            saveSession(user);
+            loadUserFromCloud(user.email).then(cloudData => {
+                if (cloudData) {
+                    currentUser = cloudData;
+                    saveSession(cloudData);
+                }
+                if (currentUser.photo) {
+                    document.getElementById('main-pfp').src = currentUser.photo;
+                    document.getElementById('homeProfileImg').src = currentUser.photo;
+                }
+                showPopup(`WELCOME BACK, ${currentUser.name.toUpperCase()}`, "success");
+                setTimeout(() => { openHome(); }, 1000);
+            });
+        }
+
+        // ===== FIXED handleSubmit - Cross-device login enabled =====
         function handleSubmit() {
             if (!isRegisterMode) {
                 const lid = document.getElementById('login-id').value.toLowerCase().trim();
@@ -647,50 +722,29 @@
                     return;
                 }
                 
-                let user = null;
-                let savedData = localStorage.getItem(lid);
-                if (savedData) {
-                    try {
-                        const parsed = JSON.parse(savedData);
-                        if (parsed && parsed.password) user = parsed;
-                    } catch(e) {}
-                }
-                
-                if (!user) {
-                    for (let i = 0; i < localStorage.length; i++) {
-                        const key = localStorage.key(i);
-                        if (key && key.includes('@')) {
-                            try {
-                                const data = JSON.parse(localStorage.getItem(key));
-                                if (data && (data.email === lid || data.phone === lid)) {
-                                    user = data;
-                                    break;
-                                }
-                            } catch(e) {}
-                        }
+                // Step 1: Same device fast local check
+                const localUser = findUserLocal(lid);
+                if (localUser) {
+                    if (localUser.password === lpass) {
+                        finalizeLogin(localUser);
+                    } else {
+                        showPopup("WRONG PASSWORD", "error");
                     }
+                    return;
                 }
                 
-                if (user) {
-                    if (user.password === lpass) {
-                        currentUser = user;
-                        saveSession(user);
-                        
-                        loadUserFromCloud(user.email).then(cloudData => {
-                            if (cloudData) {
-                                currentUser = cloudData;
-                                saveSession(cloudData);
-                            }
-                            if (currentUser.photo) {
-                                document.getElementById('main-pfp').src = currentUser.photo;
-                                document.getElementById('homeProfileImg').src = currentUser.photo;
-                            }
-                            showPopup(`WELCOME BACK, ${currentUser.name.toUpperCase()}`, "success");
-                            setTimeout(() => { openHome(); }, 1000);
-                        });
-                        return;
-                    } else { showPopup("WRONG PASSWORD", "error"); }
-                } else { showPopup("USER NOT FOUND", "error"); }
+                // Step 2: Cross-device Firebase check
+                showPopup("VERIFYING USER...", "success");
+                tryFirebaseLogin(lid, lpass).then(result => {
+                    if (result === null) {
+                        showPopup("USER NOT FOUND", "error");
+                    } else if (result.error) {
+                        showPopup(result.error, "error");
+                    } else {
+                        finalizeLogin(result);
+                    }
+                });
+                
             } else {
                 const name = document.getElementById('full-name').value;
                 const emailInput = document.getElementById('reg-email').value;
