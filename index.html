@@ -202,7 +202,7 @@
         .edit-input:focus { border-color: var(--sky-blue); }
         @media (max-width: 400px) {
             .auth-card h1 { font-size: 36px; }
-            .p-avatar { width: 120px; height: 120px; }
+n            .p-avatar { width: 120px; height: 120px; }
             .playlist-grid { gap: 10px; }
         }
     </style>
@@ -215,8 +215,8 @@
     <div id="toast"><i class="fas fa-shield-alt"></i> PROFILE SECURED</div>
     <div id="status-popup"></div>
 
-    <!-- ===== LOGIN SCREEN (active class REMOVED - fixes flash) ===== -->
-    <div id="loginScreen" class="app-screen">
+    <!-- ===== LOGIN SCREEN ===== -->
+    <div id="loginScreen" class="app-screen active">
         <div class="auth-card">
             <div class="logo-area">
                 <i class="fas fa-headphones-alt"></i>
@@ -315,6 +315,7 @@
         </div>
         <div class="watermark">Made by Aditya</div>
     </div>
+
     <!-- ===== PROFILE SCREEN ===== -->
     <div id="profileScreen" class="profile-screen">
         <div class="profile-back-btn" onclick="closeProfile()">
@@ -815,42 +816,57 @@
         function showLogout() { document.getElementById('logout-modal').style.display = 'flex'; }
         function hideLogout() { document.getElementById('logout-modal').style.display = 'none'; }
 
-        // ===== FIXED window.onload - No login flash =====
+        // ===== FIXED window.onload - Reload pe logout nahi hoga =====
         window.onload = function() {
             const savedSession = localStorage.getItem('adify_current_session');
+            
             if (savedSession) {
                 try {
                     currentUser = JSON.parse(savedSession);
+                    
+                    // IMMEDIATELY switch to home screen - no delay!
                     showScreen("homeScreen");
                     renderAll();
+                    detectDevice();
+                    
+                    // Update UI with saved user data
+                    if (currentUser.photo) {
+                        document.getElementById('main-pfp').src = currentUser.photo;
+                        document.getElementById('homeProfileImg').src = currentUser.photo;
+                    }
+                    
+                    // Show welcome back message
+                    showPopup("WELCOME BACK, " + (currentUser.name || "USER").toUpperCase(), "success");
+                    
+                    // Sync with cloud in background (non-blocking)
                     loadUserFromCloud(currentUser.email).then(cloudData => {
                         if (cloudData) {
                             currentUser = cloudData;
                             localStorage.setItem('adify_current_session', JSON.stringify(cloudData));
                             localStorage.setItem(currentUser.email, JSON.stringify(cloudData));
-                        } else {
-                            const latestData = localStorage.getItem(currentUser.email);
-                            if (latestData) {
-                                try { currentUser = JSON.parse(latestData); } catch(e) {}
+                            
+                            // Update profile with latest cloud data
+                            document.getElementById("display-name").innerText = currentUser.name || "Adify User";
+                            document.getElementById("p-gender").innerText = currentUser.gender || "Male";
+                            document.getElementById("p-age").innerText = (currentUser.age || 22) + " Years";
+                            if (currentUser.photo) {
+                                document.getElementById('main-pfp').src = currentUser.photo;
+                                document.getElementById('homeProfileImg').src = currentUser.photo;
                             }
                         }
-                        if (currentUser.photo) {
-                            document.getElementById('main-pfp').src = currentUser.photo;
-                            document.getElementById('homeProfileImg').src = currentUser.photo;
-                        }
-                        showPopup("WELCOME BACK, " + (currentUser.name || "USER").toUpperCase(), "success");
-                    }).catch(() => {
-                        const latestData = localStorage.getItem(currentUser.email);
-                        if (latestData) {
-                            try { currentUser = JSON.parse(latestData); } catch(e) {}
-                        }
+                    }).catch(err => {
+                        console.log("Cloud sync failed on reload:", err);
                     });
-                    detectDevice();
-                    return;
+                    
+                    return; // User is logged in, exit here
+                    
                 } catch(e) {
-                    localStorage.removeItem('adify_current_session');
+                    console.error("Session parse error on reload:", e);
+                    // Don't clear session on parse error - just show login
                 }
             }
+            
+            // No valid session - show login screen
             showScreen("loginScreen");
             renderAll();
             detectDevice();
