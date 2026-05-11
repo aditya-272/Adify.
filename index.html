@@ -215,8 +215,8 @@
     <div id="toast"><i class="fas fa-shield-alt"></i> PROFILE SECURED</div>
     <div id="status-popup"></div>
 
-    <!-- ===== LOGIN SCREEN ===== -->
-    <div id="loginScreen" class="app-screen active">
+    <!-- ===== LOGIN SCREEN (active class REMOVED - fixes flash) ===== -->
+    <div id="loginScreen" class="app-screen">
         <div class="auth-card">
             <div class="logo-area">
                 <i class="fas fa-headphones-alt"></i>
@@ -279,7 +279,6 @@
             <p class="toggle-text" id="switch-text">New here? <span onclick="toggleAuth(true)">Create Account</span></p>
         </div>
     </div>
-
     <!-- ===== HOME SCREEN ===== -->
     <div id="homeScreen" class="app-screen">
         <div class="home-header">
@@ -316,7 +315,6 @@
         </div>
         <div class="watermark">Made by Aditya</div>
     </div>
-
     <!-- ===== PROFILE SCREEN ===== -->
     <div id="profileScreen" class="profile-screen">
         <div class="profile-back-btn" onclick="closeProfile()">
@@ -403,7 +401,7 @@
         let currentUser = null;
         const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
 
-        // ===== FIREBASE CONFIG (TUMHAARA REAL CONFIG) =====
+        // ===== FIREBASE CONFIG =====
         const firebaseConfig = {
             apiKey: "AIzaSyDLBqzimyPQj16sGRC2mJaP5N4ZxjwQvm4",
             authDomain: "adify-music-9280e.firebaseapp.com",
@@ -414,7 +412,6 @@
             appId: "1:534415071027:web:255cb8f8869d87459a5046"
         };
         
-        // Initialize Firebase
         let db = null;
         try {
             firebase.initializeApp(firebaseConfig);
@@ -424,35 +421,18 @@
             console.log("Firebase error:", e);
         }
 
-        // ===== FIREBASE FUNCTIONS =====
         function saveUserToCloud(userData) {
-            if (!db) {
-                console.log("Firebase not available, saving to localStorage only");
-                return Promise.resolve();
-            }
+            if (!db) return Promise.resolve();
             return db.ref('users/' + userData.email.replace(/\./g, '_')).set(userData)
                 .then(() => console.log("User saved to cloud!"))
                 .catch(err => console.log("Cloud save error:", err));
         }
 
         function loadUserFromCloud(email) {
-            if (!db) {
-                console.log("Firebase not available, loading from localStorage");
-                return Promise.resolve(null);
-            }
+            if (!db) return Promise.resolve(null);
             return db.ref('users/' + email.replace(/\./g, '_')).once('value')
-                .then(snapshot => {
-                    const data = snapshot.val();
-                    if (data) {
-                        console.log("User loaded from cloud!");
-                        return data;
-                    }
-                    return null;
-                })
-                .catch(err => {
-                    console.log("Cloud load error:", err);
-                    return null;
-                });
+                .then(snapshot => snapshot.val())
+                .catch(err => { console.log("Cloud load error:", err); return null; });
         }
 
         function updateProfileInCloud(email, updates) {
@@ -483,16 +463,18 @@
             const el = document.getElementById(screenId);
             if (el) el.classList.add("active");
         }
-        function openHome() { showScreen("homeScreen"); renderAll(); }
+
+        function openHome() { 
+            showScreen("homeScreen"); 
+            renderAll(); 
+        }
+
         function openProfile() {
             document.getElementById("profileScreen").classList.add("active");
             if (currentUser) {
                 const latest = localStorage.getItem(currentUser.email);
                 if (latest) {
-                    try {
-                        const updated = JSON.parse(latest);
-                        currentUser = updated;
-                    } catch(e) {}
+                    try { currentUser = JSON.parse(latest); } catch(e) {}
                 }
                 document.getElementById("display-name").innerText = currentUser.name || "Adify User";
                 document.getElementById("p-gender").innerText = currentUser.gender || "Male";
@@ -505,7 +487,9 @@
                 }
             }
         }
+
         function closeProfile() { document.getElementById("profileScreen").classList.remove("active"); }
+
         function doLogout() {
             currentUser = null;
             localStorage.removeItem('adify_current_session');
@@ -562,23 +546,29 @@
             document.getElementById('main-btn').innerText = isReg ? "SIGN UP" : "LOG IN";
             document.getElementById('switch-text').innerHTML = isReg ? 'Already a member? <span onclick="toggleAuth(false)">Log In</span>' : 'New here? <span onclick="toggleAuth(true)">Create Account</span>';
         }
+
         function handleSubmit() {
             if (!isRegisterMode) {
                 const lid = document.getElementById('login-id').value.toLowerCase().trim();
                 const lpass = document.getElementById('login-pass').value;
+                
                 if (lid === "1" && lpass === "1") {
                     showPopup("MASTER LOGIN SUCCESS", "success");
                     currentUser = { name: 'Master', email: 'master@adify.com', phone: '0000000000', gender: 'Male', age: 21 };
                     localStorage.setItem('adify_current_session', JSON.stringify(currentUser));
-                    setTimeout(openHome, 1000); return;
+                    setTimeout(() => { openHome(); }, 1000); 
+                    return;
                 }
-                let savedData = localStorage.getItem(lid);
+                
                 let user = null;
+                let savedData = localStorage.getItem(lid);
                 if (savedData) {
                     try {
-                        user = JSON.parse(savedData);
+                        const parsed = JSON.parse(savedData);
+                        if (parsed && parsed.password) user = parsed;
                     } catch(e) {}
                 }
+                
                 if (!user) {
                     for (let i = 0; i < localStorage.length; i++) {
                         const key = localStorage.key(i);
@@ -593,10 +583,12 @@
                         }
                     }
                 }
+                
                 if (user) {
                     if (user.password === lpass) {
                         currentUser = user;
                         localStorage.setItem('adify_current_session', JSON.stringify(user));
+                        
                         loadUserFromCloud(user.email).then(cloudData => {
                             if (cloudData) {
                                 currentUser = cloudData;
@@ -608,7 +600,7 @@
                                 document.getElementById('homeProfileImg').src = currentUser.photo;
                             }
                             showPopup(`WELCOME BACK, ${currentUser.name.toUpperCase()}`, "success");
-                            setTimeout(openHome, 1000);
+                            setTimeout(() => { openHome(); }, 1000);
                         });
                         return;
                     } else { showPopup("WRONG PASSWORD", "error"); }
@@ -620,10 +612,13 @@
                 const phone = document.getElementById('reg-phone').value;
                 const pass = document.getElementById('reg-pass').value;
                 const age = document.getElementById('reg-age').value;
+                
                 if (localStorage.getItem(email)) { showPopup("EMAIL ALREADY REGISTERED", "error"); return; }
+                
                 let phoneCountKey = "count_" + phone;
                 let currentCount = parseInt(localStorage.getItem(phoneCountKey)) || 0;
                 if (currentCount >= 3) { showPopup("MAX 3 ACCOUNTS PER NUMBER", "error"); return; }
+                
                 if (name && emailRegex.test(emailInput) && phone.length === 10 && pass.length >= 8 && age >= 18) {
                     const userData = { name: name, email: email, phone: phone, password: pass, gender: selectedGender, age: age, photo: null };
                     localStorage.setItem(email, JSON.stringify(userData));
@@ -793,20 +788,16 @@
                 currentUser.name = newName;
                 currentUser.age = newAge;
                 currentUser.gender = selectedGenderProfile;
-                if (currentPhoto) {
-                    currentUser.photo = currentPhoto;
-                }
+                if (currentPhoto) currentUser.photo = currentPhoto;
+                
                 localStorage.setItem(currentUser.email, JSON.stringify(currentUser));
-                if (currentUser.phone) {
-                    localStorage.setItem(currentUser.phone, JSON.stringify(currentUser));
-                }
+                if (currentUser.phone) localStorage.setItem(currentUser.phone, JSON.stringify(currentUser));
                 localStorage.setItem('adify_current_session', JSON.stringify(currentUser));
+                
                 updateProfileInCloud(currentUser.email, {
-                    name: newName,
-                    age: newAge,
-                    gender: selectedGenderProfile,
-                    photo: currentUser.photo
+                    name: newName, age: newAge, gender: selectedGenderProfile, photo: currentUser.photo
                 });
+                
                 document.getElementById('display-name').innerText = newName;
                 document.getElementById('p-gender').innerText = selectedGenderProfile;
                 document.getElementById('p-age').innerText = newAge + " Years";
@@ -824,12 +815,14 @@
         function showLogout() { document.getElementById('logout-modal').style.display = 'flex'; }
         function hideLogout() { document.getElementById('logout-modal').style.display = 'none'; }
 
-        // ===== INIT =====
+        // ===== FIXED window.onload - No login flash =====
         window.onload = function() {
             const savedSession = localStorage.getItem('adify_current_session');
             if (savedSession) {
                 try {
                     currentUser = JSON.parse(savedSession);
+                    showScreen("homeScreen");
+                    renderAll();
                     loadUserFromCloud(currentUser.email).then(cloudData => {
                         if (cloudData) {
                             currentUser = cloudData;
@@ -837,20 +830,28 @@
                             localStorage.setItem(currentUser.email, JSON.stringify(cloudData));
                         } else {
                             const latestData = localStorage.getItem(currentUser.email);
-                            if (latestData) currentUser = JSON.parse(latestData);
+                            if (latestData) {
+                                try { currentUser = JSON.parse(latestData); } catch(e) {}
+                            }
                         }
                         if (currentUser.photo) {
                             document.getElementById('main-pfp').src = currentUser.photo;
                             document.getElementById('homeProfileImg').src = currentUser.photo;
                         }
                         showPopup("WELCOME BACK, " + (currentUser.name || "USER").toUpperCase(), "success");
-                        setTimeout(openHome, 800);
+                    }).catch(() => {
+                        const latestData = localStorage.getItem(currentUser.email);
+                        if (latestData) {
+                            try { currentUser = JSON.parse(latestData); } catch(e) {}
+                        }
                     });
+                    detectDevice();
                     return;
                 } catch(e) {
                     localStorage.removeItem('adify_current_session');
                 }
             }
+            showScreen("loginScreen");
             renderAll();
             detectDevice();
         };
