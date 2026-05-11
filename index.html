@@ -440,6 +440,8 @@
         function closeProfile() { document.getElementById("profileScreen").classList.remove("active"); }
         function doLogout() {
             currentUser = null;
+            // Clear the saved session so next time login screen shows
+            localStorage.removeItem('adify_current_session');
             hideLogout();
             closeProfile();
             showScreen("loginScreen");
@@ -495,6 +497,7 @@
                 if (lid === "1" && lpass === "1") {
                     showPopup("MASTER LOGIN SUCCESS", "success");
                     currentUser = { name: 'Master', email: 'master@adify.com', phone: '0000000000', gender: 'Male', age: 21 };
+                    localStorage.setItem('adify_current_session', JSON.stringify(currentUser));
                     setTimeout(openHome, 1000); return;
                 }
                 const savedData = localStorage.getItem(lid);
@@ -522,8 +525,11 @@
                     localStorage.setItem(email, JSON.stringify(userData));
                     localStorage.setItem(phone, JSON.stringify(userData));
                     localStorage.setItem(phoneCountKey, currentCount + 1);
+                    // Auto-login after registration
+                    currentUser = userData;
+                    localStorage.setItem('adify_current_session', JSON.stringify(userData));
                     showPopup("REGISTERED SUCCESSFULLY", "success");
-                    setTimeout(() => toggleAuth(false), 1500);
+                    setTimeout(openHome, 1500);
                 } else { showPopup("PLEASE FIX ALL ERRORS", "error"); }
             }
         }
@@ -697,10 +703,21 @@
 
         // ===== INIT =====
         window.onload = function() {
+            // Auto-login: Check if user was previously logged in
+            const savedSession = localStorage.getItem('adify_current_session');
+            if (savedSession) {
+                try {
+                    currentUser = JSON.parse(savedSession);
+                    showPopup("WELCOME BACK, " + (currentUser.name || "USER").toUpperCase(), "success");
+                    setTimeout(openHome, 800);
+                    return;
+                } catch(e) {
+                    localStorage.removeItem('adify_current_session');
+                }
+            }
             renderAll();
             detectDevice();
         };
     </script>
 </body>
 </html>
-
