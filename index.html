@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Inter:wght@400;600&family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        /* ===== GLOBAL ===== */
         :root {
             --sky-blue: #00BFFF;
             --deep-blue: #001529;
@@ -111,7 +110,6 @@
             z-index: 10;
         }
         .profile-back-btn:active { background: rgba(0, 191, 255, 0.2); }
-        /* ===== LOGIN ===== */
         .auth-card { width: 100%; max-width: 400px; text-align: center; margin: auto; padding: 20px; }
         .logo-area { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 5px; }
         .logo-area i { color: var(--sky-blue); font-size: 38px; filter: drop-shadow(0 0 10px rgba(0, 191, 255, 0.4)); }
@@ -131,7 +129,6 @@
         .btn-auth:active { transform: scale(0.98); }
         .toggle-text { margin-top: 25px; font-size: 13px; color: #444; }
         .toggle-text span { color: var(--sky-blue); cursor: pointer; font-weight: bold; }
-        /* ===== HOME ===== */
         .home-header { padding: 25px 20px 10px; display: flex; justify-content: space-between; align-items: center; z-index: 10; position: relative; }
         .logo { font-family: 'Syncopate', sans-serif; font-size: 18px; color: var(--primary); letter-spacing: 2px; cursor: pointer; }
         #searchToggleBtn { position: absolute; left: 50%; transform: translateX(-50%); font-size: 20px; cursor: pointer; opacity: 0.8; padding: 8px; transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
@@ -183,7 +180,6 @@
         .fill { height: 100%; background: var(--primary); width: 0%; border-radius: 10px; position: absolute; left: 0; top: 0; box-shadow: 0 0 10px var(--primary); }
         #seekSlider { width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5; position: absolute; }
         .watermark { position: fixed; bottom: 105px; right: 25px; font-size: 8px; color: var(--primary); opacity: 0.4; letter-spacing: 1px; }
-        /* ===== PROFILE ===== */
         .p-header { padding: 70px 20px 40px; text-align: center; background: linear-gradient(to bottom, #001a33, #020202); position: relative; }
         .p-avatar { width: 140px; height: 140px; border-radius: 50%; border: 3px solid var(--sky-blue); padding: 5px; background: var(--bg-black); box-shadow: 0 0 30px rgba(0, 191, 255, 0.5); }
         .info-label { padding: 25px 30px 10px; font-size: 11px; color: var(--sky-blue); text-transform: uppercase; letter-spacing: 3px; font-weight: 900; opacity: 0.8; }
@@ -212,7 +208,6 @@
     </style>
 </head>
 <body onclick="handleGlobalClick(event)">
-
     <audio id="mainAudio"></audio>
     <div id="toast"><i class="fas fa-shield-alt"></i> PROFILE SECURED</div>
     <div id="status-popup"></div>
@@ -440,13 +435,17 @@
         function closeProfile() { document.getElementById("profileScreen").classList.remove("active"); }
         function doLogout() {
             currentUser = null;
-            // Clear the saved session so next time login screen shows
             localStorage.removeItem('adify_current_session');
             hideLogout();
             closeProfile();
             showScreen("loginScreen");
             document.getElementById("login-id").value = "";
             document.getElementById("login-pass").value = "";
+            document.getElementById('reg-fields').style.display = 'none';
+            document.getElementById('login-section').style.display = 'block';
+            document.getElementById('main-btn').innerText = "LOG IN";
+            document.getElementById('switch-text').innerHTML = 'New here? <span onclick="toggleAuth(true)">Create Account</span>';
+            isRegisterMode = false;
         }
 
         // ===== LOGIN FUNCTIONS =====
@@ -492,7 +491,7 @@
         }
         function handleSubmit() {
             if (!isRegisterMode) {
-                const lid = document.getElementById('login-id').value.toLowerCase();
+                const lid = document.getElementById('login-id').value.toLowerCase().trim();
                 const lpass = document.getElementById('login-pass').value;
                 if (lid === "1" && lpass === "1") {
                     showPopup("MASTER LOGIN SUCCESS", "success");
@@ -500,11 +499,31 @@
                     localStorage.setItem('adify_current_session', JSON.stringify(currentUser));
                     setTimeout(openHome, 1000); return;
                 }
-                const savedData = localStorage.getItem(lid);
+                let savedData = localStorage.getItem(lid);
+                let user = null;
                 if (savedData) {
-                    const user = JSON.parse(savedData);
+                    try {
+                        user = JSON.parse(savedData);
+                    } catch(e) {}
+                }
+                if (!user) {
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key && key.includes('@')) {
+                            try {
+                                const data = JSON.parse(localStorage.getItem(key));
+                                if (data && (data.email === lid || data.phone === lid)) {
+                                    user = data;
+                                    break;
+                                }
+                            } catch(e) {}
+                        }
+                    }
+                }
+                if (user) {
                     if (user.password === lpass) {
                         currentUser = user;
+                        localStorage.setItem('adify_current_session', JSON.stringify(user));
                         showPopup(`WELCOME BACK, ${user.name.toUpperCase()}`, "success");
                         setTimeout(openHome, 1000);
                     } else { showPopup("WRONG PASSWORD", "error"); }
@@ -525,11 +544,11 @@
                     localStorage.setItem(email, JSON.stringify(userData));
                     localStorage.setItem(phone, JSON.stringify(userData));
                     localStorage.setItem(phoneCountKey, currentCount + 1);
-                    // Auto-login after registration
-                    currentUser = userData;
-                    localStorage.setItem('adify_current_session', JSON.stringify(userData));
                     showPopup("REGISTERED SUCCESSFULLY", "success");
-                    setTimeout(openHome, 1500);
+                    setTimeout(() => {
+                        toggleAuth(false);
+                        showPopup("PLEASE LOG IN WITH YOUR DETAILS", "success");
+                    }, 1500);
                 } else { showPopup("PLEASE FIX ALL ERRORS", "error"); }
             }
         }
@@ -703,7 +722,6 @@
 
         // ===== INIT =====
         window.onload = function() {
-            // Auto-login: Check if user was previously logged in
             const savedSession = localStorage.getItem('adify_current_session');
             if (savedSession) {
                 try {
