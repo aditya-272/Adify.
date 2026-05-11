@@ -200,9 +200,43 @@
         #edit-screen { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; padding: 30px; backdrop-filter: blur(20px); overflow-y: auto; }
         .edit-input { width: 100%; padding: 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-edge); border-radius: 15px; color: #fff; font-size: 15px; outline: none !important; transition: 0.3s; margin-bottom: 20px; }
         .edit-input:focus { border-color: var(--sky-blue); }
+        
+        /* Loading overlay - prevents login flash */
+        #loadingOverlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at top right, #001f3f, #000814);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            transition: opacity 0.3s ease;
+        }
+        #loadingOverlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(0, 191, 255, 0.2);
+            border-top-color: var(--sky-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text {
+            color: var(--sky-blue);
+            margin-top: 15px;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        
         @media (max-width: 400px) {
             .auth-card h1 { font-size: 36px; }
-n            .p-avatar { width: 120px; height: 120px; }
+            .p-avatar { width: 120px; height: 120px; }
             .playlist-grid { gap: 10px; }
         }
     </style>
@@ -211,6 +245,13 @@ n            .p-avatar { width: 120px; height: 120px; }
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
 <body onclick="handleGlobalClick(event)">
+    
+    <!-- Loading Overlay - prevents login flash on reload -->
+    <div id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading...</div>
+    </div>
+    
     <audio id="mainAudio"></audio>
     <div id="toast"><i class="fas fa-shield-alt"></i> PROFILE SECURED</div>
     <div id="status-popup"></div>
@@ -394,6 +435,61 @@ n            .p-avatar { width: 120px; height: 120px; }
     </div>
 
     <script>
+        // ===== SESSION BACKUP FUNCTIONS =====
+        function saveSession(userData) {
+            const data = JSON.stringify(userData);
+            localStorage.setItem('adify_current_session', data);
+            sessionStorage.setItem('adify_backup_session', data);
+            localStorage.setItem(userData.email, data);
+        }
+        
+        function getSession() {
+            let session = localStorage.getItem('adify_current_session');
+            if (session) {
+                try {
+                    const user = JSON.parse(session);
+                    if (user && user.email) return user;
+                } catch(e) {}
+            }
+            session = sessionStorage.getItem('adify_backup_session');
+            if (session) {
+                try {
+                    const user = JSON.parse(session);
+                    if (user && user.email) {
+                        localStorage.setItem('adify_current_session', session);
+                        return user;
+                    }
+                } catch(e) {}
+            }
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.includes('@')) {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        if (data && data.email) {
+                            saveSession(data);
+                            return data;
+                        }
+                    } catch(e) {}
+                }
+            }
+            return null;
+        }
+
+        // ===== PROFILE UI UPDATE - Called immediately, no glitch! =====
+        function updateProfileUI(user) {
+            document.getElementById("display-name").innerText = user.name || "Adify User";
+            document.getElementById("p-gender").innerText = user.gender || "Male";
+            document.getElementById("p-email").innerText = user.email || "user@adify.com";
+            document.getElementById("p-phone").innerText = user.phone ? "+91 " + user.phone : "+91 98765 43210";
+            document.getElementById("p-age").innerText = (user.age || 22) + " Years";
+            
+            // Photo with fallback - no default flicker!
+            const pfp = user.photo || "https://api.dicebear.com/7.x/avataaars/svg?seed=" + (user.name || "User");
+            document.getElementById('main-pfp').src = pfp;
+            document.getElementById('homeProfileImg').src = pfp;
+        }
+
         // ===== GLOBAL STATE =====
         let isRegisterMode = false;
         let selectedGender = "Male";
@@ -473,19 +569,7 @@ n            .p-avatar { width: 120px; height: 120px; }
         function openProfile() {
             document.getElementById("profileScreen").classList.add("active");
             if (currentUser) {
-                const latest = localStorage.getItem(currentUser.email);
-                if (latest) {
-                    try { currentUser = JSON.parse(latest); } catch(e) {}
-                }
-                document.getElementById("display-name").innerText = currentUser.name || "Adify User";
-                document.getElementById("p-gender").innerText = currentUser.gender || "Male";
-                document.getElementById("p-email").innerText = currentUser.email || "user@adify.com";
-                document.getElementById("p-phone").innerText = currentUser.phone ? "+91 " + currentUser.phone : "+91 98765 43210";
-                if (currentUser.age) document.getElementById("p-age").innerText = currentUser.age + " Years";
-                if (currentUser.photo) {
-                    document.getElementById('main-pfp').src = currentUser.photo;
-                    document.getElementById('homeProfileImg').src = currentUser.photo;
-                }
+                updateProfileUI(currentUser);
             }
         }
 
@@ -494,6 +578,7 @@ n            .p-avatar { width: 120px; height: 120px; }
         function doLogout() {
             currentUser = null;
             localStorage.removeItem('adify_current_session');
+            sessionStorage.removeItem('adify_backup_session');
             hideLogout();
             closeProfile();
             showScreen("loginScreen");
@@ -556,7 +641,7 @@ n            .p-avatar { width: 120px; height: 120px; }
                 if (lid === "1" && lpass === "1") {
                     showPopup("MASTER LOGIN SUCCESS", "success");
                     currentUser = { name: 'Master', email: 'master@adify.com', phone: '0000000000', gender: 'Male', age: 21 };
-                    localStorage.setItem('adify_current_session', JSON.stringify(currentUser));
+                    saveSession(currentUser);
                     setTimeout(() => { openHome(); }, 1000); 
                     return;
                 }
@@ -588,13 +673,12 @@ n            .p-avatar { width: 120px; height: 120px; }
                 if (user) {
                     if (user.password === lpass) {
                         currentUser = user;
-                        localStorage.setItem('adify_current_session', JSON.stringify(user));
+                        saveSession(user);
                         
                         loadUserFromCloud(user.email).then(cloudData => {
                             if (cloudData) {
                                 currentUser = cloudData;
-                                localStorage.setItem('adify_current_session', JSON.stringify(cloudData));
-                                localStorage.setItem(user.email, JSON.stringify(cloudData));
+                                saveSession(cloudData);
                             }
                             if (currentUser.photo) {
                                 document.getElementById('main-pfp').src = currentUser.photo;
@@ -625,6 +709,7 @@ n            .p-avatar { width: 120px; height: 120px; }
                     localStorage.setItem(email, JSON.stringify(userData));
                     localStorage.setItem(phone, JSON.stringify(userData));
                     localStorage.setItem(phoneCountKey, currentCount + 1);
+                    saveSession(userData);
                     saveUserToCloud(userData);
                     showPopup("REGISTERED SUCCESSFULLY", "success");
                     setTimeout(() => {
@@ -793,7 +878,7 @@ n            .p-avatar { width: 120px; height: 120px; }
                 
                 localStorage.setItem(currentUser.email, JSON.stringify(currentUser));
                 if (currentUser.phone) localStorage.setItem(currentUser.phone, JSON.stringify(currentUser));
-                localStorage.setItem('adify_current_session', JSON.stringify(currentUser));
+                saveSession(currentUser);
                 
                 updateProfileInCloud(currentUser.email, {
                     name: newName, age: newAge, gender: selectedGenderProfile, photo: currentUser.photo
@@ -816,60 +901,51 @@ n            .p-avatar { width: 120px; height: 120px; }
         function showLogout() { document.getElementById('logout-modal').style.display = 'flex'; }
         function hideLogout() { document.getElementById('logout-modal').style.display = 'none'; }
 
-        // ===== FIXED window.onload - Reload pe logout nahi hoga =====
+        // ===== FIXED window.onload - No profile glitch, no photo flicker =====
         window.onload = function() {
-            const savedSession = localStorage.getItem('adify_current_session');
+            const user = getSession();
             
-            if (savedSession) {
-                try {
-                    currentUser = JSON.parse(savedSession);
-                    
-                    // IMMEDIATELY switch to home screen - no delay!
-                    showScreen("homeScreen");
-                    renderAll();
-                    detectDevice();
-                    
-                    // Update UI with saved user data
-                    if (currentUser.photo) {
-                        document.getElementById('main-pfp').src = currentUser.photo;
-                        document.getElementById('homeProfileImg').src = currentUser.photo;
-                    }
-                    
-                    // Show welcome back message
+            if (user) {
+                currentUser = user;
+                
+                // STEP 1: Update ALL profile data BEFORE showing screen
+                updateProfileUI(currentUser);
+                
+                // STEP 2: Now show home (profile already correct, no glitch!)
+                document.getElementById('loginScreen').classList.remove('active');
+                document.getElementById('homeScreen').classList.add('active');
+                renderAll();
+                detectDevice();
+                
+                // STEP 3: Hide loading overlay
+                const loader = document.getElementById('loadingOverlay');
+                if (loader) loader.classList.add('hidden');
+                
+                // STEP 4: Welcome message
+                setTimeout(() => {
                     showPopup("WELCOME BACK, " + (currentUser.name || "USER").toUpperCase(), "success");
-                    
-                    // Sync with cloud in background (non-blocking)
-                    loadUserFromCloud(currentUser.email).then(cloudData => {
-                        if (cloudData) {
-                            currentUser = cloudData;
-                            localStorage.setItem('adify_current_session', JSON.stringify(cloudData));
-                            localStorage.setItem(currentUser.email, JSON.stringify(cloudData));
-                            
-                            // Update profile with latest cloud data
-                            document.getElementById("display-name").innerText = currentUser.name || "Adify User";
-                            document.getElementById("p-gender").innerText = currentUser.gender || "Male";
-                            document.getElementById("p-age").innerText = (currentUser.age || 22) + " Years";
-                            if (currentUser.photo) {
-                                document.getElementById('main-pfp').src = currentUser.photo;
-                                document.getElementById('homeProfileImg').src = currentUser.photo;
-                            }
-                        }
-                    }).catch(err => {
-                        console.log("Cloud sync failed on reload:", err);
-                    });
-                    
-                    return; // User is logged in, exit here
-                    
-                } catch(e) {
-                    console.error("Session parse error on reload:", e);
-                    // Don't clear session on parse error - just show login
-                }
+                }, 500);
+                
+                // STEP 5: Background cloud sync (updates only if newer data)
+                loadUserFromCloud(currentUser.email).then(cloudData => {
+                    if (cloudData) {
+                        currentUser = cloudData;
+                        saveSession(cloudData);
+                        updateProfileUI(currentUser);
+                    }
+                }).catch(() => {});
+                
+                return;
             }
             
-            // No valid session - show login screen
-            showScreen("loginScreen");
+            // No session - show login
+            document.getElementById('homeScreen').classList.remove('active');
+            document.getElementById('loginScreen').classList.add('active');
             renderAll();
             detectDevice();
+            
+            const loader = document.getElementById('loadingOverlay');
+            if (loader) loader.classList.add('hidden');
         };
     </script>
 </body>
