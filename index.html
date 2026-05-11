@@ -201,7 +201,6 @@
         .edit-input { width: 100%; padding: 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-edge); border-radius: 15px; color: #fff; font-size: 15px; outline: none !important; transition: 0.3s; margin-bottom: 20px; }
         .edit-input:focus { border-color: var(--sky-blue); }
         
-        /* Loading overlay - prevents login flash */
         #loadingOverlay {
             position: fixed;
             inset: 0;
@@ -240,13 +239,11 @@
             .playlist-grid { gap: 10px; }
         }
     </style>
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
 <body onclick="handleGlobalClick(event)">
     
-    <!-- Loading Overlay - prevents login flash on reload -->
     <div id="loadingOverlay">
         <div class="loading-spinner"></div>
         <div class="loading-text">Loading...</div>
@@ -256,7 +253,7 @@
     <div id="toast"><i class="fas fa-shield-alt"></i> PROFILE SECURED</div>
     <div id="status-popup"></div>
 
-    <!-- ===== LOGIN SCREEN ===== -->
+    <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="app-screen active">
         <div class="auth-card">
             <div class="logo-area">
@@ -320,7 +317,8 @@
             <p class="toggle-text" id="switch-text">New here? <span onclick="toggleAuth(true)">Create Account</span></p>
         </div>
     </div>
-    <!-- ===== HOME SCREEN ===== -->
+
+    <!-- HOME SCREEN -->
     <div id="homeScreen" class="app-screen">
         <div class="home-header">
             <div class="logo" onclick="resetToHome()">ADIFY</div>
@@ -357,7 +355,7 @@
         <div class="watermark">Made by Aditya</div>
     </div>
 
-    <!-- ===== PROFILE SCREEN ===== -->
+    <!-- PROFILE SCREEN -->
     <div id="profileScreen" class="profile-screen">
         <div class="profile-back-btn" onclick="closeProfile()">
             <i class="fas fa-arrow-left" style="color: #fff; font-size: 18px;"></i>
@@ -390,7 +388,6 @@
             </div>
         </div>
 
-        <!-- Edit Screen -->
         <div id="edit-screen">
             <div style="display:flex; justify-content:space-between; margin-bottom:40px; align-items: center;">
                 <h2 style="font-size: 26px; font-weight: 900;">Update Node</h2>
@@ -418,7 +415,6 @@
             <button class="btn-blue" onclick="saveProfile()">SYNC CHANGES</button>
         </div>
 
-        <!-- Logout Modal -->
         <div id="logout-modal">
             <div class="warn-card">
                 <i class="fas fa-power-off" style="font-size:50px; color:var(--danger); margin-bottom:20px;"></i>
@@ -476,21 +472,17 @@
             return null;
         }
 
-        // ===== PROFILE UI UPDATE - Called immediately, no glitch! =====
         function updateProfileUI(user) {
             document.getElementById("display-name").innerText = user.name || "Adify User";
             document.getElementById("p-gender").innerText = user.gender || "Male";
             document.getElementById("p-email").innerText = user.email || "user@adify.com";
             document.getElementById("p-phone").innerText = user.phone ? "+91 " + user.phone : "+91 98765 43210";
             document.getElementById("p-age").innerText = (user.age || 22) + " Years";
-            
-            // Photo with fallback - no default flicker!
             const pfp = user.photo || "https://api.dicebear.com/7.x/avataaars/svg?seed=" + (user.name || "User");
             document.getElementById('main-pfp').src = pfp;
             document.getElementById('homeProfileImg').src = pfp;
         }
 
-        // ===== GLOBAL STATE =====
         let isRegisterMode = false;
         let selectedGender = "Male";
         let currentPhoto = null;
@@ -513,30 +505,28 @@
         try {
             firebase.initializeApp(firebaseConfig);
             db = firebase.database();
-            console.log("Firebase connected!");
+            console.log("[Adify] Firebase connected!");
         } catch(e) {
-            console.log("Firebase error:", e);
+            console.error("[Adify] Firebase init error:", e);
         }
 
         function saveUserToCloud(userData) {
-            if (!db) return Promise.resolve();
-            return db.ref('users/' + userData.email.replace(/\./g, '_')).set(userData)
-                .then(() => console.log("User saved to cloud!"))
-                .catch(err => console.log("Cloud save error:", err));
+            if (!db) return Promise.reject("DB not initialized");
+            return db.ref('users/' + userData.email.replace(/\./g, '_')).set(userData);
         }
 
         function loadUserFromCloud(email) {
             if (!db) return Promise.resolve(null);
             return db.ref('users/' + email.replace(/\./g, '_')).once('value')
                 .then(snapshot => snapshot.val())
-                .catch(err => { console.log("Cloud load error:", err); return null; });
+                .catch(err => { console.error("[Adify] Cloud load error:", err); return null; });
         }
 
         function updateProfileInCloud(email, updates) {
             if (!db) return Promise.resolve();
             return db.ref('users/' + email.replace(/\./g, '_')).update(updates)
-                .then(() => console.log("Profile updated in cloud!"))
-                .catch(err => console.log("Cloud update error:", err));
+                .then(() => console.log("[Adify] Profile updated in cloud!"))
+                .catch(err => console.error("[Adify] Cloud update error:", err));
         }
 
         // ===== AUDIO STATE =====
@@ -545,8 +535,7 @@
         const userPlaylists = { "Lo-Fi Sleep 😴": [], "Study Focus 📖": [], "Traveling ✈️": [], "My Playlist 💖": [] };
         const allSongs = [
             { id: 1, title: "Udariyan", artist: "Aditya", url: "https://www.image2url.com/r2/default/audio/1778420635219-a057d459-d0af-413e-bd2f-5f148740396c.mp3", image: "https://files.catbox.moe/0j9stc.jpeg" },
-            { id: 2, title: "BEST SHORT SONG", artist: "Aditya", url: "https://www.image2url.com/r2/default/audio/1778446960362-cacf9cfe-95fa-4724-80cd-79e9e3e38a08.mp3", image: "https://files.catbox.moe/0j9stc.jpeg" },
-            { id: 3, title: "Night Vibes", artist: "Lofi Beats", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", image: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=400" }
+            { id: 2, title: "Night Vibes", artist: "Lofi Beats", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", image: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=400" }
         ];
         const playlistsData = [
             { name: "Lo-Fi Sleep 😴", img: "https://files.catbox.moe/0j9stc.jpeg" },
@@ -634,7 +623,7 @@
             document.getElementById('switch-text').innerHTML = isReg ? 'Already a member? <span onclick="toggleAuth(false)">Log In</span>' : 'New here? <span onclick="toggleAuth(true)">Create Account</span>';
         }
 
-        // ===== CROSS-DEVICE LOGIN HELPERS (NEW) =====
+        // ===== CROSS-DEVICE LOGIN HELPERS =====
         function findUserLocal(lid) {
             let savedData = localStorage.getItem(lid);
             if (savedData) {
@@ -659,7 +648,11 @@
 
         function tryFirebaseLogin(lid, lpass) {
             return new Promise((resolve) => {
-                if (!db) { resolve(null); return; }
+                if (!db) { 
+                    console.error("[Adify] Firebase DB not initialized!"); 
+                    resolve({ error: "FIREBASE NOT CONNECTED" }); 
+                    return; 
+                }
                 
                 const checkUser = (user) => {
                     if (!user) return resolve(null);
@@ -673,20 +666,36 @@
                 };
                 
                 if (lid.includes('@')) {
-                    db.ref('users/' + lid.replace(/\./g, '_')).once('value')
-                        .then(snap => checkUser(snap.val()))
-                        .catch(() => resolve(null));
+                    const safeKey = lid.replace(/\./g, '_');
+                    console.log("[Adify] Firebase lookup by email:", safeKey);
+                    db.ref('users/' + safeKey).once('value')
+                        .then(snap => {
+                            console.log("[Adify] Firebase snapshot exists:", snap.exists());
+                            checkUser(snap.val());
+                        })
+                        .catch(err => {
+                            console.error("[Adify] Firebase email lookup error:", err.message);
+                            resolve({ error: "FIREBASE ERROR: " + err.message });
+                        });
                 } else {
+                    console.log("[Adify] Firebase scan by phone:", lid);
                     db.ref('users').once('value')
                         .then(snap => {
                             const users = snap.val();
+                            console.log("[Adify] Total users in DB:", users ? Object.keys(users).length : 0);
                             if (!users) return resolve(null);
                             for (let key in users) {
-                                if (users[key].phone === lid) return checkUser(users[key]);
+                                if (users[key] && users[key].phone === lid) {
+                                    console.log("[Adify] Found user by phone:", key);
+                                    return checkUser(users[key]);
+                                }
                             }
                             resolve(null);
                         })
-                        .catch(() => resolve(null));
+                        .catch(err => {
+                            console.error("[Adify] Firebase phone scan error:", err.message);
+                            resolve({ error: "FIREBASE ERROR: " + err.message });
+                        });
                 }
             });
         }
@@ -708,8 +717,8 @@
             });
         }
 
-        // ===== FIXED handleSubmit - Cross-device login enabled =====
-        function handleSubmit() {
+        // ===== FIXED handleSubmit - Cross-device + async cloud save =====
+        async function handleSubmit() {
             if (!isRegisterMode) {
                 const lid = document.getElementById('login-id').value.toLowerCase().trim();
                 const lpass = document.getElementById('login-pass').value;
@@ -735,17 +744,23 @@
                 
                 // Step 2: Cross-device Firebase check
                 showPopup("VERIFYING USER...", "success");
-                tryFirebaseLogin(lid, lpass).then(result => {
-                    if (result === null) {
-                        showPopup("USER NOT FOUND", "error");
-                    } else if (result.error) {
-                        showPopup(result.error, "error");
+                const result = await tryFirebaseLogin(lid, lpass);
+                
+                if (result === null) {
+                    showPopup("USER NOT FOUND", "error");
+                } else if (result.error) {
+                    if (result.error.includes("FIREBASE")) {
+                        showPopup("SERVER ERROR - CHECK CONSOLE", "error");
+                        console.error("[Adify] Cross-device login failed:", result.error);
                     } else {
-                        finalizeLogin(result);
+                        showPopup(result.error, "error");
                     }
-                });
+                } else {
+                    finalizeLogin(result);
+                }
                 
             } else {
+                // ===== REGISTRATION =====
                 const name = document.getElementById('full-name').value;
                 const emailInput = document.getElementById('reg-email').value;
                 const email = emailInput.toLowerCase();
@@ -765,13 +780,23 @@
                     localStorage.setItem(phone, JSON.stringify(userData));
                     localStorage.setItem(phoneCountKey, currentCount + 1);
                     saveSession(userData);
-                    saveUserToCloud(userData);
-                    showPopup("REGISTERED SUCCESSFULLY", "success");
+                    
+                    showPopup("SYNCING TO CLOUD...", "success");
+                    try {
+                        await saveUserToCloud(userData);
+                        showPopup("REGISTERED SUCCESSFULLY", "success");
+                    } catch(e) {
+                        console.error("[Adify] Cloud save failed:", e);
+                        showPopup("REGISTERED - CLOUD SYNC FAILED", "error");
+                    }
+                    
                     setTimeout(() => {
                         toggleAuth(false);
                         showPopup("PLEASE LOG IN WITH YOUR DETAILS", "success");
                     }, 1500);
-                } else { showPopup("PLEASE FIX ALL ERRORS", "error"); }
+                } else { 
+                    showPopup("PLEASE FIX ALL ERRORS", "error"); 
+                }
             }
         }
 
@@ -956,35 +981,24 @@
         function showLogout() { document.getElementById('logout-modal').style.display = 'flex'; }
         function hideLogout() { document.getElementById('logout-modal').style.display = 'none'; }
 
-        // ===== HARDWARE BACK BUTTON HANDLER =====
-        // Handles phone back button behavior
+        // ===== BACK BUTTON HANDLER =====
         function handleBackButton(e) {
-            // Check if profile screen is active
             const profileScreen = document.getElementById('profileScreen');
             if (profileScreen && profileScreen.classList.contains('active')) {
-                // Close profile and go to home
                 e.preventDefault();
                 closeProfile();
-                // Push state so back works properly next time
                 history.pushState(null, null, window.location.href);
                 return;
             }
-            
-            // Check if playlist view is active (user is inside a playlist)
             const playlistView = document.getElementById('playlistView');
             if (playlistView && playlistView.classList.contains('active')) {
-                // Go back to home
                 e.preventDefault();
                 resetToHome();
-                // Push state so back works properly next time
                 history.pushState(null, null, window.location.href);
                 return;
             }
-            
-            // Check if home screen is active - exit app
             const homeScreen = document.getElementById('homeScreen');
             if (homeScreen && homeScreen.classList.contains('active')) {
-                // Exit the app
                 e.preventDefault();
                 if (navigator.app && navigator.app.exitApp) {
                     navigator.app.exitApp();
@@ -995,8 +1009,6 @@
                 }
                 return;
             }
-            
-            // Login screen - exit app
             const loginScreen = document.getElementById('loginScreen');
             if (loginScreen && loginScreen.classList.contains('active')) {
                 e.preventDefault();
@@ -1011,44 +1023,31 @@
             }
         }
 
-        // Setup back button listener
         function setupBackButton() {
-            // Push initial state
             history.pushState(null, null, window.location.href);
-            
-            // Listen for popstate (back button)
             window.addEventListener('popstate', handleBackButton);
-            
-            // Also listen for backbutton event (Cordova/Android)
             document.addEventListener('backbutton', handleBackButton, false);
         }
 
-        // ===== FIXED window.onload - No profile glitch, no photo flicker =====
+        // ===== window.onload =====
         window.onload = function() {
             const user = getSession();
             
             if (user) {
                 currentUser = user;
-                
-                // STEP 1: Update ALL profile data BEFORE showing screen
                 updateProfileUI(currentUser);
-                
-                // STEP 2: Now show home (profile already correct, no glitch!)
                 document.getElementById('loginScreen').classList.remove('active');
                 document.getElementById('homeScreen').classList.add('active');
                 renderAll();
                 detectDevice();
                 
-                // STEP 3: Hide loading overlay
                 const loader = document.getElementById('loadingOverlay');
                 if (loader) loader.classList.add('hidden');
                 
-                // STEP 4: Welcome message
                 setTimeout(() => {
                     showPopup("WELCOME BACK, " + (currentUser.name || "USER").toUpperCase(), "success");
                 }, 500);
                 
-                // STEP 5: Background cloud sync (updates only if newer data)
                 loadUserFromCloud(currentUser.email).then(cloudData => {
                     if (cloudData) {
                         currentUser = cloudData;
@@ -1057,13 +1056,10 @@
                     }
                 }).catch(() => {});
                 
-                // Setup back button handler
                 setupBackButton();
-                
                 return;
             }
             
-            // No session - show login
             document.getElementById('homeScreen').classList.remove('active');
             document.getElementById('loginScreen').classList.add('active');
             renderAll();
@@ -1072,7 +1068,6 @@
             const loader = document.getElementById('loadingOverlay');
             if (loader) loader.classList.add('hidden');
             
-            // Setup back button handler
             setupBackButton();
         };
     </script>
