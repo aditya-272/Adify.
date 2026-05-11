@@ -206,6 +206,9 @@
             .playlist-grid { gap: 10px; }
         }
     </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
 <body onclick="handleGlobalClick(event)">
     <audio id="mainAudio"></audio>
@@ -400,6 +403,65 @@
         let currentUser = null;
         const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
 
+        // ===== FIREBASE CONFIG (TUMHAARA REAL CONFIG) =====
+        const firebaseConfig = {
+            apiKey: "AIzaSyDLBqzimyPQj16sGRC2mJaP5N4ZxjwQvm4",
+            authDomain: "adify-music-9280e.firebaseapp.com",
+            databaseURL: "https://adify-music-9280e-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "adify-music-9280e",
+            storageBucket: "adify-music-9280e.firebasestorage.app",
+            messagingSenderId: "534415071027",
+            appId: "1:534415071027:web:255cb8f8869d87459a5046"
+        };
+        
+        // Initialize Firebase
+        let db = null;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+            console.log("Firebase connected!");
+        } catch(e) {
+            console.log("Firebase error:", e);
+        }
+
+        // ===== FIREBASE FUNCTIONS =====
+        function saveUserToCloud(userData) {
+            if (!db) {
+                console.log("Firebase not available, saving to localStorage only");
+                return Promise.resolve();
+            }
+            return db.ref('users/' + userData.email.replace(/\./g, '_')).set(userData)
+                .then(() => console.log("User saved to cloud!"))
+                .catch(err => console.log("Cloud save error:", err));
+        }
+
+        function loadUserFromCloud(email) {
+            if (!db) {
+                console.log("Firebase not available, loading from localStorage");
+                return Promise.resolve(null);
+            }
+            return db.ref('users/' + email.replace(/\./g, '_')).once('value')
+                .then(snapshot => {
+                    const data = snapshot.val();
+                    if (data) {
+                        console.log("User loaded from cloud!");
+                        return data;
+                    }
+                    return null;
+                })
+                .catch(err => {
+                    console.log("Cloud load error:", err);
+                    return null;
+                });
+        }
+
+        function updateProfileInCloud(email, updates) {
+            if (!db) return Promise.resolve();
+            return db.ref('users/' + email.replace(/\./g, '_')).update(updates)
+                .then(() => console.log("Profile updated in cloud!"))
+                .catch(err => console.log("Cloud update error:", err));
+        }
+
         // ===== AUDIO STATE =====
         const audio = document.getElementById("mainAudio");
         let currentUrl = "", searchQuery = "", activeP = null, isDragging = false, isSelectionMode = false, currentTrackData = null, selectedSongs = new Set();
@@ -425,6 +487,13 @@
         function openProfile() {
             document.getElementById("profileScreen").classList.add("active");
             if (currentUser) {
+                const latest = localStorage.getItem(currentUser.email);
+                if (latest) {
+                    try {
+                        const updated = JSON.parse(latest);
+                        currentUser = updated;
+                    } catch(e) {}
+                }
                 document.getElementById("display-name").innerText = currentUser.name || "Adify User";
                 document.getElementById("p-gender").innerText = currentUser.gender || "Male";
                 document.getElementById("p-email").innerText = currentUser.email || "user@adify.com";
@@ -528,12 +597,20 @@
                     if (user.password === lpass) {
                         currentUser = user;
                         localStorage.setItem('adify_current_session', JSON.stringify(user));
-                        if (currentUser.photo) {
-                            document.getElementById('main-pfp').src = currentUser.photo;
-                            document.getElementById('homeProfileImg').src = currentUser.photo;
-                        }
-                        showPopup(`WELCOME BACK, ${user.name.toUpperCase()}`, "success");
-                        setTimeout(openHome, 1000);
+                        loadUserFromCloud(user.email).then(cloudData => {
+                            if (cloudData) {
+                                currentUser = cloudData;
+                                localStorage.setItem('adify_current_session', JSON.stringify(cloudData));
+                                localStorage.setItem(user.email, JSON.stringify(cloudData));
+                            }
+                            if (currentUser.photo) {
+                                document.getElementById('main-pfp').src = currentUser.photo;
+                                document.getElementById('homeProfileImg').src = currentUser.photo;
+                            }
+                            showPopup(`WELCOME BACK, ${currentUser.name.toUpperCase()}`, "success");
+                            setTimeout(openHome, 1000);
+                        });
+                        return;
                     } else { showPopup("WRONG PASSWORD", "error"); }
                 } else { showPopup("USER NOT FOUND", "error"); }
             } else {
@@ -548,10 +625,11 @@
                 let currentCount = parseInt(localStorage.getItem(phoneCountKey)) || 0;
                 if (currentCount >= 3) { showPopup("MAX 3 ACCOUNTS PER NUMBER", "error"); return; }
                 if (name && emailRegex.test(emailInput) && phone.length === 10 && pass.length >= 8 && age >= 18) {
-                    const userData = { name: name, email: email, phone: phone, password: pass, gender: selectedGender, age: age };
+                    const userData = { name: name, email: email, phone: phone, password: pass, gender: selectedGender, age: age, photo: null };
                     localStorage.setItem(email, JSON.stringify(userData));
                     localStorage.setItem(phone, JSON.stringify(userData));
                     localStorage.setItem(phoneCountKey, currentCount + 1);
+                    saveUserToCloud(userData);
                     showPopup("REGISTERED SUCCESSFULLY", "success");
                     setTimeout(() => {
                         toggleAuth(false);
@@ -717,19 +795,28 @@
                 currentUser.gender = selectedGenderProfile;
                 if (currentPhoto) {
                     currentUser.photo = currentPhoto;
-                    document.getElementById('main-pfp').src = currentPhoto;
-                    document.getElementById('homeProfileImg').src = currentPhoto;
                 }
                 localStorage.setItem(currentUser.email, JSON.stringify(currentUser));
                 if (currentUser.phone) {
                     localStorage.setItem(currentUser.phone, JSON.stringify(currentUser));
                 }
                 localStorage.setItem('adify_current_session', JSON.stringify(currentUser));
+                updateProfileInCloud(currentUser.email, {
+                    name: newName,
+                    age: newAge,
+                    gender: selectedGenderProfile,
+                    photo: currentUser.photo
+                });
                 document.getElementById('display-name').innerText = newName;
                 document.getElementById('p-gender').innerText = selectedGenderProfile;
                 document.getElementById('p-age').innerText = newAge + " Years";
+                if (currentUser.photo) {
+                    document.getElementById('main-pfp').src = currentUser.photo;
+                    document.getElementById('homeProfileImg').src = currentUser.photo;
+                }
                 closeEdit();
                 const t = document.getElementById('toast');
+                t.innerText = "PROFILE UPDATED SUCCESSFULLY";
                 t.style.display = 'block';
                 setTimeout(() => t.style.display = 'none', 3000);
             }
@@ -743,12 +830,22 @@
             if (savedSession) {
                 try {
                     currentUser = JSON.parse(savedSession);
-                    if (currentUser.photo) {
-                        document.getElementById('main-pfp').src = currentUser.photo;
-                        document.getElementById('homeProfileImg').src = currentUser.photo;
-                    }
-                    showPopup("WELCOME BACK, " + (currentUser.name || "USER").toUpperCase(), "success");
-                    setTimeout(openHome, 800);
+                    loadUserFromCloud(currentUser.email).then(cloudData => {
+                        if (cloudData) {
+                            currentUser = cloudData;
+                            localStorage.setItem('adify_current_session', JSON.stringify(cloudData));
+                            localStorage.setItem(currentUser.email, JSON.stringify(cloudData));
+                        } else {
+                            const latestData = localStorage.getItem(currentUser.email);
+                            if (latestData) currentUser = JSON.parse(latestData);
+                        }
+                        if (currentUser.photo) {
+                            document.getElementById('main-pfp').src = currentUser.photo;
+                            document.getElementById('homeProfileImg').src = currentUser.photo;
+                        }
+                        showPopup("WELCOME BACK, " + (currentUser.name || "USER").toUpperCase(), "success");
+                        setTimeout(openHome, 800);
+                    });
                     return;
                 } catch(e) {
                     localStorage.removeItem('adify_current_session');
