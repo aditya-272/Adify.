@@ -342,7 +342,6 @@
             <p class="toggle-text" id="switch-text">New here? <span onclick="toggleAuth(true)">Create Account</span></p>
         </div>
     </div>
-
     <!-- HOME SCREEN -->
     <div id="homeScreen" class="app-screen">
         <div class="home-header">
@@ -353,7 +352,7 @@
 
         <div id="searchWrapper" onclick="event.stopPropagation()">
             <input type="text" class="search-bar" id="searchInput" placeholder="Search tracks or YouTube..." oninput="handleSearchInput()" onkeydown="if(event.key==='Enter'){event.preventDefault(); searchYouTube();}">
-            <button class="search-back" onclick="searchYouTube()">BACK</button>
+            <button class="search-back" onclick="closeSearch()">BACK</button>
         </div>
 
         <div class="menu-dropdown" id="globalPopup" onclick="event.stopPropagation()">
@@ -513,7 +512,6 @@
         let ytPlayerReady = false;
 
         // ===== PLAYLIST PERSISTENCE FUNCTIONS =====
-        // NEW: These functions save/load playlists per user in localStorage
         function getPlaylistStorageKey() {
             if (currentUser && currentUser.email) {
                 return 'adify_playlists_' + currentUser.email.replace(/\./g, '_');
@@ -537,7 +535,6 @@
                 const saved = localStorage.getItem(key);
                 if (saved) {
                     const parsed = JSON.parse(saved);
-                    // Merge saved playlists with defaults to ensure all keys exist
                     Object.keys(userPlaylists).forEach(pName => {
                         if (parsed[pName] && Array.isArray(parsed[pName])) {
                             userPlaylists[pName] = parsed[pName];
@@ -605,7 +602,6 @@
                     image: item.snippet.thumbnails.medium ? item.snippet.thumbnails.medium.url : item.snippet.thumbnails.default.url
                 }));
 
-                // Save to youtubeSongs permanently
                 youtubeResults.forEach(yt => {
                     const exists = youtubeSongs.some(s => s.videoId === yt.videoId);
                     if (!exists) {
@@ -645,7 +641,7 @@
         function ytSongItemTemplate(s) {
             const isP = currentYouTubeId === s.videoId;
             return `
-                <div class="song-item ${isP ? 'playing-active' : ''}" onclick="playYouTubeSong('${s.videoId}', '${s.title.replace(/'/g, "\'")}', '${s.artist.replace(/'/g, "\'")}', '${s.image}')">
+                <div class="song-item ${isP ? 'playing-active' : ''}" onclick="playYouTubeSong('${s.videoId}', '${s.title.replace(/'/g, "\\'")}', '${s.artist.replace(/'/g, "\\'")}', '${s.image}')">
                     <div style="display:flex; align-items:center; flex:1">
                         <div class="img-container">
                             <img src="${s.image}" class="song-img">
@@ -688,7 +684,6 @@
                     showToast("Added!");
                 }
             }
-            // SAVE PLAYLISTS AFTER EVERY CHANGE
             saveUserPlaylists();
             document.getElementById('globalPopup').classList.remove('show');
         }
@@ -1006,7 +1001,6 @@
         const audio = document.getElementById("mainAudio");
         let currentUrl = "", searchQuery = "", activeP = null, isDragging = false, isSelectionMode = false, currentTrackData = null, selectedSongs = new Set(), youtubeSongs = [];
 
-        // Default empty playlists - will be populated from localStorage on login
         const userPlaylists = { "Lo-Fi Sleep 😴": [], "Study Focus 📖": [], "Traveling ✈️": [], "My Playlist 💖": [] };
 
         const allSongs = [
@@ -1181,7 +1175,6 @@
         function finalizeLogin(user) {
             currentUser = user;
             saveSession(user);
-            // NEW: Load user's saved playlists
             loadUserPlaylists();
             loadUserFromCloud(user.email).then(cloudData => {
                 if (cloudData) {
@@ -1315,7 +1308,6 @@
             if (ex) userPlaylists[pN] = userPlaylists[pN].filter(s => s.id !== id);
             else userPlaylists[pN].push(allSongs.find(s => s.id === id));
             showToast(ex ? "Removed!" : "Added!");
-            // NEW: Save playlists after every change
             saveUserPlaylists();
             document.getElementById('globalPopup').classList.remove('show'); refreshView();
         }
@@ -1325,9 +1317,9 @@
             if (isSelectionMode) {
                 clickAction = `toggleSelectSong(${s.id})`;
             } else if (s.ytId) {
-                clickAction = `playYouTubeSong('${s.ytId}', '${s.title.replace(/'/g, "\'")}', '${s.artist.replace(/'/g, "\'")}', '${s.image}')`;
+                clickAction = `playYouTubeSong('${s.ytId}', '${s.title.replace(/'/g, "\\'")}', '${s.artist.replace(/'/g, "\\'")}', '${s.image}')`;
             } else {
-                clickAction = `playSong('${s.title.replace(/'/g, "\'")}','${s.artist.replace(/'/g, "\'")}','${s.url}','${s.image}')`;
+                clickAction = `playSong('${s.title.replace(/'/g, "\\'")}','${s.artist.replace(/'/g, "\\'")}','${s.url}','${s.image}')`;
             }
             const moreBtn = !isSelectionMode 
                 ? (s.ytId 
@@ -1340,7 +1332,6 @@
             try {
                 document.getElementById('mainPlaylistGrid').innerHTML = playlistsData.filter(p => p.name.toLowerCase().includes(searchQuery)).map(p => `<div class="card" onclick="openPlaylist('${p.name}')"><div class="art" style="background: url('${p.img}');"></div><p style="font-size:10px;">${p.name}</p></div>`).join('');
 
-                // Show allSongs + youtubeSongs (no duplicates)
                 const merged = [...allSongs];
                 if (youtubeSongs && Array.isArray(youtubeSongs)) {
                     youtubeSongs.forEach(yt => {
@@ -1549,7 +1540,6 @@
         function toggleSelectSong(id) { selectedSongs.has(id) ? selectedSongs.delete(id) : selectedSongs.add(id); renderPlaylistSongs(); }
         function confirmRemoval() { 
             userPlaylists[activeP] = userPlaylists[activeP].filter(s => !selectedSongs.has(s.id)); 
-            // NEW: Save playlists after removal
             saveUserPlaylists();
             showToast("Songs Removed!"); 
             disableSelectionMode(); 
@@ -1656,46 +1646,61 @@
             } catch(e) { youtubeSongs = []; }
         }
 
-        // ===== BACK BUTTON HANDLER =====
+        // ===== BACK BUTTON HANDLER - FIXED =====
         let isHandlingBack = false;
         let backPressCount = 0;
         let backPressTimer = null;
 
+        function getCurrentScreen() {
+            const loginScreen = document.getElementById('loginScreen');
+            const homeScreen = document.getElementById('homeScreen');
+            const profileScreen = document.getElementById('profileScreen');
+            
+            if (profileScreen && profileScreen.classList.contains('active')) return 'profile';
+            if (homeScreen && homeScreen.classList.contains('active')) {
+                const playlistView = document.getElementById('playlistView');
+                if (playlistView && playlistView.classList.contains('active')) return 'playlist';
+                const searchWrapper = document.getElementById('searchWrapper');
+                if (searchWrapper && searchWrapper.classList.contains('open')) return 'search';
+                return 'home';
+            }
+            if (loginScreen && loginScreen.classList.contains('active')) return 'login';
+            return 'unknown';
+        }
+
         function handleBackButton(e) {
-            // Prevent double-fire from popstate + backbutton
             if (isHandlingBack) return;
             isHandlingBack = true;
             setTimeout(() => { isHandlingBack = false; }, 300);
 
-            // 1. Search open? → Close search
-            const searchWrapper = document.getElementById('searchWrapper');
-            if (searchWrapper && searchWrapper.classList.contains('open')) {
+            const screen = getCurrentScreen();
+            console.log("[Adify] Back pressed, current screen:", screen);
+
+            if (screen === 'search') {
                 closeSearch();
+                history.pushState({screen: 'home'}, '', window.location.href);
                 return;
             }
 
-            // 2. Profile open? → Go to home
-            const profileScreen = document.getElementById('profileScreen');
-            if (profileScreen && profileScreen.classList.contains('active')) {
+            if (screen === 'profile') {
                 closeProfile();
+                history.pushState({screen: 'home'}, '', window.location.href);
                 return;
             }
 
-            // 3. Playlist open? → Go to home
-            const playlistView = document.getElementById('playlistView');
-            if (playlistView && playlistView.classList.contains('active')) {
+            if (screen === 'playlist') {
                 resetToHome();
+                history.pushState({screen: 'home'}, '', window.location.href);
                 return;
             }
 
-            // 4. Home active? → Double press to exit
-            const homeScreen = document.getElementById('homeScreen');
-            if (homeScreen && homeScreen.classList.contains('active')) {
+            if (screen === 'home') {
                 backPressCount++;
                 if (backPressCount === 1) {
                     showToast("Press back again to exit");
                     if (backPressTimer) clearTimeout(backPressTimer);
                     backPressTimer = setTimeout(() => { backPressCount = 0; }, 2000);
+                    history.pushState({screen: 'home'}, '', window.location.href);
                 } else {
                     backPressCount = 0;
                     if (backPressTimer) clearTimeout(backPressTimer);
@@ -1708,9 +1713,7 @@
                 return;
             }
 
-            // 5. Login active? → EXIT
-            const loginScreen = document.getElementById('loginScreen');
-            if (loginScreen && loginScreen.classList.contains('active')) {
+            if (screen === 'login') {
                 if (navigator.app && navigator.app.exitApp) {
                     navigator.app.exitApp();
                 } else {
@@ -1720,10 +1723,13 @@
         }
 
         function setupBackButton() {
-            history.pushState({page: 'app'}, '', window.location.href);
+            history.pushState({screen: 'init'}, '', window.location.href);
+            
             window.addEventListener('popstate', function(e) {
+                e.preventDefault();
                 handleBackButton(e);
             });
+            
             document.addEventListener('backbutton', function(e) {
                 e.preventDefault();
                 handleBackButton(e);
@@ -1736,7 +1742,6 @@
 
             if (user) {
                 currentUser = user;
-                // NEW: Load saved playlists for this user
                 loadUserPlaylists();
                 updateProfileUI(currentUser);
                 document.getElementById('loginScreen').classList.remove('active');
