@@ -570,7 +570,8 @@
 
             if (query.length >= 3) {
                 searchTimeout = setTimeout(() => {
-                    searchYouTubeRealtime(query);                }, 800);
+                    searchYouTubeRealtime(query);
+                }, 800);
             }
         }
 
@@ -1143,7 +1144,8 @@
                 if (lid.includes('@')) {
                     const safeKey = lid.replace(/\./g, '_');
                     console.log("[Adify] Firebase lookup by email:", safeKey);
-                    db.ref('users/' + safeKey).once('value')                        .then(snap => {
+                    db.ref('users/' + safeKey).once('value')
+                        .then(snap => {
                             console.log("[Adify] Firebase snapshot exists:", snap.exists());
                             checkUser(snap.val());
                         })
@@ -1624,50 +1626,61 @@
 
         // ===== BACK BUTTON HANDLER =====
         function handleBackButton(e) {
+            // 1. Search open? → Close search
+            const searchWrapper = document.getElementById('searchWrapper');
+            if (searchWrapper && searchWrapper.classList.contains('open')) {
+                closeSearch();
+                history.pushState({page: 'app'}, '', window.location.href);
+                return;
+            }
+
+            // 2. Profile open? → Go to home
             const profileScreen = document.getElementById('profileScreen');
             if (profileScreen && profileScreen.classList.contains('active')) {
-                e.preventDefault();
                 closeProfile();
-                history.pushState(null, null, window.location.href);
+                history.pushState({page: 'app'}, '', window.location.href);
                 return;
             }
+
+            // 3. Playlist open? → Go to home
             const playlistView = document.getElementById('playlistView');
             if (playlistView && playlistView.classList.contains('active')) {
-                e.preventDefault();
                 resetToHome();
-                history.pushState(null, null, window.location.href);
+                history.pushState({page: 'app'}, '', window.location.href);
                 return;
             }
+
+            // 4. Home active? → EXIT APP
             const homeScreen = document.getElementById('homeScreen');
             if (homeScreen && homeScreen.classList.contains('active')) {
-                e.preventDefault();
                 if (navigator.app && navigator.app.exitApp) {
                     navigator.app.exitApp();
                 } else if (window.close) {
                     window.close();
-                } else {
-                    window.history.back();
                 }
                 return;
             }
+
+            // 5. Login active? → EXIT APP
             const loginScreen = document.getElementById('loginScreen');
             if (loginScreen && loginScreen.classList.contains('active')) {
-                e.preventDefault();
                 if (navigator.app && navigator.app.exitApp) {
                     navigator.app.exitApp();
                 } else if (window.close) {
                     window.close();
-                } else {
-                    window.history.back();
                 }
-                return;
             }
         }
 
         function setupBackButton() {
-            history.pushState(null, null, window.location.href);
-            window.addEventListener('popstate', handleBackButton);
-            document.addEventListener('backbutton', handleBackButton, false);
+            history.pushState({page: 'app'}, '', window.location.href);
+            window.addEventListener('popstate', function(e) {
+                handleBackButton(e);
+            });
+            document.addEventListener('backbutton', function(e) {
+                e.preventDefault();
+                handleBackButton(e);
+            }, false);
         }
 
         // ===== window.onload =====
