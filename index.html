@@ -201,10 +201,21 @@
         .edit-input { width: 100%; padding: 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-edge); border-radius: 15px; color: #fff; font-size: 15px; outline: none !important; transition: 0.3s; margin-bottom: 20px; }
         .edit-input:focus { border-color: var(--sky-blue); }
         
-        /* YouTube Results - Same as normal songs */
-        #ytResultsSection { margin-top: 10px; display: none; }
-        .yt-loading { text-align: center; padding: 20px; color: var(--primary); font-size: 12px; }
-        .yt-no-results { text-align: center; padding: 30px; color: #666; font-size: 13px; }
+        /* YouTube iframe container - visible but small */
+        #yt-player-wrapper {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            z-index: 1;
+            overflow: hidden;
+        }
+        #yt-player-wrapper iframe {
+            width: 100%;
+            height: 200px;
+            border: none;
+        }
         
         #loadingOverlay {
             position: fixed;
@@ -253,6 +264,9 @@
         <div class="loading-spinner"></div>
         <div class="loading-text">Loading...</div>
     </div>
+    
+    <!-- YouTube Player Wrapper -->
+    <div id="yt-player-wrapper"></div>
     
     <audio id="mainAudio"></audio>
     <div id="toast"><i class="fas fa-shield-alt"></i> PROFILE SECURED</div>
@@ -331,9 +345,8 @@
             <div class="profile-btn" onclick="openProfile()"><img id="homeProfileImg" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100" alt="User"></div>
         </div>
         
-        <!-- Search Wrapper - Same as before, ab Enter se YouTube search -->
         <div id="searchWrapper" onclick="event.stopPropagation()">
-            <input type="text" class="search-bar" id="searchInput" placeholder="Search tracks or YouTube..." oninput="handleSearch()" onkeydown="if(event.key==='Enter' && this.value.trim().length > 2){event.preventDefault(); searchYouTube();}">
+            <input type="text" class="search-bar" id="searchInput" placeholder="Search tracks or YouTube..." oninput="handleSearchInput()" onkeydown="if(event.key==='Enter'){event.preventDefault(); searchYouTube();}">
             <button class="search-back" onclick="closeSearch()">BACK</button>
         </div>
         
@@ -349,8 +362,8 @@
             <p class="section-title">Tracks</p>
             <div id="singleTracksContainer"></div>
             
-            <!-- YouTube Results - Same style as normal tracks -->
-            <div id="ytResultsSection">
+            <!-- YouTube Results - Hidden by default -->
+            <div id="ytResultsSection" style="display:none;">
                 <p class="section-title">🎵 YouTube Results</p>
                 <div id="ytResults"></div>
             </div>
@@ -486,21 +499,43 @@
         let isYouTubePlaying = false;
         let currentYouTubeId = null;
         let youtubeResults = [];
+        let searchTimeout = null;
 
-        // ===== YOUTUBE SEARCH FUNCTIONS =====
-        async function searchYouTube() {
+        // ===== YOUTUBE SEARCH - REALTIME =====
+        function handleSearchInput() {
             const query = document.getElementById('searchInput').value.trim();
-            const resultsDiv = document.getElementById('ytResults');
-            const section = document.getElementById('ytResultsSection');
             
-            if (!query || query.length < 2) {
-                showPopup("ENTER A SONG NAME!", "error");
+            // Clear previous timeout
+            if (searchTimeout) clearTimeout(searchTimeout);
+            
+            if (!query) {
+                // Empty search - show only local tracks
+                document.getElementById('singleTracksContainer').style.display = 'block';
+                document.getElementById('ytResultsSection').style.display = 'none';
+                searchQuery = "";
+                renderAll();
                 return;
             }
             
+            // Filter local tracks immediately
+            searchQuery = query.toLowerCase();
+            document.getElementById('singleTracksContainer').style.display = 'block';
+            renderAll();
+            
+            // If query is long enough, search YouTube after delay
+            if (query.length >= 3) {
+                searchTimeout = setTimeout(() => {
+                    searchYouTubeRealtime(query);
+                }, 800); // 800ms delay so user can finish typing
+            }
+        }
+
+        async function searchYouTubeRealtime(query) {
+            const resultsDiv = document.getElementById('ytResults');
+            const section = document.getElementById('ytResultsSection');
+            
             section.style.display = 'block';
-            resultsDiv.innerHTML = '<div class="yt-loading"><div class="loading-spinner" style="width:30px;height:30px;border-width:2px;margin:0 auto 10px;"></div>Searching YouTube...</div>';
-            document.getElementById('singleTracksContainer').style.display = 'none';
+            resultsDiv.innerHTML = '<div class="yt-loading">🔍 Searching YouTube...</div>';
             
             try {
                 const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query + " song")}&type=video&videoCategoryId=10&key=${YOUTUBE_API_KEY}&maxResults=10`;
@@ -508,12 +543,12 @@
                 const data = await response.json();
                 
                 if (data.error) {
-                    resultsDiv.innerHTML = `<div class="yt-no-results">❌ API Error: ${data.error.message}</div>`;
+                    section.style.display = 'none';
                     return;
                 }
                 
                 if (!data.items || data.items.length === 0) {
-                    resultsDiv.innerHTML = '<div class="yt-no-results">😕 No songs found. Try different keywords.</div>';
+                    section.style.display = 'none';
                     return;
                 }
                 
@@ -534,10 +569,19 @@
                 
             } catch (err) {
                 console.error("[Adify] YouTube search error:", err);
-                resultsDiv.innerHTML = '<div class="yt-no-results">❌ Network error. Check your connection.</div>';
+                section.style.display = 'none';
             }
         }
 
+        async function searchYouTube() {
+            // Manual search on Enter key
+            const query = document.getElementById('searchInput').value.trim();
+            if (query.length >= 3) {
+                await searchYouTubeRealtime(query);
+            }
+        }
+
+        // YouTube song item - Same style as normal songs
         function ytSongItemTemplate(s) {
             const isP = currentYouTubeId === s.videoId;
             return `
@@ -588,6 +632,7 @@
         }
 
         function playYouTubeSong(videoId, title, channel, thumbUrl) {
+            // Stop local audio
             audio.pause();
             audio.src = "";
             
@@ -595,32 +640,39 @@
             isYouTubePlaying = true;
             currentUrl = 'youtube://' + videoId;
             
-            document.getElementById('pTitle').innerText = title;
+            // Update player UI
+            document.getElementById('pTitle').innerText = title.substring(0, 30);
             document.getElementById('pArtist').innerText = channel;
             const art = document.getElementById('playerImgArt');
             art.style.background = `url('${thumbUrl}')`;
             art.classList.add('music-playing');
             document.getElementById('playIcon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
             
-            createYouTubePlayer(videoId);
+            // Load YouTube embed with autoplay
+            loadYouTubeEmbed(videoId);
+            
             showPopup("▶ PLAYING", "success");
             refreshView();
         }
 
-        function createYouTubePlayer(videoId) {
-            const existing = document.getElementById('youtube-player-container');
-            if (existing) existing.remove();
+        function loadYouTubeEmbed(videoId) {
+            const wrapper = document.getElementById('yt-player-wrapper');
+            wrapper.innerHTML = '';
             
-            const container = document.createElement('div');
-            container.id = 'youtube-player-container';
-            container.style.cssText = 'position:fixed; bottom:-9999px; left:-9999px; width:1px; height:1px; overflow:hidden; z-index:-1;';
-            document.body.appendChild(container);
+            // Create iframe with autoplay
+            const iframe = document.createElement('iframe');
+            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&playsinline=1&enablejsapi=1`;
+            iframe.allow = "autoplay; encrypted-media";
+            iframe.id = "active-yt-player";
             
-            const playerDiv = document.createElement('div');
-            playerDiv.id = 'youtube-player';
-            container.appendChild(playerDiv);
+            wrapper.appendChild(iframe);
             
-            if (!window.YT || !window.YT.Player) {
+            // Also try to load API for control
+            loadYouTubeAPI(videoId);
+        }
+
+        function loadYouTubeAPI(videoId) {
+            if (!window.YT) {
                 const tag = document.createElement('script');
                 tag.src = "https://www.youtube.com/iframe_api";
                 document.head.appendChild(tag);
@@ -628,13 +680,16 @@
                 window.onYouTubeIframeAPIReady = function() {
                     initYouTubePlayer(videoId);
                 };
-            } else {
+            } else if (YT.Player) {
                 initYouTubePlayer(videoId);
             }
         }
 
         function initYouTubePlayer(videoId) {
             try {
+                const wrapper = document.getElementById('yt-player-wrapper');
+                wrapper.innerHTML = '<div id="youtube-player"></div>';
+                
                 youtubePlayer = new YT.Player('youtube-player', {
                     height: '1',
                     width: '1',
@@ -652,11 +707,10 @@
                     },
                     events: {
                         'onReady': function(event) {
-                            console.log("[Adify] YouTube player ready");
                             event.target.playVideo();
+                            event.target.unMute();
                         },
                         'onStateChange': function(event) {
-                            console.log("[Adify] YouTube state:", event.data);
                             if (event.data === YT.PlayerState.ENDED) {
                                 nextTrack();
                             }
@@ -669,15 +723,14 @@
                             }
                         },
                         'onError': function(event) {
-                            console.error("[Adify] YouTube player error:", event.data);
-                            showPopup("❌ Cannot play this song", "error");
-                            nextTrack();
+                            console.error("[Adify] YouTube error:", event.data);
+                            // Fallback: try direct embed
+                            loadYouTubeEmbed(currentYouTubeId);
                         }
                     }
                 });
             } catch (e) {
-                console.error("[Adify] Failed to create player:", e);
-                showPopup("❌ Player error", "error");
+                console.error("[Adify] Player init failed:", e);
             }
         }
 
@@ -1062,27 +1115,13 @@
             }
         }
         
-        function handleSearch() { 
-            searchQuery = document.getElementById('searchInput').value.toLowerCase(); 
-            if (!searchQuery) {
-                document.getElementById('singleTracksContainer').style.display = 'block';
-                document.getElementById('ytResultsSection').style.display = 'none';
-                renderAll();
-                return;
-            }
-            if (searchQuery.length < 3) {
-                document.getElementById('singleTracksContainer').style.display = 'block';
-                document.getElementById('ytResultsSection').style.display = 'none';
-                renderAll();
-            }
-        }
-        
         function closeSearch() { 
             searchQuery = ""; 
             document.getElementById('searchInput').value = ""; 
             document.getElementById('searchWrapper').classList.remove('open'); 
             document.getElementById('singleTracksContainer').style.display = 'block';
             document.getElementById('ytResultsSection').style.display = 'none';
+            if (searchTimeout) clearTimeout(searchTimeout);
             renderAll(); 
         }
         function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2000); }
@@ -1111,12 +1150,9 @@
         }
         
         function playSong(t, a, u, i) {
+            // Stop YouTube if playing
             if (isYouTubePlaying) {
-                if (youtubePlayer) {
-                    try { youtubePlayer.stopVideo(); } catch(e) {}
-                }
-                isYouTubePlaying = false;
-                currentYouTubeId = null;
+                stopYouTubePlayer();
             }
             
             currentTrackData = { title: t, artist: a, url: u, image: i };
@@ -1129,21 +1165,34 @@
             refreshView();
         }
         
+        function stopYouTubePlayer() {
+            if (youtubePlayer) {
+                try { youtubePlayer.stopVideo(); } catch(e) {}
+                try { youtubePlayer.destroy(); } catch(e) {}
+                youtubePlayer = null;
+            }
+            const wrapper = document.getElementById('yt-player-wrapper');
+            if (wrapper) wrapper.innerHTML = '';
+            isYouTubePlaying = false;
+            currentYouTubeId = null;
+        }
+        
         function togglePlay() {
-            if (isYouTubePlaying && youtubePlayer && youtubePlayer.playVideo) {
-                try {
-                    const state = youtubePlayer.getPlayerState();
-                    if (state === YT.PlayerState.PLAYING) {
-                        youtubePlayer.pauseVideo();
-                        document.getElementById('playIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
-                        document.getElementById('playerImgArt').classList.remove('music-playing');
-                    } else {
-                        youtubePlayer.playVideo();
+            if (isYouTubePlaying) {
+                // YouTube play/pause via postMessage
+                const iframe = document.getElementById('active-yt-player');
+                if (iframe) {
+                    const cmd = iframe.dataset.playing === 'true' ? 'pauseVideo' : 'playVideo';
+                    iframe.contentWindow.postMessage('{"event":"command","func":"' + cmd + '","args":""}', '*');
+                    iframe.dataset.playing = iframe.dataset.playing === 'true' ? 'false' : 'true';
+                    
+                    if (iframe.dataset.playing === 'true') {
                         document.getElementById('playIcon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
                         document.getElementById('playerImgArt').classList.add('music-playing');
+                    } else {
+                        document.getElementById('playIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+                        document.getElementById('playerImgArt').classList.remove('music-playing');
                     }
-                } catch(e) {
-                    console.error("YouTube toggle error:", e);
                 }
             } else {
                 if (!audio.src) return;
@@ -1221,22 +1270,14 @@
         function refreshView() { if (activeP) renderPlaylistSongs(); else renderAll(); }
         function nextTrack() {
             if (isYouTubePlaying) {
-                if (youtubePlayer) {
-                    try { youtubePlayer.stopVideo(); } catch(e) {}
-                }
-                isYouTubePlaying = false;
-                currentYouTubeId = null;
+                stopYouTubePlayer();
             }
             const r = allSongs[Math.floor(Math.random() * allSongs.length)];
             playSong(r.title, r.artist, r.url, r.image);
         }
         function prevTrack() {
             if (isYouTubePlaying) {
-                if (youtubePlayer) {
-                    try { youtubePlayer.stopVideo(); } catch(e) {}
-                }
-                isYouTubePlaying = false;
-                currentYouTubeId = null;
+                stopYouTubePlayer();
             }
             nextTrack();
         }
