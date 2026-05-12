@@ -531,57 +531,6 @@
             }
         }
 
-        function getRecentTracksKey() {
-            if (currentUser && currentUser.email) {
-                return 'adify_recent_' + currentUser.email.replace(/\./g, '_');
-            }
-            return 'adify_recent_default';
-        }
-
-        function saveRecentTracks() {
-            try {
-                localStorage.setItem(getRecentTracksKey(), JSON.stringify(recentTracks));
-            } catch(e) {}
-        }
-
-        function loadRecentTracks() {
-            try {
-                const saved = localStorage.getItem(getRecentTracksKey());
-                if (saved) {
-                    recentTracks = JSON.parse(saved);
-                } else {
-                    recentTracks = [];
-                }
-            } catch(e) { recentTracks = []; }
-        }
-
-        function saveRecentTracksToCloud() {
-            if (!db || !currentUser) return;
-            db.ref('users/' + currentUser.email.replace(/\./g, '_') + '/recentTracks').set(recentTracks)
-                .then(() => console.log("[Adify] Recent tracks synced to cloud"))
-                .catch(err => console.error("[Adify] Cloud recent save error:", err));
-        }
-
-        function loadRecentTracksFromCloud() {
-            if (!db || !currentUser) return Promise.resolve();
-            return db.ref('users/' + currentUser.email.replace(/\./g, '_') + '/recentTracks').once('value')
-                .then(snapshot => {
-                    const cloudTracks = snapshot.val();
-                    if (cloudTracks && Array.isArray(cloudTracks) && cloudTracks.length > 0) {
-                        // Merge cloud + local, avoid duplicates, keep latest 50
-                        const merged = [...cloudTracks];
-                        recentTracks.forEach(rt => {
-                            const dup = merged.some(m => m.url === rt.url || (rt.ytId && m.ytId === rt.ytId));
-                            if (!dup) merged.push(rt);
-                        });
-                        recentTracks = merged.slice(0, 50);
-                        saveRecentTracks();
-                        renderAll();
-                    }
-                })
-                .catch(err => console.error("[Adify] Cloud recent load error:", err));
-        }
-
         function loadUserPlaylists() {
             const key = getPlaylistStorageKey();
             try {
@@ -621,8 +570,7 @@
 
             if (query.length >= 3) {
                 searchTimeout = setTimeout(() => {
-                    searchYouTubeRealtime(query);
-                }, 800);
+                    searchYouTubeRealtime(query);                }, 800);
             }
         }
 
@@ -656,7 +604,7 @@
                     image: item.snippet.thumbnails.medium ? item.snippet.thumbnails.medium.url : item.snippet.thumbnails.default.url
                 }));
 
-                // NEW: Save search results to youtubeSongs permanently
+                // Save to youtubeSongs permanently
                 youtubeResults.forEach(yt => {
                     const exists = youtubeSongs.some(s => s.videoId === yt.videoId);
                     if (!exists) {
@@ -670,9 +618,6 @@
                         });
                     }
                 });
-                saveYoutubeSongs();
-                saveYoutubeSongsToCloud();
-                renderAll();
 
                 let html = '';
                 youtubeResults.forEach((song) => {
@@ -768,22 +713,6 @@
 
             loadYouTubePlayer(videoId);
 
-            // Add to recent tracks
-            const existingIdx = recentTracks.findIndex(t => t.ytId === videoId);
-            if (existingIdx !== -1) recentTracks.splice(existingIdx, 1);
-            recentTracks.unshift({
-                id: 'yt_' + Date.now(),
-                ytId: videoId,
-                title: title,
-                artist: channel,
-                url: 'youtube://' + videoId,
-                image: thumbUrl
-            });
-            if (recentTracks.length > 50) recentTracks.pop();
-            saveRecentTracks();
-            saveRecentTracksToCloud();
-
-            // NEW: Start auto-play mode
             isAutoPlayMode = true;
             startYoutubeAutoPlay(videoId);
 
@@ -923,10 +852,13 @@
             isPlaying = false;
         }
 
+        let isAutoPlayMode = false;
+        let youtubeShuffleQueue = [];
+        let currentYoutubeQueueIndex = -1;
+
         function startYoutubeAutoPlay(currentVideoId) {
             if (youtubeSongs.length === 0) return;
             youtubeShuffleQueue = [...youtubeSongs];
-            // Fisher-Yates shuffle
             for (let i = youtubeShuffleQueue.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [youtubeShuffleQueue[i], youtubeShuffleQueue[j]] = [youtubeShuffleQueue[j], youtubeShuffleQueue[i]];
@@ -937,17 +869,14 @@
 
         function playNextYoutubeAuto() {
             if (!isAutoPlayMode || youtubeShuffleQueue.length === 0) return;
-
             currentYoutubeQueueIndex++;
             if (currentYoutubeQueueIndex >= youtubeShuffleQueue.length) {
-                // Reshuffle and restart
                 for (let i = youtubeShuffleQueue.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [youtubeShuffleQueue[i], youtubeShuffleQueue[j]] = [youtubeShuffleQueue[j], youtubeShuffleQueue[i]];
                 }
                 currentYoutubeQueueIndex = 0;
             }
-
             const next = youtubeShuffleQueue[currentYoutubeQueueIndex];
             playYouTubeSong(next.ytId, next.title, next.artist, next.image);
         }
@@ -1072,7 +1001,7 @@
 
         // ===== AUDIO STATE =====
         const audio = document.getElementById("mainAudio");
-        let currentUrl = "", searchQuery = "", activeP = null, isDragging = false, isSelectionMode = false, currentTrackData = null, selectedSongs = new Set();
+        let currentUrl = "", searchQuery = "", activeP = null, isDragging = false, isSelectionMode = false, currentTrackData = null, selectedSongs = new Set(), youtubeSongs = [];
 
         // Default empty playlists - will be populated from localStorage on login
         const userPlaylists = { "Lo-Fi Sleep 😴": [], "Study Focus 📖": [], "Traveling ✈️": [], "My Playlist 💖": [] };
@@ -1113,13 +1042,6 @@
         function doLogout() {
             stopAllPlayback();
             currentUser = null;
-            recentTracks = [];
-            shuffleQueue = [];
-            currentQueueIndex = -1;
-            youtubeSongs = [];
-            isAutoPlayMode = false;
-            youtubeShuffleQueue = [];
-            currentYoutubeQueueIndex = -1;
             localStorage.removeItem('adify_current_session');
             sessionStorage.removeItem('adify_backup_session');
             hideLogout();
@@ -1221,8 +1143,7 @@
                 if (lid.includes('@')) {
                     const safeKey = lid.replace(/\./g, '_');
                     console.log("[Adify] Firebase lookup by email:", safeKey);
-                    db.ref('users/' + safeKey).once('value')
-                        .then(snap => {
+                    db.ref('users/' + safeKey).once('value')                        .then(snap => {
                             console.log("[Adify] Firebase snapshot exists:", snap.exists());
                             checkUser(snap.val());
                         })
@@ -1256,12 +1177,8 @@
         function finalizeLogin(user) {
             currentUser = user;
             saveSession(user);
-            // NEW: Load user's saved playlists, recent tracks, and youtube songs
+            // NEW: Load user's saved playlists
             loadUserPlaylists();
-            loadRecentTracks();
-            loadRecentTracksFromCloud();
-            loadYoutubeSongs();
-            loadYoutubeSongsFromCloud();
             loadUserFromCloud(user.email).then(cloudData => {
                 if (cloudData) {
                     currentUser = cloudData;
@@ -1392,10 +1309,7 @@
         }
         function playlistAction(id, pN, ex) {
             if (ex) userPlaylists[pN] = userPlaylists[pN].filter(s => s.id !== id);
-            else {
-                const song = allSongs.find(s => s.id === id) || recentTracks.find(s => s.id === id);
-                if (song) userPlaylists[pN].push(song);
-            }
+            else userPlaylists[pN].push(allSongs.find(s => s.id === id));
             showToast(ex ? "Removed!" : "Added!");
             // NEW: Save playlists after every change
             saveUserPlaylists();
@@ -1403,20 +1317,29 @@
         }
         function songItemTemplate(s) {
             const isP = currentUrl === s.url, isS = selectedSongs.has(s.id);
-            return `<div class="song-item ${isP ? 'playing-active' : ''} ${isS ? 'selected-to-remove' : ''}" onclick="${isSelectionMode ? `toggleSelectSong(${s.id})` : `playSong('${s.title.replace(/'/g, "\'")}','${s.artist.replace(/'/g, "\'")}','${s.url}','${s.image}')`}"><div style="display:flex; align-items:center; flex:1"><div class="img-container"><img src="${s.image}" class="song-img"></div><div style="overflow:hidden; flex:1"><h4>${s.title}</h4><p style="font-size:10px; opacity:0.5">${s.artist}</p></div></div>${!isSelectionMode ? `<div class="more-btn" onclick="openMenu(event, ${s.id})">⋮</div>` : `<div style="color:var(--danger); font-weight:bold; margin-right:10px;">${isS ? '✓' : ''}</div>`}</div>`;
+            let clickAction;
+            if (isSelectionMode) {
+                clickAction = `toggleSelectSong(${s.id})`;
+            } else if (s.ytId) {
+                clickAction = `playYouTubeSong('${s.ytId}', '${s.title.replace(/'/g, "\'")}', '${s.artist.replace(/'/g, "\'")}', '${s.image}')`;
+            } else {
+                clickAction = `playSong('${s.title.replace(/'/g, "\'")}','${s.artist.replace(/'/g, "\'")}','${s.url}','${s.image}')`;
+            }
+            const moreBtn = !isSelectionMode 
+                ? (s.ytId 
+                    ? `<div class="more-btn" onclick="event.stopPropagation(); openYtMenu(event, '${s.ytId}')">⋮</div>` 
+                    : `<div class="more-btn" onclick="openMenu(event, ${s.id})">⋮</div>`)
+                : `<div style="color:var(--danger); font-weight:bold; margin-right:10px;">${isS ? '✓' : ''}</div>`;
+            return `<div class="song-item ${isP ? 'playing-active' : ''} ${isS ? 'selected-to-remove' : ''}" onclick="${clickAction}"><div style="display:flex; align-items:center; flex:1"><div class="img-container"><img src="${s.image}" class="song-img"></div><div style="overflow:hidden; flex:1"><h4>${s.title}</h4><p style="font-size:10px; opacity:0.5">${s.artist}</p></div></div>${moreBtn}</div>`;
         }
         function renderAll() {
             document.getElementById('mainPlaylistGrid').innerHTML = playlistsData.filter(p => p.name.toLowerCase().includes(searchQuery)).map(p => `<div class="card" onclick="openPlaylist('${p.name}')"><div class="art" style="background: url('${p.img}');"></div><p style="font-size:10px;">${p.name}</p></div>`).join('');
 
-            // Merge allSongs + youtubeSongs + recentTracks, avoid duplicates
+            // Show allSongs + youtubeSongs (no duplicates)
             const merged = [...allSongs];
             youtubeSongs.forEach(yt => {
                 const dup = merged.some(m => m.url === yt.url || (yt.ytId && m.ytId === yt.ytId));
                 if (!dup) merged.push(yt);
-            });
-            recentTracks.forEach(rt => {
-                const dup = merged.some(m => m.url === rt.url || (rt.ytId && m.ytId === rt.ytId));
-                if (!dup) merged.push(rt);
             });
 
             document.getElementById('singleTracksContainer').innerHTML = merged.filter(s => s.title.toLowerCase().includes(searchQuery)).map(s => songItemTemplate(s)).join('');
@@ -1427,7 +1350,6 @@
                 stopYouTubePlayer();
             }
 
-            // NEW: Stop auto-play mode for local songs
             isAutoPlayMode = false;
 
             currentTrackData = { title: t, artist: a, url: u, image: i };
@@ -1468,23 +1390,6 @@
                 updatePlayIcon(true);
             }
 
-            // Add external songs to recent tracks
-            const inAllSongs = allSongs.some(s => s.url === u);
-            if (!inAllSongs) {
-                const existingIdx = recentTracks.findIndex(t => t.url === u);
-                if (existingIdx !== -1) recentTracks.splice(existingIdx, 1);
-                recentTracks.unshift({
-                    id: 'ext_' + Date.now(),
-                    title: t,
-                    artist: a,
-                    url: u,
-                    image: i
-                });
-                if (recentTracks.length > 50) recentTracks.pop();
-                saveRecentTracks();
-                saveRecentTracksToCloud();
-            }
-
             refreshView();
         }
 
@@ -1506,11 +1411,6 @@
                     console.error("[Adify] YouTube toggle error:", e);
                 }
                 return;
-            }
-
-            // NEW: Stop auto-play when user manually pauses
-            if (isAutoPlayMode) {
-                isAutoPlayMode = false;
             }
 
             if (!audio.src || audio.src === window.location.href) {
@@ -1649,52 +1549,14 @@
 
         function nextTrack() {
             stopAllPlayback();
-
-            // Build pool: allSongs + recentTracks (no duplicates)
-            const pool = [...allSongs];
-            recentTracks.forEach(rt => {
-                const dup = pool.some(p => p.url === rt.url || (rt.ytId && p.ytId === rt.ytId));
-                if (!dup) pool.push(rt);
-            });
-
-            if (pool.length === 0) return;
-
-            // If queue empty or finished, reshuffle entire pool
-            if (shuffleQueue.length === 0 || currentQueueIndex >= shuffleQueue.length - 1) {
-                shuffleQueue = [...pool];
-                // Fisher-Yates shuffle
-                for (let i = shuffleQueue.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [shuffleQueue[i], shuffleQueue[j]] = [shuffleQueue[j], shuffleQueue[i]];
-                }
-                currentQueueIndex = -1;
-            }
-
-            currentQueueIndex++;
-            const next = shuffleQueue[currentQueueIndex];
-
-            if (next.ytId) {
-                playYouTubeSong(next.ytId, next.title, next.artist, next.image);
-            } else {
-                playSong(next.title, next.artist, next.url, next.image);
-            }
+            const r = allSongs[Math.floor(Math.random() * allSongs.length)];
+            playSong(r.title, r.artist, r.url, r.image);
         }
 
         function prevTrack() {
             stopAllPlayback();
-
-            if (currentQueueIndex > 0) {
-                currentQueueIndex--;
-                const prev = shuffleQueue[currentQueueIndex];
-                if (prev.ytId) {
-                    playYouTubeSong(prev.ytId, prev.title, prev.artist, prev.image);
-                } else {
-                    playSong(prev.title, prev.artist, prev.url, prev.image);
-                }
-            } else {
-                // Can't go back further, play next (reshuffle if needed)
-                nextTrack();
-            }
+            const r = allSongs[Math.floor(Math.random() * allSongs.length)];
+            playSong(r.title, r.artist, r.url, r.image);
         }
 
         // ===== PROFILE FUNCTIONS =====
@@ -1810,66 +1672,46 @@
 
         // ===== window.onload =====
         window.onload = function() {
-            // Fallback: always hide loader after 3 seconds
-            setTimeout(() => {
-                const fallbackLoader = document.getElementById('loadingOverlay');
-                if (fallbackLoader) fallbackLoader.classList.add('hidden');
-            }, 3000);
+            const user = getSession();
 
-            try {
-                const user = getSession();
-
-                if (user) {
-                    currentUser = user;
-                    // NEW: Load saved playlists and recent tracks for this user
-                    try { loadUserPlaylists(); } catch(e) { console.error("[Adify] load playlists error:", e); }
-                    try { loadRecentTracks(); } catch(e) { console.error("[Adify] load recent error:", e); }
-                    try { loadRecentTracksFromCloud(); } catch(e) { console.error("[Adify] cloud recent error:", e); }
-                    try { loadYoutubeSongs(); } catch(e) { console.error("[Adify] load yt songs error:", e); }
-                    try { loadYoutubeSongsFromCloud(); } catch(e) { console.error("[Adify] cloud yt error:", e); }
-                    updateProfileUI(currentUser);
-                    document.getElementById('loginScreen').classList.remove('active');
-                    document.getElementById('homeScreen').classList.add('active');
-                    renderAll();
-                    detectDevice();
-
-                    const loader = document.getElementById('loadingOverlay');
-                    if (loader) loader.classList.add('hidden');
-
-                    setTimeout(() => {
-                        showPopup("WELCOME BACK, " + (currentUser.name || "USER").toUpperCase(), "success");
-                    }, 500);
-
-                    loadUserFromCloud(currentUser.email).then(cloudData => {
-                        if (cloudData) {
-                            currentUser = cloudData;
-                            saveSession(cloudData);
-                            updateProfileUI(currentUser);
-                        }
-                    }).catch(() => {});
-
-                    setupBackButton();
-                    return;
-                }
-
-                document.getElementById('homeScreen').classList.remove('active');
-                document.getElementById('loginScreen').classList.add('active');
-                try { loadRecentTracks(); } catch(e) {}
-                try { loadYoutubeSongs(); } catch(e) {}
+            if (user) {
+                currentUser = user;
+                // NEW: Load saved playlists for this user
+                loadUserPlaylists();
+                updateProfileUI(currentUser);
+                document.getElementById('loginScreen').classList.remove('active');
+                document.getElementById('homeScreen').classList.add('active');
                 renderAll();
                 detectDevice();
 
                 const loader = document.getElementById('loadingOverlay');
                 if (loader) loader.classList.add('hidden');
 
+                setTimeout(() => {
+                    showPopup("WELCOME BACK, " + (currentUser.name || "USER").toUpperCase(), "success");
+                }, 500);
+
+                loadUserFromCloud(currentUser.email).then(cloudData => {
+                    if (cloudData) {
+                        currentUser = cloudData;
+                        saveSession(cloudData);
+                        updateProfileUI(currentUser);
+                    }
+                }).catch(() => {});
+
                 setupBackButton();
-            } catch(err) {
-                console.error("[Adify] window.onload error:", err);
-                const loader = document.getElementById('loadingOverlay');
-                if (loader) loader.classList.add('hidden');
-                // Show login screen as fallback
-                document.getElementById('loginScreen').classList.add('active');
+                return;
             }
+
+            document.getElementById('homeScreen').classList.remove('active');
+            document.getElementById('loginScreen').classList.add('active');
+            renderAll();
+            detectDevice();
+
+            const loader = document.getElementById('loadingOverlay');
+            if (loader) loader.classList.add('hidden');
+
+            setupBackButton();
         };
     </script>
 </body>
