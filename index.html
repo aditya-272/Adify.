@@ -353,7 +353,7 @@
 
         <div id="searchWrapper" onclick="event.stopPropagation()">
             <input type="text" class="search-bar" id="searchInput" placeholder="Search tracks or YouTube..." oninput="handleSearchInput()" onkeydown="if(event.key==='Enter'){event.preventDefault(); searchYouTube();}">
-            <button class="search-back" onclick="closeSearch()">BACK</button>
+            <button class="search-back" onclick="searchYouTube()">BACK</button>
         </div>
 
         <div class="menu-dropdown" id="globalPopup" onclick="event.stopPropagation()">
@@ -619,6 +619,8 @@
                         });
                     }
                 });
+                saveYoutubeSongs();
+                renderAll();
 
                 let html = '';
                 youtubeResults.forEach((song) => {
@@ -1632,6 +1634,27 @@
         }
         function showLogout() { document.getElementById('logout-modal').style.display = 'flex'; }
         function hideLogout() { document.getElementById('logout-modal').style.display = 'none'; }
+
+        function getYoutubeSongsKey() {
+            return 'adify_yt_songs_' + (currentUser ? currentUser.email.replace(/\./g, '_') : 'default');
+        }
+
+        function saveYoutubeSongs() {
+            try {
+                localStorage.setItem(getYoutubeSongsKey(), JSON.stringify(youtubeSongs));
+            } catch(e) {}
+        }
+
+        function loadYoutubeSongs() {
+            try {
+                const saved = localStorage.getItem(getYoutubeSongsKey());
+                if (saved) {
+                    youtubeSongs = JSON.parse(saved);
+                } else {
+                    youtubeSongs = [];
+                }
+            } catch(e) { youtubeSongs = []; }
+        }
 
         // ===== BACK BUTTON HANDLER =====
         let isHandlingBack = false;
