@@ -342,6 +342,7 @@
             <p class="toggle-text" id="switch-text">New here? <span onclick="toggleAuth(true)">Create Account</span></p>
         </div>
     </div>
+
     <!-- HOME SCREEN -->
     <div id="homeScreen" class="app-screen">
         <div class="home-header">
@@ -512,6 +513,7 @@
         let ytPlayerReady = false;
 
         // ===== PLAYLIST PERSISTENCE FUNCTIONS =====
+        // NEW: These functions save/load playlists per user in localStorage
         function getPlaylistStorageKey() {
             if (currentUser && currentUser.email) {
                 return 'adify_playlists_' + currentUser.email.replace(/\./g, '_');
@@ -535,6 +537,7 @@
                 const saved = localStorage.getItem(key);
                 if (saved) {
                     const parsed = JSON.parse(saved);
+                    // Merge saved playlists with defaults to ensure all keys exist
                     Object.keys(userPlaylists).forEach(pName => {
                         if (parsed[pName] && Array.isArray(parsed[pName])) {
                             userPlaylists[pName] = parsed[pName];
@@ -567,8 +570,7 @@
 
             if (query.length >= 3) {
                 searchTimeout = setTimeout(() => {
-                    searchYouTubeRealtime(query);
-                }, 800);
+                    searchYouTubeRealtime(query);                }, 800);
             }
         }
 
@@ -602,6 +604,7 @@
                     image: item.snippet.thumbnails.medium ? item.snippet.thumbnails.medium.url : item.snippet.thumbnails.default.url
                 }));
 
+                // Save to youtubeSongs permanently
                 youtubeResults.forEach(yt => {
                     const exists = youtubeSongs.some(s => s.videoId === yt.videoId);
                     if (!exists) {
@@ -615,8 +618,6 @@
                         });
                     }
                 });
-                saveYoutubeSongs();
-                renderAll();
 
                 let html = '';
                 youtubeResults.forEach((song) => {
@@ -641,7 +642,7 @@
         function ytSongItemTemplate(s) {
             const isP = currentYouTubeId === s.videoId;
             return `
-                <div class="song-item ${isP ? 'playing-active' : ''}" onclick="playYouTubeSong('${s.videoId}', '${s.title.replace(/'/g, "\\'")}', '${s.artist.replace(/'/g, "\\'")}', '${s.image}')">
+                <div class="song-item ${isP ? 'playing-active' : ''}" onclick="playYouTubeSong('${s.videoId}', '${s.title.replace(/'/g, "\'")}', '${s.artist.replace(/'/g, "\'")}', '${s.image}')">
                     <div style="display:flex; align-items:center; flex:1">
                         <div class="img-container">
                             <img src="${s.image}" class="song-img">
@@ -684,6 +685,7 @@
                     showToast("Added!");
                 }
             }
+            // SAVE PLAYLISTS AFTER EVERY CHANGE
             saveUserPlaylists();
             document.getElementById('globalPopup').classList.remove('show');
         }
@@ -1001,6 +1003,7 @@
         const audio = document.getElementById("mainAudio");
         let currentUrl = "", searchQuery = "", activeP = null, isDragging = false, isSelectionMode = false, currentTrackData = null, selectedSongs = new Set(), youtubeSongs = [];
 
+        // Default empty playlists - will be populated from localStorage on login
         const userPlaylists = { "Lo-Fi Sleep 😴": [], "Study Focus 📖": [], "Traveling ✈️": [], "My Playlist 💖": [] };
 
         const allSongs = [
@@ -1140,8 +1143,7 @@
                 if (lid.includes('@')) {
                     const safeKey = lid.replace(/\./g, '_');
                     console.log("[Adify] Firebase lookup by email:", safeKey);
-                    db.ref('users/' + safeKey).once('value')
-                        .then(snap => {
+                    db.ref('users/' + safeKey).once('value')                        .then(snap => {
                             console.log("[Adify] Firebase snapshot exists:", snap.exists());
                             checkUser(snap.val());
                         })
@@ -1175,6 +1177,7 @@
         function finalizeLogin(user) {
             currentUser = user;
             saveSession(user);
+            // NEW: Load user's saved playlists
             loadUserPlaylists();
             loadUserFromCloud(user.email).then(cloudData => {
                 if (cloudData) {
@@ -1308,6 +1311,7 @@
             if (ex) userPlaylists[pN] = userPlaylists[pN].filter(s => s.id !== id);
             else userPlaylists[pN].push(allSongs.find(s => s.id === id));
             showToast(ex ? "Removed!" : "Added!");
+            // NEW: Save playlists after every change
             saveUserPlaylists();
             document.getElementById('globalPopup').classList.remove('show'); refreshView();
         }
@@ -1317,9 +1321,9 @@
             if (isSelectionMode) {
                 clickAction = `toggleSelectSong(${s.id})`;
             } else if (s.ytId) {
-                clickAction = `playYouTubeSong('${s.ytId}', '${s.title.replace(/'/g, "\\'")}', '${s.artist.replace(/'/g, "\\'")}', '${s.image}')`;
+                clickAction = `playYouTubeSong('${s.ytId}', '${s.title.replace(/'/g, "\'")}', '${s.artist.replace(/'/g, "\'")}', '${s.image}')`;
             } else {
-                clickAction = `playSong('${s.title.replace(/'/g, "\\'")}','${s.artist.replace(/'/g, "\\'")}','${s.url}','${s.image}')`;
+                clickAction = `playSong('${s.title.replace(/'/g, "\'")}','${s.artist.replace(/'/g, "\'")}','${s.url}','${s.image}')`;
             }
             const moreBtn = !isSelectionMode 
                 ? (s.ytId 
@@ -1329,24 +1333,16 @@
             return `<div class="song-item ${isP ? 'playing-active' : ''} ${isS ? 'selected-to-remove' : ''}" onclick="${clickAction}"><div style="display:flex; align-items:center; flex:1"><div class="img-container"><img src="${s.image}" class="song-img"></div><div style="overflow:hidden; flex:1"><h4>${s.title}</h4><p style="font-size:10px; opacity:0.5">${s.artist}</p></div></div>${moreBtn}</div>`;
         }
         function renderAll() {
-            try {
-                document.getElementById('mainPlaylistGrid').innerHTML = playlistsData.filter(p => p.name.toLowerCase().includes(searchQuery)).map(p => `<div class="card" onclick="openPlaylist('${p.name}')"><div class="art" style="background: url('${p.img}');"></div><p style="font-size:10px;">${p.name}</p></div>`).join('');
+            document.getElementById('mainPlaylistGrid').innerHTML = playlistsData.filter(p => p.name.toLowerCase().includes(searchQuery)).map(p => `<div class="card" onclick="openPlaylist('${p.name}')"><div class="art" style="background: url('${p.img}');"></div><p style="font-size:10px;">${p.name}</p></div>`).join('');
 
-                const merged = [...allSongs];
-                if (youtubeSongs && Array.isArray(youtubeSongs)) {
-                    youtubeSongs.forEach(yt => {
-                        const dup = merged.some(m => m.url === yt.url || (yt.ytId && m.ytId === yt.ytId));
-                        if (!dup) merged.push(yt);
-                    });
-                }
+            // Show allSongs + youtubeSongs (no duplicates)
+            const merged = [...allSongs];
+            youtubeSongs.forEach(yt => {
+                const dup = merged.some(m => m.url === yt.url || (yt.ytId && m.ytId === yt.ytId));
+                if (!dup) merged.push(yt);
+            });
 
-                const container = document.getElementById('singleTracksContainer');
-                if (container) {
-                    container.innerHTML = merged.filter(s => s.title.toLowerCase().includes(searchQuery)).map(s => songItemTemplate(s)).join('');
-                }
-            } catch(err) {
-                console.error("[Adify] renderAll error:", err);
-            }
+            document.getElementById('singleTracksContainer').innerHTML = merged.filter(s => s.title.toLowerCase().includes(searchQuery)).map(s => songItemTemplate(s)).join('');
         }
 
         function playSong(t, a, u, i) {
@@ -1540,6 +1536,7 @@
         function toggleSelectSong(id) { selectedSongs.has(id) ? selectedSongs.delete(id) : selectedSongs.add(id); renderPlaylistSongs(); }
         function confirmRemoval() { 
             userPlaylists[activeP] = userPlaylists[activeP].filter(s => !selectedSongs.has(s.id)); 
+            // NEW: Save playlists after removal
             saveUserPlaylists();
             showToast("Songs Removed!"); 
             disableSelectionMode(); 
@@ -1625,115 +1622,52 @@
         function showLogout() { document.getElementById('logout-modal').style.display = 'flex'; }
         function hideLogout() { document.getElementById('logout-modal').style.display = 'none'; }
 
-        function getYoutubeSongsKey() {
-            return 'adify_yt_songs_' + (currentUser ? currentUser.email.replace(/\./g, '_') : 'default');
-        }
-
-        function saveYoutubeSongs() {
-            try {
-                localStorage.setItem(getYoutubeSongsKey(), JSON.stringify(youtubeSongs));
-            } catch(e) {}
-        }
-
-        function loadYoutubeSongs() {
-            try {
-                const saved = localStorage.getItem(getYoutubeSongsKey());
-                if (saved) {
-                    youtubeSongs = JSON.parse(saved);
-                } else {
-                    youtubeSongs = [];
-                }
-            } catch(e) { youtubeSongs = []; }
-        }
-
-        // ===== BACK BUTTON HANDLER - FIXED =====
-        let isHandlingBack = false;
-        let backPressCount = 0;
-        let backPressTimer = null;
-
-        function getCurrentScreen() {
-            const loginScreen = document.getElementById('loginScreen');
-            const homeScreen = document.getElementById('homeScreen');
-            const profileScreen = document.getElementById('profileScreen');
-            
-            if (profileScreen && profileScreen.classList.contains('active')) return 'profile';
-            if (homeScreen && homeScreen.classList.contains('active')) {
-                const playlistView = document.getElementById('playlistView');
-                if (playlistView && playlistView.classList.contains('active')) return 'playlist';
-                const searchWrapper = document.getElementById('searchWrapper');
-                if (searchWrapper && searchWrapper.classList.contains('open')) return 'search';
-                return 'home';
-            }
-            if (loginScreen && loginScreen.classList.contains('active')) return 'login';
-            return 'unknown';
-        }
-
+        // ===== BACK BUTTON HANDLER =====
         function handleBackButton(e) {
-            if (isHandlingBack) return;
-            isHandlingBack = true;
-            setTimeout(() => { isHandlingBack = false; }, 300);
-
-            const screen = getCurrentScreen();
-            console.log("[Adify] Back pressed, current screen:", screen);
-
-            if (screen === 'search') {
-                closeSearch();
-                history.pushState({screen: 'home'}, '', window.location.href);
-                return;
-            }
-
-            if (screen === 'profile') {
+            const profileScreen = document.getElementById('profileScreen');
+            if (profileScreen && profileScreen.classList.contains('active')) {
+                e.preventDefault();
                 closeProfile();
-                history.pushState({screen: 'home'}, '', window.location.href);
+                history.pushState(null, null, window.location.href);
                 return;
             }
-
-            if (screen === 'playlist') {
+            const playlistView = document.getElementById('playlistView');
+            if (playlistView && playlistView.classList.contains('active')) {
+                e.preventDefault();
                 resetToHome();
-                history.pushState({screen: 'home'}, '', window.location.href);
+                history.pushState(null, null, window.location.href);
                 return;
             }
-
-            if (screen === 'home') {
-                backPressCount++;
-                if (backPressCount === 1) {
-                    showToast("Press back again to exit");
-                    if (backPressTimer) clearTimeout(backPressTimer);
-                    backPressTimer = setTimeout(() => { backPressCount = 0; }, 2000);
-                    history.pushState({screen: 'home'}, '', window.location.href);
-                } else {
-                    backPressCount = 0;
-                    if (backPressTimer) clearTimeout(backPressTimer);
-                    if (navigator.app && navigator.app.exitApp) {
-                        navigator.app.exitApp();
-                    } else {
-                        window.history.back();
-                    }
-                }
-                return;
-            }
-
-            if (screen === 'login') {
+            const homeScreen = document.getElementById('homeScreen');
+            if (homeScreen && homeScreen.classList.contains('active')) {
+                e.preventDefault();
                 if (navigator.app && navigator.app.exitApp) {
                     navigator.app.exitApp();
+                } else if (window.close) {
+                    window.close();
                 } else {
                     window.history.back();
                 }
+                return;
+            }
+            const loginScreen = document.getElementById('loginScreen');
+            if (loginScreen && loginScreen.classList.contains('active')) {
+                e.preventDefault();
+                if (navigator.app && navigator.app.exitApp) {
+                    navigator.app.exitApp();
+                } else if (window.close) {
+                    window.close();
+                } else {
+                    window.history.back();
+                }
+                return;
             }
         }
 
         function setupBackButton() {
-            history.pushState({screen: 'init'}, '', window.location.href);
-            
-            window.addEventListener('popstate', function(e) {
-                e.preventDefault();
-                handleBackButton(e);
-            });
-            
-            document.addEventListener('backbutton', function(e) {
-                e.preventDefault();
-                handleBackButton(e);
-            }, false);
+            history.pushState(null, null, window.location.href);
+            window.addEventListener('popstate', handleBackButton);
+            document.addEventListener('backbutton', handleBackButton, false);
         }
 
         // ===== window.onload =====
@@ -1742,6 +1676,7 @@
 
             if (user) {
                 currentUser = user;
+                // NEW: Load saved playlists for this user
                 loadUserPlaylists();
                 updateProfileUI(currentUser);
                 document.getElementById('loginScreen').classList.remove('active');
@@ -1770,7 +1705,6 @@
 
             document.getElementById('homeScreen').classList.remove('active');
             document.getElementById('loginScreen').classList.add('active');
-            loadYoutubeSongs();
             renderAll();
             detectDevice();
 
