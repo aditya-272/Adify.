@@ -618,6 +618,7 @@
             searchQuery = query.toLowerCase();
             document.getElementById('singleTracksContainer').style.display = 'block';
             renderAll();
+
             if (query.length >= 3) {
                 searchTimeout = setTimeout(() => {
                     searchYouTubeRealtime(query);
@@ -1238,7 +1239,8 @@
                             if (!users) return resolve(null);
                             for (let key in users) {
                                 if (users[key] && users[key].phone === lid) {
-                                    console.log("[Adify] Found user by phone:", key);                                    return checkUser(users[key]);
+                                    console.log("[Adify] Found user by phone:", key);
+                                    return checkUser(users[key]);
                                 }
                             }
                             resolve(null);
@@ -1808,52 +1810,66 @@
 
         // ===== window.onload =====
         window.onload = function() {
-            const user = getSession();
+            // Fallback: always hide loader after 3 seconds
+            setTimeout(() => {
+                const fallbackLoader = document.getElementById('loadingOverlay');
+                if (fallbackLoader) fallbackLoader.classList.add('hidden');
+            }, 3000);
 
-            if (user) {
-                currentUser = user;
-                // NEW: Load saved playlists and recent tracks for this user
-                loadUserPlaylists();
-                loadRecentTracks();
-                loadRecentTracksFromCloud();
-                loadYoutubeSongs();
-                loadYoutubeSongsFromCloud();
-                updateProfileUI(currentUser);
-                document.getElementById('loginScreen').classList.remove('active');
-                document.getElementById('homeScreen').classList.add('active');
+            try {
+                const user = getSession();
+
+                if (user) {
+                    currentUser = user;
+                    // NEW: Load saved playlists and recent tracks for this user
+                    try { loadUserPlaylists(); } catch(e) { console.error("[Adify] load playlists error:", e); }
+                    try { loadRecentTracks(); } catch(e) { console.error("[Adify] load recent error:", e); }
+                    try { loadRecentTracksFromCloud(); } catch(e) { console.error("[Adify] cloud recent error:", e); }
+                    try { loadYoutubeSongs(); } catch(e) { console.error("[Adify] load yt songs error:", e); }
+                    try { loadYoutubeSongsFromCloud(); } catch(e) { console.error("[Adify] cloud yt error:", e); }
+                    updateProfileUI(currentUser);
+                    document.getElementById('loginScreen').classList.remove('active');
+                    document.getElementById('homeScreen').classList.add('active');
+                    renderAll();
+                    detectDevice();
+
+                    const loader = document.getElementById('loadingOverlay');
+                    if (loader) loader.classList.add('hidden');
+
+                    setTimeout(() => {
+                        showPopup("WELCOME BACK, " + (currentUser.name || "USER").toUpperCase(), "success");
+                    }, 500);
+
+                    loadUserFromCloud(currentUser.email).then(cloudData => {
+                        if (cloudData) {
+                            currentUser = cloudData;
+                            saveSession(cloudData);
+                            updateProfileUI(currentUser);
+                        }
+                    }).catch(() => {});
+
+                    setupBackButton();
+                    return;
+                }
+
+                document.getElementById('homeScreen').classList.remove('active');
+                document.getElementById('loginScreen').classList.add('active');
+                try { loadRecentTracks(); } catch(e) {}
+                try { loadYoutubeSongs(); } catch(e) {}
                 renderAll();
                 detectDevice();
 
                 const loader = document.getElementById('loadingOverlay');
                 if (loader) loader.classList.add('hidden');
 
-                setTimeout(() => {
-                    showPopup("WELCOME BACK, " + (currentUser.name || "USER").toUpperCase(), "success");
-                }, 500);
-
-                loadUserFromCloud(currentUser.email).then(cloudData => {
-                    if (cloudData) {
-                        currentUser = cloudData;
-                        saveSession(cloudData);
-                        updateProfileUI(currentUser);
-                    }
-                }).catch(() => {});
-
                 setupBackButton();
-                return;
+            } catch(err) {
+                console.error("[Adify] window.onload error:", err);
+                const loader = document.getElementById('loadingOverlay');
+                if (loader) loader.classList.add('hidden');
+                // Show login screen as fallback
+                document.getElementById('loginScreen').classList.add('active');
             }
-
-            document.getElementById('homeScreen').classList.remove('active');
-            document.getElementById('loginScreen').classList.add('active');
-            loadRecentTracks();
-            loadYoutubeSongs();
-            renderAll();
-            detectDevice();
-
-            const loader = document.getElementById('loadingOverlay');
-            if (loader) loader.classList.add('hidden');
-
-            setupBackButton();
         };
     </script>
 </body>
