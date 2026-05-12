@@ -166,7 +166,7 @@
         .player { position: fixed; bottom: 15px; left: 12px; right: 12px; background: rgba(10, 20, 35, 0.98); backdrop-filter: blur(40px); border: 1px solid var(--border); border-radius: 28px; padding: 18px 15px; z-index: 1000; }
         .player-main { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
         .player-info { display: flex; align-items: center; gap: 10px; width: 45%; }
-        .player-art { width: 44px; height: 44px; border-radius: 8px; background-size: cover !important; border: 1px solid var(--border); }
+        .player-art { width: 44px; height: 44px; border-radius: 8px; background-size: cover !important; background-position: center !important; border: 1px solid var(--border); }
         @keyframes djGlow { 0% { box-shadow: 0 0 15px 2px rgba(0, 132, 255, 0.7); } 50% { box-shadow: 0 0 25px 4px rgba(255, 51, 51, 0.8); } 100% { box-shadow: 0 0 15px 2px rgba(0, 132, 255, 0.7); } }
         .player-art.music-playing { animation: djGlow 3s infinite ease-in-out; }
         .controls { display: flex; align-items: center; justify-content: center; gap: 22px; flex: 1; }
@@ -177,8 +177,8 @@
         .time-container { margin-top: 5px; }
         .time-info { display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,0.5); margin-bottom: 4px; font-weight: 500; }
         .time-bar { width: 100%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 10px; position: relative; display: flex; align-items: center; }
-        .fill { height: 100%; background: var(--primary); width: 0%; border-radius: 10px; position: absolute; left: 0; top: 0; box-shadow: 0 0 10px var(--primary); }
-        #seekSlider { width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5; position: absolute; }
+        .fill { height: 100%; background: var(--primary); width: 0%; border-radius: 10px; position: absolute; left: 0; top: 0; box-shadow: 0 0 10px var(--primary); pointer-events: none; }
+        #seekSlider { width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5; position: absolute; top: 0; left: 0; }
         .watermark { position: fixed; bottom: 105px; right: 25px; font-size: 8px; color: var(--primary); opacity: 0.4; letter-spacing: 1px; }
         .p-header { padding: 70px 20px 40px; text-align: center; background: linear-gradient(to bottom, #001a33, #020202); position: relative; }
         .p-avatar { width: 140px; height: 140px; border-radius: 50%; border: 3px solid var(--sky-blue); padding: 5px; background: var(--bg-black); box-shadow: 0 0 30px rgba(0, 191, 255, 0.5); }
@@ -201,7 +201,6 @@
         .edit-input { width: 100%; padding: 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-edge); border-radius: 15px; color: #fff; font-size: 15px; outline: none !important; transition: 0.3s; margin-bottom: 20px; }
         .edit-input:focus { border-color: var(--sky-blue); }
         
-        /* YouTube iframe container - visible but small */
         #yt-player-wrapper {
             position: fixed;
             bottom: 0;
@@ -210,6 +209,8 @@
             height: 1px;
             z-index: 1;
             overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
         }
         #yt-player-wrapper iframe {
             width: 100%;
@@ -248,6 +249,12 @@
             letter-spacing: 2px;
             text-transform: uppercase;
         }
+        .yt-loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--primary);
+            font-size: 12px;
+        }
         
         @media (max-width: 400px) {
             .auth-card h1 { font-size: 36px; }
@@ -265,7 +272,6 @@
         <div class="loading-text">Loading...</div>
     </div>
     
-    <!-- YouTube Player Wrapper -->
     <div id="yt-player-wrapper"></div>
     
     <audio id="mainAudio"></audio>
@@ -362,7 +368,6 @@
             <p class="section-title">Tracks</p>
             <div id="singleTracksContainer"></div>
             
-            <!-- YouTube Results - Hidden by default -->
             <div id="ytResultsSection" style="display:none;">
                 <p class="section-title">🎵 YouTube Results</p>
                 <div id="ytResults"></div>
@@ -501,15 +506,20 @@
         let youtubeResults = [];
         let searchTimeout = null;
 
+        // ===== PLAYER STATE =====
+        let isPlaying = false;
+        let ytDuration = 0;
+        let ytCurrentTime = 0;
+        let ytTimeInterval = null;
+        let ytPlayerReady = false;
+
         // ===== YOUTUBE SEARCH - REALTIME =====
         function handleSearchInput() {
             const query = document.getElementById('searchInput').value.trim();
             
-            // Clear previous timeout
             if (searchTimeout) clearTimeout(searchTimeout);
             
             if (!query) {
-                // Empty search - show only local tracks
                 document.getElementById('singleTracksContainer').style.display = 'block';
                 document.getElementById('ytResultsSection').style.display = 'none';
                 searchQuery = "";
@@ -517,16 +527,14 @@
                 return;
             }
             
-            // Filter local tracks immediately
             searchQuery = query.toLowerCase();
             document.getElementById('singleTracksContainer').style.display = 'block';
             renderAll();
             
-            // If query is long enough, search YouTube after delay
             if (query.length >= 3) {
                 searchTimeout = setTimeout(() => {
                     searchYouTubeRealtime(query);
-                }, 800); // 800ms delay so user can finish typing
+                }, 800);
             }
         }
 
@@ -574,14 +582,12 @@
         }
 
         async function searchYouTube() {
-            // Manual search on Enter key
             const query = document.getElementById('searchInput').value.trim();
             if (query.length >= 3) {
                 await searchYouTubeRealtime(query);
             }
         }
 
-        // YouTube song item - Same style as normal songs
         function ytSongItemTemplate(s) {
             const isP = currentYouTubeId === s.videoId;
             return `
@@ -631,65 +637,70 @@
             document.getElementById('globalPopup').classList.remove('show');
         }
 
+        // ===== FIXED: playYouTubeSong - Properly stops local audio, resets UI, loads player =====
         function playYouTubeSong(videoId, title, channel, thumbUrl) {
-            // Stop local audio
-            audio.pause();
-            audio.src = "";
+            // Stop local audio first
+            stopLocalAudio();
             
             currentYouTubeId = videoId;
             isYouTubePlaying = true;
             currentUrl = 'youtube://' + videoId;
+            isPlaying = true;
             
             // Update player UI
             document.getElementById('pTitle').innerText = title.substring(0, 30);
             document.getElementById('pArtist').innerText = channel;
             const art = document.getElementById('playerImgArt');
-            art.style.background = `url('${thumbUrl}')`;
+            art.style.backgroundImage = `url('${thumbUrl}')`;
+            art.style.backgroundSize = 'cover';
             art.classList.add('music-playing');
-            document.getElementById('playIcon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+            updatePlayIcon(true);
             
-            // Load YouTube embed with autoplay
-            loadYouTubeEmbed(videoId);
+            // Reset time display
+            document.getElementById('currentTime').innerText = "0:00";
+            document.getElementById('totalDuration').innerText = "0:00";
+            document.getElementById('fill').style.width = '0%';
+            document.getElementById('seekSlider').value = 0;
+            
+            // Load YouTube player
+            loadYouTubePlayer(videoId);
             
             showPopup("▶ PLAYING", "success");
             refreshView();
         }
 
-        function loadYouTubeEmbed(videoId) {
+        // ===== FIXED: loadYouTubePlayer - Loads API then creates player =====
+        function loadYouTubePlayer(videoId) {
             const wrapper = document.getElementById('yt-player-wrapper');
             wrapper.innerHTML = '';
             
-            // Create iframe with autoplay
-            const iframe = document.createElement('iframe');
-            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&playsinline=1&enablejsapi=1`;
-            iframe.allow = "autoplay; encrypted-media";
-            iframe.id = "active-yt-player";
-            
-            wrapper.appendChild(iframe);
-            
-            // Also try to load API for control
-            loadYouTubeAPI(videoId);
-        }
-
-        function loadYouTubeAPI(videoId) {
-            if (!window.YT) {
+            // Load YouTube IFrame API first
+            if (!window.YT || !YT.Player) {
                 const tag = document.createElement('script');
                 tag.src = "https://www.youtube.com/iframe_api";
-                document.head.appendChild(tag);
-                
-                window.onYouTubeIframeAPIReady = function() {
-                    initYouTubePlayer(videoId);
+                tag.onload = function() {
+                    window._pendingVideoId = videoId;
                 };
-            } else if (YT.Player) {
-                initYouTubePlayer(videoId);
+                document.head.appendChild(tag);
+            } else {
+                createYouTubePlayer(videoId);
             }
         }
 
-        function initYouTubePlayer(videoId) {
+        // ===== FIXED: onYouTubeIframeAPIReady - Handles pending video =====
+        window.onYouTubeIframeAPIReady = function() {
+            if (window._pendingVideoId) {
+                createYouTubePlayer(window._pendingVideoId);
+                window._pendingVideoId = null;
+            }
+        };
+
+        // ===== FIXED: createYouTubePlayer - Proper player with time updates =====
+        function createYouTubePlayer(videoId) {
+            const wrapper = document.getElementById('yt-player-wrapper');
+            wrapper.innerHTML = '<div id="youtube-player"></div>';
+            
             try {
-                const wrapper = document.getElementById('yt-player-wrapper');
-                wrapper.innerHTML = '<div id="youtube-player"></div>';
-                
                 youtubePlayer = new YT.Player('youtube-player', {
                     height: '1',
                     width: '1',
@@ -707,25 +718,32 @@
                     },
                     events: {
                         'onReady': function(event) {
+                            ytPlayerReady = true;
                             event.target.playVideo();
                             event.target.unMute();
+                            startYtTimeUpdate();
                         },
                         'onStateChange': function(event) {
                             if (event.data === YT.PlayerState.ENDED) {
                                 nextTrack();
                             }
                             if (event.data === YT.PlayerState.PLAYING) {
-                                document.getElementById('playIcon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+                                isPlaying = true;
+                                updatePlayIcon(true);
                                 document.getElementById('playerImgArt').classList.add('music-playing');
+                                try {
+                                    ytDuration = youtubePlayer.getDuration();
+                                    document.getElementById('totalDuration').innerText = formatTime(ytDuration);
+                                } catch(e) {}
                             } else if (event.data === YT.PlayerState.PAUSED) {
-                                document.getElementById('playIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+                                isPlaying = false;
+                                updatePlayIcon(false);
                                 document.getElementById('playerImgArt').classList.remove('music-playing');
                             }
                         },
                         'onError': function(event) {
                             console.error("[Adify] YouTube error:", event.data);
-                            // Fallback: try direct embed
-                            loadYouTubeEmbed(currentYouTubeId);
+                            showPopup("PLAYBACK ERROR", "error");
                         }
                     }
                 });
@@ -734,6 +752,80 @@
             }
         }
 
+        // ===== FIXED: startYtTimeUpdate - Interval for YouTube time/progress =====
+        function startYtTimeUpdate() {
+            if (ytTimeInterval) clearInterval(ytTimeInterval);
+            ytTimeInterval = setInterval(() => {
+                if (!isYouTubePlaying || !youtubePlayer || !ytPlayerReady) return;
+                try {
+                    ytCurrentTime = youtubePlayer.getCurrentTime();
+                    ytDuration = youtubePlayer.getDuration();
+                    
+                    if (ytDuration > 0) {
+                        const pct = (ytCurrentTime / ytDuration) * 100;
+                        document.getElementById('fill').style.width = pct + '%';
+                        document.getElementById('seekSlider').value = pct * 10;
+                        document.getElementById('currentTime').innerText = formatTime(ytCurrentTime);
+                        document.getElementById('totalDuration').innerText = formatTime(ytDuration);
+                    }
+                } catch(e) {}
+            }, 500);
+        }
+
+        // ===== FIXED: stopYtTimeUpdate - Clears interval =====
+        function stopYtTimeUpdate() {
+            if (ytTimeInterval) {
+                clearInterval(ytTimeInterval);
+                ytTimeInterval = null;
+            }
+        }
+
+        // ===== FIXED: stopYouTubePlayer - Proper cleanup =====
+        function stopYouTubePlayer() {
+            stopYtTimeUpdate();
+            if (youtubePlayer) {
+                try { youtubePlayer.stopVideo(); } catch(e) {}
+                try { youtubePlayer.destroy(); } catch(e) {}
+                youtubePlayer = null;
+            }
+            const wrapper = document.getElementById('yt-player-wrapper');
+            if (wrapper) wrapper.innerHTML = '';
+            isYouTubePlaying = false;
+            currentYouTubeId = null;
+            ytPlayerReady = false;
+            ytDuration = 0;
+            ytCurrentTime = 0;
+        }
+
+        // ===== FIXED: stopLocalAudio - Stops audio and resets UI =====
+        function stopLocalAudio() {
+            audio.pause();
+            audio.src = "";
+            audio.currentTime = 0;
+            isPlaying = false;
+        }
+
+        // ===== FIXED: stopAllPlayback - Stops everything =====
+        function stopAllPlayback() {
+            stopLocalAudio();
+            stopYouTubePlayer();
+            updatePlayIcon(false);
+            document.getElementById('playerImgArt').classList.remove('music-playing');
+            document.getElementById('currentTime').innerText = "0:00";
+            document.getElementById('totalDuration').innerText = "0:00";
+            document.getElementById('fill').style.width = '0%';
+            document.getElementById('seekSlider').value = 0;
+        }
+
+        // ===== FIXED: updatePlayIcon - Centralized icon update =====
+        function updatePlayIcon(playing) {
+            const icon = document.getElementById('playIcon');
+            if (playing) {
+                icon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'; // Pause icon
+            } else {
+                icon.innerHTML = '<path d="M8 5v14l11-7z"/>'; // Play icon
+            }
+        }
         // ===== SESSION BACKUP FUNCTIONS =====
         function saveSession(userData) {
             const data = JSON.stringify(userData);
@@ -870,6 +962,7 @@
         function closeProfile() { document.getElementById("profileScreen").classList.remove("active"); }
 
         function doLogout() {
+            stopAllPlayback();
             currentUser = null;
             localStorage.removeItem('adify_current_session');
             sessionStorage.removeItem('adify_backup_session');
@@ -1099,7 +1192,6 @@
                 }
             }
         }
-
         // ===== HOME FUNCTIONS =====
         function handleGlobalClick() {
             document.getElementById('globalPopup').classList.remove('show');
@@ -1125,7 +1217,7 @@
             renderAll(); 
         }
         function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2000); }
-        function formatTime(s) { if (!s) return "0:00"; let m = Math.floor(s / 60), sec = Math.floor(s % 60); return `${m}:${sec < 10 ? '0' : ''}${sec}`; }
+        function formatTime(s) { if (!s || isNaN(s) || !isFinite(s)) return "0:00"; let m = Math.floor(s / 60), sec = Math.floor(s % 60); return `${m}:${sec < 10 ? '0' : ''}${sec}`; }
         function openMenu(e, id) {
             e.stopPropagation();
             const popup = document.getElementById('globalPopup');
@@ -1149,6 +1241,7 @@
             document.getElementById('singleTracksContainer').innerHTML = allSongs.filter(s => s.title.toLowerCase().includes(searchQuery)).map(s => songItemTemplate(s)).join('');
         }
         
+        // ===== FIXED: playSong - Better error handling, no popup spam =====
         function playSong(t, a, u, i) {
             // Stop YouTube if playing
             if (isYouTubePlaying) {
@@ -1156,72 +1249,137 @@
             }
             
             currentTrackData = { title: t, artist: a, url: u, image: i };
-            currentUrl = u; audio.src = u; audio.play();
-            document.getElementById('pTitle').innerText = t;
-            document.getElementById('pArtist').innerText = a;
-            const art = document.getElementById('playerImgArt');
-            art.style.background = `url('${i}')`; art.classList.add('music-playing');
-            document.getElementById('playIcon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+            currentUrl = u;
+            isPlaying = true;
+            
+            // Reset audio and set new source
+            audio.pause();
+            audio.src = u;
+            audio.load();
+            
+            // Play with error handling
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    // Playback started successfully
+                    document.getElementById('pTitle').innerText = t;
+                    document.getElementById('pArtist').innerText = a;
+                    const art = document.getElementById('playerImgArt');
+                    art.style.backgroundImage = `url('${i}')`;
+                    art.style.backgroundSize = 'cover';
+                    art.classList.add('music-playing');
+                    updatePlayIcon(true);
+                }).catch(err => {
+                    console.error("[Adify] Audio play error:", err);
+                    // Don't show popup - just update UI to show it's trying to play
+                    document.getElementById('pTitle').innerText = t;
+                    document.getElementById('pArtist').innerText = a;
+                    const art = document.getElementById('playerImgArt');
+                    art.style.backgroundImage = `url('${i}')`;
+                    art.style.backgroundSize = 'cover';
+                    updatePlayIcon(false);
+                    isPlaying = false;
+                });
+            } else {
+                // For browsers that don't return promise
+                document.getElementById('pTitle').innerText = t;
+                document.getElementById('pArtist').innerText = a;
+                const art = document.getElementById('playerImgArt');
+                art.style.backgroundImage = `url('${i}')`;
+                art.style.backgroundSize = 'cover';
+                art.classList.add('music-playing');
+                updatePlayIcon(true);
+            }
+            
             refreshView();
         }
         
-        function stopYouTubePlayer() {
-            if (youtubePlayer) {
-                try { youtubePlayer.stopVideo(); } catch(e) {}
-                try { youtubePlayer.destroy(); } catch(e) {}
-                youtubePlayer = null;
-            }
-            const wrapper = document.getElementById('yt-player-wrapper');
-            if (wrapper) wrapper.innerHTML = '';
-            isYouTubePlaying = false;
-            currentYouTubeId = null;
-        }
-        
+        // ===== FIXED: togglePlay - Works for both Audio and YouTube =====
         function togglePlay() {
-            if (isYouTubePlaying) {
-                // YouTube play/pause via postMessage
-                const iframe = document.getElementById('active-yt-player');
-                if (iframe) {
-                    const cmd = iframe.dataset.playing === 'true' ? 'pauseVideo' : 'playVideo';
-                    iframe.contentWindow.postMessage('{"event":"command","func":"' + cmd + '","args":""}', '*');
-                    iframe.dataset.playing = iframe.dataset.playing === 'true' ? 'false' : 'true';
-                    
-                    if (iframe.dataset.playing === 'true') {
-                        document.getElementById('playIcon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
-                        document.getElementById('playerImgArt').classList.add('music-playing');
-                    } else {
-                        document.getElementById('playIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+            if (isYouTubePlaying && youtubePlayer && ytPlayerReady) {
+                try {
+                    if (isPlaying) {
+                        youtubePlayer.pauseVideo();
+                        isPlaying = false;
+                        updatePlayIcon(false);
                         document.getElementById('playerImgArt').classList.remove('music-playing');
+                    } else {
+                        youtubePlayer.playVideo();
+                        isPlaying = true;
+                        updatePlayIcon(true);
+                        document.getElementById('playerImgArt').classList.add('music-playing');
                     }
+                } catch(e) {
+                    console.error("[Adify] YouTube toggle error:", e);
+                }
+                return;
+            }
+            
+            // Local audio play/pause
+            if (!audio.src || audio.src === window.location.href) {
+                nextTrack();
+                return;
+            }
+            
+            if (audio.paused) {
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        isPlaying = true;
+                        updatePlayIcon(true);
+                        document.getElementById('playerImgArt').classList.add('music-playing');
+                    }).catch(err => {
+                        console.error("[Adify] Audio play error:", err);
+                        isPlaying = false;
+                        updatePlayIcon(false);
+                    });
                 }
             } else {
-                if (!audio.src) return;
-                const art = document.getElementById('playerImgArt');
-                if (audio.paused) {
-                    audio.play();
-                    document.getElementById('playIcon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
-                    art.classList.add('music-playing');
-                } else {
-                    audio.pause();
-                    document.getElementById('playIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
-                    art.classList.remove('music-playing');
-                }
+                audio.pause();
+                isPlaying = false;
+                updatePlayIcon(false);
+                document.getElementById('playerImgArt').classList.remove('music-playing');
             }
         }
         
+        // ===== FIXED: handleSeekInput =====
         function handleSeekInput() {
-            if (!audio.duration) return; isDragging = true;
             const s = document.getElementById('seekSlider');
-            document.getElementById('fill').style.width = (s.value / s.max) * 100 + '%';
-            document.getElementById('currentTime').innerText = formatTime(audio.duration * (s.value / 1000));
+            const pct = (s.value / s.max) * 100;
+            document.getElementById('fill').style.width = pct + '%';
+            
+            if (!isYouTubePlaying && audio.duration && isFinite(audio.duration)) {
+                isDragging = true;
+                const time = audio.duration * (s.value / 1000);
+                document.getElementById('currentTime').innerText = formatTime(time);
+            } else if (isYouTubePlaying && ytDuration > 0) {
+                isDragging = true;
+                const time = ytDuration * (s.value / 1000);
+                document.getElementById('currentTime').innerText = formatTime(time);
+            }
         }
+        
+        // ===== FIXED: handleSeekChange =====
         function handleSeekChange() {
-            if (!audio.duration) return;
-            audio.currentTime = audio.duration * (document.getElementById('seekSlider').value / 1000);
-            isDragging = false;
+            const s = document.getElementById('seekSlider');
+            
+            if (isYouTubePlaying && youtubePlayer && ytPlayerReady && ytDuration > 0) {
+                const seekTime = ytDuration * (s.value / 1000);
+                try {
+                    youtubePlayer.seekTo(seekTime, true);
+                } catch(e) {
+                    console.error("[Adify] YouTube seek error:", e);
+                }
+                isDragging = false;
+            } else if (audio.duration && isFinite(audio.duration)) {
+                audio.currentTime = audio.duration * (s.value / 1000);
+                isDragging = false;
+            }
         }
+        
+        // ===== FIXED: audio.ontimeupdate - Check for valid duration =====
         audio.ontimeupdate = () => {
-            if (!isDragging && audio.duration) {
+            if (!isDragging && audio.duration && isFinite(audio.duration) && !isYouTubePlaying) {
                 const p = (audio.currentTime / audio.duration) * 100;
                 document.getElementById('fill').style.width = p + '%';
                 document.getElementById('seekSlider').value = p * 10;
@@ -1229,7 +1387,30 @@
                 document.getElementById('totalDuration').innerText = formatTime(audio.duration);
             }
         };
-        audio.onended = () => { nextTrack(); };
+        
+        audio.onended = () => { 
+            isPlaying = false;
+            updatePlayIcon(false);
+            document.getElementById('playerImgArt').classList.remove('music-playing');
+            nextTrack(); 
+        };
+        
+        audio.onloadedmetadata = () => {
+            if (!isYouTubePlaying && audio.duration && isFinite(audio.duration)) {
+                document.getElementById('totalDuration').innerText = formatTime(audio.duration);
+            }
+        };
+        
+        // ===== FIXED: audio.onerror - Silent fail, no popup spam =====
+        audio.onerror = () => {
+            console.error("[Adify] Audio error:", audio.error);
+            isPlaying = false;
+            updatePlayIcon(false);
+            document.getElementById('playerImgArt').classList.remove('music-playing');
+            // Don't show popup - just log to console
+            // The song title still shows in player so user knows what was selected
+        };
+        
         function openPlaylist(n) {
             activeP = n;
             document.getElementById('homeView').classList.remove('active');
@@ -1268,18 +1449,19 @@
             document.getElementById('songsContainer').innerHTML = list.length ? list.map(s => songItemTemplate(s)).join('') : "<p style='text-align:center; opacity:0.3; padding:20px;'>Empty.</p>";
         }
         function refreshView() { if (activeP) renderPlaylistSongs(); else renderAll(); }
+        
+        // ===== FIXED: nextTrack =====
         function nextTrack() {
-            if (isYouTubePlaying) {
-                stopYouTubePlayer();
-            }
+            stopAllPlayback();
             const r = allSongs[Math.floor(Math.random() * allSongs.length)];
             playSong(r.title, r.artist, r.url, r.image);
         }
+        
+        // ===== FIXED: prevTrack =====
         function prevTrack() {
-            if (isYouTubePlaying) {
-                stopYouTubePlayer();
-            }
-            nextTrack();
+            stopAllPlayback();
+            const r = allSongs[Math.floor(Math.random() * allSongs.length)];
+            playSong(r.title, r.artist, r.url, r.image);
         }
 
         // ===== PROFILE FUNCTIONS =====
