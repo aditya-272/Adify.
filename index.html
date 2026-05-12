@@ -1335,16 +1335,25 @@
             return `<div class="song-item ${isP ? 'playing-active' : ''} ${isS ? 'selected-to-remove' : ''}" onclick="${clickAction}"><div style="display:flex; align-items:center; flex:1"><div class="img-container"><img src="${s.image}" class="song-img"></div><div style="overflow:hidden; flex:1"><h4>${s.title}</h4><p style="font-size:10px; opacity:0.5">${s.artist}</p></div></div>${moreBtn}</div>`;
         }
         function renderAll() {
-            document.getElementById('mainPlaylistGrid').innerHTML = playlistsData.filter(p => p.name.toLowerCase().includes(searchQuery)).map(p => `<div class="card" onclick="openPlaylist('${p.name}')"><div class="art" style="background: url('${p.img}');"></div><p style="font-size:10px;">${p.name}</p></div>`).join('');
+            try {
+                document.getElementById('mainPlaylistGrid').innerHTML = playlistsData.filter(p => p.name.toLowerCase().includes(searchQuery)).map(p => `<div class="card" onclick="openPlaylist('${p.name}')"><div class="art" style="background: url('${p.img}');"></div><p style="font-size:10px;">${p.name}</p></div>`).join('');
 
-            // Show allSongs + youtubeSongs (no duplicates)
-            const merged = [...allSongs];
-            youtubeSongs.forEach(yt => {
-                const dup = merged.some(m => m.url === yt.url || (yt.ytId && m.ytId === yt.ytId));
-                if (!dup) merged.push(yt);
-            });
+                // Show allSongs + youtubeSongs (no duplicates)
+                const merged = [...allSongs];
+                if (youtubeSongs && Array.isArray(youtubeSongs)) {
+                    youtubeSongs.forEach(yt => {
+                        const dup = merged.some(m => m.url === yt.url || (yt.ytId && m.ytId === yt.ytId));
+                        if (!dup) merged.push(yt);
+                    });
+                }
 
-            document.getElementById('singleTracksContainer').innerHTML = merged.filter(s => s.title.toLowerCase().includes(searchQuery)).map(s => songItemTemplate(s)).join('');
+                const container = document.getElementById('singleTracksContainer');
+                if (container) {
+                    container.innerHTML = merged.filter(s => s.title.toLowerCase().includes(searchQuery)).map(s => songItemTemplate(s)).join('');
+                }
+            } catch(err) {
+                console.error("[Adify] renderAll error:", err);
+            }
         }
 
         function playSong(t, a, u, i) {
@@ -1626,11 +1635,13 @@
 
         // ===== BACK BUTTON HANDLER =====
         function handleBackButton(e) {
+            // Prevent browser from navigating back - stay on same page
+            history.replaceState({page: 'app'}, '', window.location.href);
+
             // 1. Search open? → Close search
             const searchWrapper = document.getElementById('searchWrapper');
             if (searchWrapper && searchWrapper.classList.contains('open')) {
                 closeSearch();
-                history.pushState({page: 'app'}, '', window.location.href);
                 return;
             }
 
@@ -1638,7 +1649,6 @@
             const profileScreen = document.getElementById('profileScreen');
             if (profileScreen && profileScreen.classList.contains('active')) {
                 closeProfile();
-                history.pushState({page: 'app'}, '', window.location.href);
                 return;
             }
 
@@ -1646,7 +1656,6 @@
             const playlistView = document.getElementById('playlistView');
             if (playlistView && playlistView.classList.contains('active')) {
                 resetToHome();
-                history.pushState({page: 'app'}, '', window.location.href);
                 return;
             }
 
@@ -1673,7 +1682,7 @@
         }
 
         function setupBackButton() {
-            history.pushState({page: 'app'}, '', window.location.href);
+            history.replaceState({page: 'app'}, '', window.location.href);
             window.addEventListener('popstate', function(e) {
                 handleBackButton(e);
             });
