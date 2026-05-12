@@ -1634,9 +1634,15 @@
         function hideLogout() { document.getElementById('logout-modal').style.display = 'none'; }
 
         // ===== BACK BUTTON HANDLER =====
+        let isHandlingBack = false;
+        let backPressCount = 0;
+        let backPressTimer = null;
+
         function handleBackButton(e) {
-            // Prevent browser from navigating back - stay on same page
-            history.replaceState({page: 'app'}, '', window.location.href);
+            // Prevent double-fire from popstate + backbutton
+            if (isHandlingBack) return;
+            isHandlingBack = true;
+            setTimeout(() => { isHandlingBack = false; }, 300);
 
             // 1. Search open? → Close search
             const searchWrapper = document.getElementById('searchWrapper');
@@ -1659,30 +1665,39 @@
                 return;
             }
 
-            // 4. Home active? → EXIT APP
+            // 4. Home active? → Double press to exit
             const homeScreen = document.getElementById('homeScreen');
             if (homeScreen && homeScreen.classList.contains('active')) {
-                if (navigator.app && navigator.app.exitApp) {
-                    navigator.app.exitApp();
-                } else if (window.close) {
-                    window.close();
+                backPressCount++;
+                if (backPressCount === 1) {
+                    showToast("Press back again to exit");
+                    if (backPressTimer) clearTimeout(backPressTimer);
+                    backPressTimer = setTimeout(() => { backPressCount = 0; }, 2000);
+                } else {
+                    backPressCount = 0;
+                    if (backPressTimer) clearTimeout(backPressTimer);
+                    if (navigator.app && navigator.app.exitApp) {
+                        navigator.app.exitApp();
+                    } else {
+                        window.history.back();
+                    }
                 }
                 return;
             }
 
-            // 5. Login active? → EXIT APP
+            // 5. Login active? → EXIT
             const loginScreen = document.getElementById('loginScreen');
             if (loginScreen && loginScreen.classList.contains('active')) {
                 if (navigator.app && navigator.app.exitApp) {
                     navigator.app.exitApp();
-                } else if (window.close) {
-                    window.close();
+                } else {
+                    window.history.back();
                 }
             }
         }
 
         function setupBackButton() {
-            history.replaceState({page: 'app'}, '', window.location.href);
+            history.pushState({page: 'app'}, '', window.location.href);
             window.addEventListener('popstate', function(e) {
                 handleBackButton(e);
             });
@@ -1727,6 +1742,7 @@
 
             document.getElementById('homeScreen').classList.remove('active');
             document.getElementById('loginScreen').classList.add('active');
+            loadYoutubeSongs();
             renderAll();
             detectDevice();
 
