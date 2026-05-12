@@ -201,6 +201,11 @@
         .edit-input { width: 100%; padding: 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-edge); border-radius: 15px; color: #fff; font-size: 15px; outline: none !important; transition: 0.3s; margin-bottom: 20px; }
         .edit-input:focus { border-color: var(--sky-blue); }
         
+        /* YouTube Results - Same as normal songs */
+        #ytResultsSection { margin-top: 10px; display: none; }
+        .yt-loading { text-align: center; padding: 20px; color: var(--primary); font-size: 12px; }
+        .yt-no-results { text-align: center; padding: 30px; color: #666; font-size: 13px; }
+        
         #loadingOverlay {
             position: fixed;
             inset: 0;
@@ -325,14 +330,36 @@
             <div id="searchToggleBtn" onclick="toggleSearchBar(event)">🔍</div>
             <div class="profile-btn" onclick="openProfile()"><img id="homeProfileImg" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100" alt="User"></div>
         </div>
-        <div id="searchWrapper" onclick="event.stopPropagation()"><input type="text" class="search-bar" id="searchInput" placeholder="Search track..." oninput="handleSearch()"><button class="search-back" onclick="closeSearch()">BACK</button></div>
-        <div class="menu-dropdown" id="globalPopup" onclick="event.stopPropagation()"><div class="menu-header">ADD TO PLAYLIST</div><div id="playlistOptions"></div></div>
-        <div id="homeView" class="view active">
-            <p class="section-title">Playlists</p><div class="playlist-grid" id="mainPlaylistGrid"></div>
-            <p class="section-title">Tracks</p><div id="singleTracksContainer"></div>
+        
+        <!-- Search Wrapper - Same as before, ab Enter se YouTube search -->
+        <div id="searchWrapper" onclick="event.stopPropagation()">
+            <input type="text" class="search-bar" id="searchInput" placeholder="Search tracks or YouTube..." oninput="handleSearch()" onkeydown="if(event.key==='Enter' && this.value.trim().length > 2){event.preventDefault(); searchYouTube();}">
+            <button class="search-back" onclick="closeSearch()">BACK</button>
         </div>
+        
+        <div class="menu-dropdown" id="globalPopup" onclick="event.stopPropagation()">
+            <div class="menu-header">ADD TO PLAYLIST</div>
+            <div id="playlistOptions"></div>
+        </div>
+        
+        <div id="homeView" class="view active">
+            <p class="section-title">Playlists</p>
+            <div class="playlist-grid" id="mainPlaylistGrid"></div>
+            
+            <p class="section-title">Tracks</p>
+            <div id="singleTracksContainer"></div>
+            
+            <!-- YouTube Results - Same style as normal tracks -->
+            <div id="ytResultsSection">
+                <p class="section-title">🎵 YouTube Results</p>
+                <div id="ytResults"></div>
+            </div>
+        </div>
+        
         <div id="playlistView" class="view">
-            <div style="margin-bottom:20px;"><button style="background:var(--glass); color:white; border:1px solid var(--border); padding:10px 18px; border-radius:10px; font-size:11px; cursor:pointer;" onclick="resetToHome()">🏠 HOME</button></div>
+            <div style="margin-bottom:20px;">
+                <button style="background:var(--glass); color:white; border:1px solid var(--border); padding:10px 18px; border-radius:10px; font-size:11px; cursor:pointer;" onclick="resetToHome()">🏠 HOME</button>
+            </div>
             <h2 id="playlistTitle" style="font-size:24px; margin-bottom:15px; color:var(--primary);"></h2>
             <div class="playlist-actions">
                 <button id="modeBtn" class="action-btn btn-remove-mode" onclick="enableSelectionMode()">Select songs to remove</button>
@@ -341,16 +368,38 @@
             </div>
             <div id="songsContainer"></div>
         </div>
+        
         <div class="player">
             <div class="player-main">
-                <div class="player-info"><div class="player-art" id="playerImgArt"></div><div style="overflow:hidden;"><h4 id="pTitle" style="font-size:11px; white-space:nowrap;">Select a song</h4><p id="pArtist" style="font-size:9px; color:var(--primary);">---</p></div></div>
+                <div class="player-info">
+                    <div class="player-art" id="playerImgArt"></div>
+                    <div style="overflow:hidden;">
+                        <h4 id="pTitle" style="font-size:11px; white-space:nowrap;">Select a song</h4>
+                        <p id="pArtist" style="font-size:9px; color:var(--primary);">---</p>
+                    </div>
+                </div>
                 <div class="controls">
-                    <div class="nav-btn" onclick="prevTrack()"><svg viewBox="0 0 24 24" width="22" fill="white"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></div>
-                    <div class="play-btn" id="playBtn" onclick="togglePlay()"><svg id="playIcon" viewBox="0 0 24 24" width="22" fill="white"><path d="M8 5v14l11-7z"/></svg></div>
-                    <div class="nav-btn" onclick="nextTrack()"><svg viewBox="0 0 24 24" width="22" fill="white"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></div>
+                    <div class="nav-btn" onclick="prevTrack()">
+                        <svg viewBox="0 0 24 24" width="22" fill="white"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                    </div>
+                    <div class="play-btn" id="playBtn" onclick="togglePlay()">
+                        <svg id="playIcon" viewBox="0 0 24 24" width="22" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                    <div class="nav-btn" onclick="nextTrack()">
+                        <svg viewBox="0 0 24 24" width="22" fill="white"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                    </div>
                 </div>
             </div>
-            <div class="time-container"><div class="time-info"><span id="currentTime">0:00</span><span id="totalDuration">0:00</span></div><div class="time-bar"><div class="fill" id="fill"></div><input type="range" id="seekSlider" min="0" max="1000" value="0" oninput="handleSeekInput()" onchange="handleSeekChange()"></div></div>
+            <div class="time-container">
+                <div class="time-info">
+                    <span id="currentTime">0:00</span>
+                    <span id="totalDuration">0:00</span>
+                </div>
+                <div class="time-bar">
+                    <div class="fill" id="fill"></div>
+                    <input type="range" id="seekSlider" min="0" max="1000" value="0" oninput="handleSeekInput()" onchange="handleSeekChange()">
+                </div>
+            </div>
         </div>
         <div class="watermark">Made by Aditya</div>
     </div>
@@ -431,6 +480,207 @@
     </div>
 
     <script>
+        // ===== YOUTUBE API CONFIG =====
+        const YOUTUBE_API_KEY = "AIzaSyB3qn_Mk8ct7ePFztqObXUvptoCvNt7kzU";
+        let youtubePlayer = null;
+        let isYouTubePlaying = false;
+        let currentYouTubeId = null;
+        let youtubeResults = [];
+
+        // ===== YOUTUBE SEARCH FUNCTIONS =====
+        async function searchYouTube() {
+            const query = document.getElementById('searchInput').value.trim();
+            const resultsDiv = document.getElementById('ytResults');
+            const section = document.getElementById('ytResultsSection');
+            
+            if (!query || query.length < 2) {
+                showPopup("ENTER A SONG NAME!", "error");
+                return;
+            }
+            
+            section.style.display = 'block';
+            resultsDiv.innerHTML = '<div class="yt-loading"><div class="loading-spinner" style="width:30px;height:30px;border-width:2px;margin:0 auto 10px;"></div>Searching YouTube...</div>';
+            document.getElementById('singleTracksContainer').style.display = 'none';
+            
+            try {
+                const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query + " song")}&type=video&videoCategoryId=10&key=${YOUTUBE_API_KEY}&maxResults=10`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.error) {
+                    resultsDiv.innerHTML = `<div class="yt-no-results">❌ API Error: ${data.error.message}</div>`;
+                    return;
+                }
+                
+                if (!data.items || data.items.length === 0) {
+                    resultsDiv.innerHTML = '<div class="yt-no-results">😕 No songs found. Try different keywords.</div>';
+                    return;
+                }
+                
+                youtubeResults = data.items.map((item, idx) => ({
+                    id: 'yt_' + idx,
+                    videoId: item.id.videoId,
+                    title: item.snippet.title,
+                    artist: item.snippet.channelTitle,
+                    image: item.snippet.thumbnails.medium ? item.snippet.thumbnails.medium.url : item.snippet.thumbnails.default.url
+                }));
+                
+                let html = '';
+                youtubeResults.forEach((song) => {
+                    html += ytSongItemTemplate(song);
+                });
+                
+                resultsDiv.innerHTML = html;
+                
+            } catch (err) {
+                console.error("[Adify] YouTube search error:", err);
+                resultsDiv.innerHTML = '<div class="yt-no-results">❌ Network error. Check your connection.</div>';
+            }
+        }
+
+        function ytSongItemTemplate(s) {
+            const isP = currentYouTubeId === s.videoId;
+            return `
+                <div class="song-item ${isP ? 'playing-active' : ''}" onclick="playYouTubeSong('${s.videoId}', '${s.title.replace(/'/g, "\\'")}', '${s.artist.replace(/'/g, "\\'")}', '${s.image}')">
+                    <div style="display:flex; align-items:center; flex:1">
+                        <div class="img-container">
+                            <img src="${s.image}" class="song-img">
+                        </div>
+                        <div style="overflow:hidden; flex:1">
+                            <h4>${s.title}</h4>
+                            <p style="font-size:10px; opacity:0.5">${s.artist}</p>
+                        </div>
+                    </div>
+                    <div class="more-btn" onclick="event.stopPropagation(); openYtMenu(event, '${s.videoId}')">⋮</div>
+                </div>
+            `;
+        }
+
+        function openYtMenu(e, videoId) {
+            e.stopPropagation();
+            const popup = document.getElementById('globalPopup');
+            document.getElementById('playlistOptions').innerHTML = playlistsData.map(p => {
+                const ex = userPlaylists[p.name].some(x => x.ytId === videoId);
+                return `<div class="menu-item" onclick="addYtToPlaylist('${videoId}', '${p.name}', ${ex})"><span>${p.name}</span><span style="color:${ex ? 'var(--danger)' : 'var(--primary)'}; font-weight:bold;">${ex ? 'REMOVE' : 'ADD'}</span></div>`;
+            }).join('');
+            popup.classList.add('show');
+        }
+
+        function addYtToPlaylist(videoId, pName, isRemove) {
+            if (isRemove) {
+                userPlaylists[pName] = userPlaylists[pName].filter(s => s.ytId !== videoId);
+                showToast("Removed!");
+            } else {
+                const song = youtubeResults.find(s => s.videoId === videoId);
+                if (song) {
+                    userPlaylists[pName].push({
+                        id: 'yt_' + Date.now(),
+                        ytId: videoId,
+                        title: song.title,
+                        artist: song.artist,
+                        url: 'youtube://' + videoId,
+                        image: song.image
+                    });
+                    showToast("Added!");
+                }
+            }
+            document.getElementById('globalPopup').classList.remove('show');
+        }
+
+        function playYouTubeSong(videoId, title, channel, thumbUrl) {
+            audio.pause();
+            audio.src = "";
+            
+            currentYouTubeId = videoId;
+            isYouTubePlaying = true;
+            currentUrl = 'youtube://' + videoId;
+            
+            document.getElementById('pTitle').innerText = title;
+            document.getElementById('pArtist').innerText = channel;
+            const art = document.getElementById('playerImgArt');
+            art.style.background = `url('${thumbUrl}')`;
+            art.classList.add('music-playing');
+            document.getElementById('playIcon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+            
+            createYouTubePlayer(videoId);
+            showPopup("▶ PLAYING", "success");
+            refreshView();
+        }
+
+        function createYouTubePlayer(videoId) {
+            const existing = document.getElementById('youtube-player-container');
+            if (existing) existing.remove();
+            
+            const container = document.createElement('div');
+            container.id = 'youtube-player-container';
+            container.style.cssText = 'position:fixed; bottom:-9999px; left:-9999px; width:1px; height:1px; overflow:hidden; z-index:-1;';
+            document.body.appendChild(container);
+            
+            const playerDiv = document.createElement('div');
+            playerDiv.id = 'youtube-player';
+            container.appendChild(playerDiv);
+            
+            if (!window.YT || !window.YT.Player) {
+                const tag = document.createElement('script');
+                tag.src = "https://www.youtube.com/iframe_api";
+                document.head.appendChild(tag);
+                
+                window.onYouTubeIframeAPIReady = function() {
+                    initYouTubePlayer(videoId);
+                };
+            } else {
+                initYouTubePlayer(videoId);
+            }
+        }
+
+        function initYouTubePlayer(videoId) {
+            try {
+                youtubePlayer = new YT.Player('youtube-player', {
+                    height: '1',
+                    width: '1',
+                    videoId: videoId,
+                    playerVars: {
+                        autoplay: 1,
+                        controls: 0,
+                        disablekb: 1,
+                        fs: 0,
+                        modestbranding: 1,
+                        rel: 0,
+                        showinfo: 0,
+                        iv_load_policy: 3,
+                        playsinline: 1
+                    },
+                    events: {
+                        'onReady': function(event) {
+                            console.log("[Adify] YouTube player ready");
+                            event.target.playVideo();
+                        },
+                        'onStateChange': function(event) {
+                            console.log("[Adify] YouTube state:", event.data);
+                            if (event.data === YT.PlayerState.ENDED) {
+                                nextTrack();
+                            }
+                            if (event.data === YT.PlayerState.PLAYING) {
+                                document.getElementById('playIcon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+                                document.getElementById('playerImgArt').classList.add('music-playing');
+                            } else if (event.data === YT.PlayerState.PAUSED) {
+                                document.getElementById('playIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+                                document.getElementById('playerImgArt').classList.remove('music-playing');
+                            }
+                        },
+                        'onError': function(event) {
+                            console.error("[Adify] YouTube player error:", event.data);
+                            showPopup("❌ Cannot play this song", "error");
+                            nextTrack();
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error("[Adify] Failed to create player:", e);
+                showPopup("❌ Player error", "error");
+            }
+        }
+
         // ===== SESSION BACKUP FUNCTIONS =====
         function saveSession(userData) {
             const data = JSON.stringify(userData);
@@ -718,7 +968,6 @@
             });
         }
 
-        // ===== FIXED handleSubmit - Cross-device + async cloud save =====
         async function handleSubmit() {
             if (!isRegisterMode) {
                 const lid = document.getElementById('login-id').value.toLowerCase().trim();
@@ -732,7 +981,6 @@
                     return;
                 }
                 
-                // Step 1: Same device fast local check
                 const localUser = findUserLocal(lid);
                 if (localUser) {
                     if (localUser.password === lpass) {
@@ -743,7 +991,6 @@
                     return;
                 }
                 
-                // Step 2: Cross-device Firebase check
                 showPopup("VERIFYING USER...", "success");
                 const result = await tryFirebaseLogin(lid, lpass);
                 
@@ -761,7 +1008,6 @@
                 }
                 
             } else {
-                // ===== REGISTRATION =====
                 const name = document.getElementById('full-name').value;
                 const emailInput = document.getElementById('reg-email').value;
                 const email = emailInput.toLowerCase();
@@ -807,9 +1053,38 @@
             const w = document.getElementById('searchWrapper');
             if (w.classList.contains('open')) w.classList.remove('open');
         }
-        function toggleSearchBar(e) { if (e) e.stopPropagation(); const w = document.getElementById('searchWrapper'); w.classList.toggle('open'); }
-        function handleSearch() { searchQuery = document.getElementById('searchInput').value.toLowerCase(); renderAll(); }
-        function closeSearch() { searchQuery = ""; document.getElementById('searchInput').value = ""; document.getElementById('searchWrapper').classList.remove('open'); renderAll(); }
+        function toggleSearchBar(e) { 
+            if (e) e.stopPropagation(); 
+            const w = document.getElementById('searchWrapper'); 
+            w.classList.toggle('open'); 
+            if (w.classList.contains('open')) {
+                document.getElementById('searchInput').focus();
+            }
+        }
+        
+        function handleSearch() { 
+            searchQuery = document.getElementById('searchInput').value.toLowerCase(); 
+            if (!searchQuery) {
+                document.getElementById('singleTracksContainer').style.display = 'block';
+                document.getElementById('ytResultsSection').style.display = 'none';
+                renderAll();
+                return;
+            }
+            if (searchQuery.length < 3) {
+                document.getElementById('singleTracksContainer').style.display = 'block';
+                document.getElementById('ytResultsSection').style.display = 'none';
+                renderAll();
+            }
+        }
+        
+        function closeSearch() { 
+            searchQuery = ""; 
+            document.getElementById('searchInput').value = ""; 
+            document.getElementById('searchWrapper').classList.remove('open'); 
+            document.getElementById('singleTracksContainer').style.display = 'block';
+            document.getElementById('ytResultsSection').style.display = 'none';
+            renderAll(); 
+        }
         function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2000); }
         function formatTime(s) { if (!s) return "0:00"; let m = Math.floor(s / 60), sec = Math.floor(s % 60); return `${m}:${sec < 10 ? '0' : ''}${sec}`; }
         function openMenu(e, id) {
@@ -834,7 +1109,16 @@
             document.getElementById('mainPlaylistGrid').innerHTML = playlistsData.filter(p => p.name.toLowerCase().includes(searchQuery)).map(p => `<div class="card" onclick="openPlaylist('${p.name}')"><div class="art" style="background: url('${p.img}');"></div><p style="font-size:10px;">${p.name}</p></div>`).join('');
             document.getElementById('singleTracksContainer').innerHTML = allSongs.filter(s => s.title.toLowerCase().includes(searchQuery)).map(s => songItemTemplate(s)).join('');
         }
+        
         function playSong(t, a, u, i) {
+            if (isYouTubePlaying) {
+                if (youtubePlayer) {
+                    try { youtubePlayer.stopVideo(); } catch(e) {}
+                }
+                isYouTubePlaying = false;
+                currentYouTubeId = null;
+            }
+            
             currentTrackData = { title: t, artist: a, url: u, image: i };
             currentUrl = u; audio.src = u; audio.play();
             document.getElementById('pTitle').innerText = t;
@@ -844,19 +1128,38 @@
             document.getElementById('playIcon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
             refreshView();
         }
+        
         function togglePlay() {
-            if (!audio.src) return;
-            const art = document.getElementById('playerImgArt');
-            if (audio.paused) {
-                audio.play();
-                document.getElementById('playIcon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
-                art.classList.add('music-playing');
+            if (isYouTubePlaying && youtubePlayer && youtubePlayer.playVideo) {
+                try {
+                    const state = youtubePlayer.getPlayerState();
+                    if (state === YT.PlayerState.PLAYING) {
+                        youtubePlayer.pauseVideo();
+                        document.getElementById('playIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+                        document.getElementById('playerImgArt').classList.remove('music-playing');
+                    } else {
+                        youtubePlayer.playVideo();
+                        document.getElementById('playIcon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+                        document.getElementById('playerImgArt').classList.add('music-playing');
+                    }
+                } catch(e) {
+                    console.error("YouTube toggle error:", e);
+                }
             } else {
-                audio.pause();
-                document.getElementById('playIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
-                art.classList.remove('music-playing');
+                if (!audio.src) return;
+                const art = document.getElementById('playerImgArt');
+                if (audio.paused) {
+                    audio.play();
+                    document.getElementById('playIcon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+                    art.classList.add('music-playing');
+                } else {
+                    audio.pause();
+                    document.getElementById('playIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+                    art.classList.remove('music-playing');
+                }
             }
         }
+        
         function handleSeekInput() {
             if (!audio.duration) return; isDragging = true;
             const s = document.getElementById('seekSlider');
@@ -916,8 +1219,27 @@
             document.getElementById('songsContainer').innerHTML = list.length ? list.map(s => songItemTemplate(s)).join('') : "<p style='text-align:center; opacity:0.3; padding:20px;'>Empty.</p>";
         }
         function refreshView() { if (activeP) renderPlaylistSongs(); else renderAll(); }
-        function nextTrack() { const r = allSongs[Math.floor(Math.random() * allSongs.length)]; playSong(r.title, r.artist, r.url, r.image); }
-        function prevTrack() { nextTrack(); }
+        function nextTrack() {
+            if (isYouTubePlaying) {
+                if (youtubePlayer) {
+                    try { youtubePlayer.stopVideo(); } catch(e) {}
+                }
+                isYouTubePlaying = false;
+                currentYouTubeId = null;
+            }
+            const r = allSongs[Math.floor(Math.random() * allSongs.length)];
+            playSong(r.title, r.artist, r.url, r.image);
+        }
+        function prevTrack() {
+            if (isYouTubePlaying) {
+                if (youtubePlayer) {
+                    try { youtubePlayer.stopVideo(); } catch(e) {}
+                }
+                isYouTubePlaying = false;
+                currentYouTubeId = null;
+            }
+            nextTrack();
+        }
 
         // ===== PROFILE FUNCTIONS =====
         async function detectDevice() {
