@@ -1268,7 +1268,20 @@
         }
         function songItemTemplate(s) {
             const isP = currentUrl === s.url, isS = selectedSongs.has(s.id);
-            return `<div class="song-item ${isP ? 'playing-active' : ''} ${isS ? 'selected-to-remove' : ''}" onclick="${isSelectionMode ? `toggleSelectSong(${s.id})` : `playSong('${s.title.replace(/'/g, "\'")}','${s.artist.replace(/'/g, "\'")}','${s.url}','${s.image}')`}"><div style="display:flex; align-items:center; flex:1"><div class="img-container"><img src="${s.image}" class="song-img"></div><div style="overflow:hidden; flex:1"><h4>${s.title}</h4><p style="font-size:10px; opacity:0.5">${s.artist}</p></div></div>${!isSelectionMode ? `<div class="more-btn" onclick="openMenu(event, ${s.id})">⋮</div>` : `<div style="color:var(--danger); font-weight:bold; margin-right:10px;">${isS ? '✓' : ''}</div>`}</div>`;
+            let clickAction;
+            if (isSelectionMode) {
+                clickAction = `toggleSelectSong(${s.id})`;
+            } else if (s.ytId) {
+                clickAction = `playYouTubeSong('${s.ytId}', '${s.title.replace(/'/g, "\\'")}', '${s.artist.replace(/'/g, "\\'")}', '${s.image}')`;
+            } else {
+                clickAction = `playSong('${s.title.replace(/'/g, "\\'")}','${s.artist.replace(/'/g, "\\'")}','${s.url}','${s.image}')`;
+            }
+            const moreBtn = !isSelectionMode 
+                ? (s.ytId 
+                    ? `<div class="more-btn" onclick="event.stopPropagation(); openYtMenu(event, '${s.ytId}')">⋮</div>` 
+                    : `<div class="more-btn" onclick="openMenu(event, ${s.id})">⋮</div>`)
+                : `<div style="color:var(--danger); font-weight:bold; margin-right:10px;">${isS ? '✓' : ''}</div>`;
+            return `<div class="song-item ${isP ? 'playing-active' : ''} ${isS ? 'selected-to-remove' : ''}" onclick="${clickAction}"><div style="display:flex; align-items:center; flex:1"><div class="img-container"><img src="${s.image}" class="song-img"></div><div style="overflow:hidden; flex:1"><h4>${s.title}</h4><p style="font-size:10px; opacity:0.5">${s.artist}</p></div></div>${moreBtn}</div>`;
         }
         function renderAll() {
             document.getElementById('mainPlaylistGrid').innerHTML = playlistsData.filter(p => p.name.toLowerCase().includes(searchQuery)).map(p => `<div class="card" onclick="openPlaylist('${p.name}')"><div class="art" style="background: url('${p.img}');"></div><p style="font-size:10px;">${p.name}</p></div>`).join('');
