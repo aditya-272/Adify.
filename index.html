@@ -618,7 +618,6 @@
             searchQuery = query.toLowerCase();
             document.getElementById('singleTracksContainer').style.display = 'block';
             renderAll();
-
             if (query.length >= 3) {
                 searchTimeout = setTimeout(() => {
                     searchYouTubeRealtime(query);
@@ -655,6 +654,24 @@
                     artist: item.snippet.channelTitle,
                     image: item.snippet.thumbnails.medium ? item.snippet.thumbnails.medium.url : item.snippet.thumbnails.default.url
                 }));
+
+                // NEW: Save search results to youtubeSongs permanently
+                youtubeResults.forEach(yt => {
+                    const exists = youtubeSongs.some(s => s.videoId === yt.videoId);
+                    if (!exists) {
+                        youtubeSongs.push({
+                            id: 'yt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                            ytId: yt.videoId,
+                            title: yt.title,
+                            artist: yt.artist,
+                            url: 'youtube://' + yt.videoId,
+                            image: yt.image
+                        });
+                    }
+                });
+                saveYoutubeSongs();
+                saveYoutubeSongsToCloud();
+                renderAll();
 
                 let html = '';
                 youtubeResults.forEach((song) => {
@@ -765,6 +782,10 @@
             saveRecentTracks();
             saveRecentTracksToCloud();
 
+            // NEW: Start auto-play mode
+            isAutoPlayMode = true;
+            startYoutubeAutoPlay(videoId);
+
             showPopup("▶ PLAYING", "success");
             refreshView();
         }
@@ -821,7 +842,11 @@
                         },
                         'onStateChange': function(event) {
                             if (event.data === YT.PlayerState.ENDED) {
-                                nextTrack();
+                                if (isAutoPlayMode) {
+                                    playNextYoutubeAuto();
+                                } else {
+                                    nextTrack();
+                                }
                             }
                             if (event.data === YT.PlayerState.PLAYING) {
                                 isPlaying = true;
@@ -895,6 +920,35 @@
             audio.src = "";
             audio.currentTime = 0;
             isPlaying = false;
+        }
+
+        function startYoutubeAutoPlay(currentVideoId) {
+            if (youtubeSongs.length === 0) return;
+            youtubeShuffleQueue = [...youtubeSongs];
+            // Fisher-Yates shuffle
+            for (let i = youtubeShuffleQueue.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [youtubeShuffleQueue[i], youtubeShuffleQueue[j]] = [youtubeShuffleQueue[j], youtubeShuffleQueue[i]];
+            }
+            currentYoutubeQueueIndex = youtubeShuffleQueue.findIndex(s => s.ytId === currentVideoId);
+            if (currentYoutubeQueueIndex === -1) currentYoutubeQueueIndex = 0;
+        }
+
+        function playNextYoutubeAuto() {
+            if (!isAutoPlayMode || youtubeShuffleQueue.length === 0) return;
+
+            currentYoutubeQueueIndex++;
+            if (currentYoutubeQueueIndex >= youtubeShuffleQueue.length) {
+                // Reshuffle and restart
+                for (let i = youtubeShuffleQueue.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [youtubeShuffleQueue[i], youtubeShuffleQueue[j]] = [youtubeShuffleQueue[j], youtubeShuffleQueue[i]];
+                }
+                currentYoutubeQueueIndex = 0;
+            }
+
+            const next = youtubeShuffleQueue[currentYoutubeQueueIndex];
+            playYouTubeSong(next.ytId, next.title, next.artist, next.image);
         }
 
         function stopAllPlayback() {
@@ -1061,6 +1115,10 @@
             recentTracks = [];
             shuffleQueue = [];
             currentQueueIndex = -1;
+            youtubeSongs = [];
+            isAutoPlayMode = false;
+            youtubeShuffleQueue = [];
+            currentYoutubeQueueIndex = -1;
             localStorage.removeItem('adify_current_session');
             sessionStorage.removeItem('adify_backup_session');
             hideLogout();
@@ -1180,8 +1238,7 @@
                             if (!users) return resolve(null);
                             for (let key in users) {
                                 if (users[key] && users[key].phone === lid) {
-                                    console.log("[Adify] Found user by phone:", key);
-                                    return checkUser(users[key]);
+                                    console.log("[Adify] Found user by phone:", key);                                    return checkUser(users[key]);
                                 }
                             }
                             resolve(null);
@@ -1197,10 +1254,12 @@
         function finalizeLogin(user) {
             currentUser = user;
             saveSession(user);
-            // NEW: Load user's saved playlists and recent tracks
+            // NEW: Load user's saved playlists, recent tracks, and youtube songs
             loadUserPlaylists();
             loadRecentTracks();
             loadRecentTracksFromCloud();
+            loadYoutubeSongs();
+            loadYoutubeSongsFromCloud();
             loadUserFromCloud(user.email).then(cloudData => {
                 if (cloudData) {
                     currentUser = cloudData;
@@ -1347,8 +1406,12 @@
         function renderAll() {
             document.getElementById('mainPlaylistGrid').innerHTML = playlistsData.filter(p => p.name.toLowerCase().includes(searchQuery)).map(p => `<div class="card" onclick="openPlaylist('${p.name}')"><div class="art" style="background: url('${p.img}');"></div><p style="font-size:10px;">${p.name}</p></div>`).join('');
 
-            // Merge allSongs + recentTracks, avoid duplicates
+            // Merge allSongs + youtubeSongs + recentTracks, avoid duplicates
             const merged = [...allSongs];
+            youtubeSongs.forEach(yt => {
+                const dup = merged.some(m => m.url === yt.url || (yt.ytId && m.ytId === yt.ytId));
+                if (!dup) merged.push(yt);
+            });
             recentTracks.forEach(rt => {
                 const dup = merged.some(m => m.url === rt.url || (rt.ytId && m.ytId === rt.ytId));
                 if (!dup) merged.push(rt);
@@ -1361,6 +1424,9 @@
             if (isYouTubePlaying) {
                 stopYouTubePlayer();
             }
+
+            // NEW: Stop auto-play mode for local songs
+            isAutoPlayMode = false;
 
             currentTrackData = { title: t, artist: a, url: u, image: i };
             currentUrl = u;
@@ -1438,6 +1504,11 @@
                     console.error("[Adify] YouTube toggle error:", e);
                 }
                 return;
+            }
+
+            // NEW: Stop auto-play when user manually pauses
+            if (isAutoPlayMode) {
+                isAutoPlayMode = false;
             }
 
             if (!audio.src || audio.src === window.location.href) {
@@ -1745,6 +1816,8 @@
                 loadUserPlaylists();
                 loadRecentTracks();
                 loadRecentTracksFromCloud();
+                loadYoutubeSongs();
+                loadYoutubeSongsFromCloud();
                 updateProfileUI(currentUser);
                 document.getElementById('loginScreen').classList.remove('active');
                 document.getElementById('homeScreen').classList.add('active');
@@ -1773,6 +1846,7 @@
             document.getElementById('homeScreen').classList.remove('active');
             document.getElementById('loginScreen').classList.add('active');
             loadRecentTracks();
+            loadYoutubeSongs();
             renderAll();
             detectDevice();
 
