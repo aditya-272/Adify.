@@ -200,7 +200,7 @@
         #edit-screen { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; padding: 30px; backdrop-filter: blur(20px); overflow-y: auto; }
         .edit-input { width: 100%; padding: 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-edge); border-radius: 15px; color: #fff; font-size: 15px; outline: none !important; transition: 0.3s; margin-bottom: 20px; }
         .edit-input:focus { border-color: var(--sky-blue); }
-
+        
         #yt-player-wrapper {
             position: fixed;
             bottom: 0;
@@ -217,7 +217,7 @@
             height: 200px;
             border: none;
         }
-
+        
         #loadingOverlay {
             position: fixed;
             inset: 0;
@@ -255,7 +255,7 @@
             color: var(--primary);
             font-size: 12px;
         }
-
+        
         @media (max-width: 400px) {
             .auth-card h1 { font-size: 36px; }
             .p-avatar { width: 120px; height: 120px; }
@@ -266,14 +266,14 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
 <body onclick="handleGlobalClick(event)">
-
+    
     <div id="loadingOverlay">
         <div class="loading-spinner"></div>
         <div class="loading-text">Loading...</div>
     </div>
-
+    
     <div id="yt-player-wrapper"></div>
-
+    
     <audio id="mainAudio"></audio>
     <div id="toast"><i class="fas fa-shield-alt"></i> PROFILE SECURED</div>
     <div id="status-popup"></div>
@@ -350,33 +350,33 @@
             <div id="searchToggleBtn" onclick="toggleSearchBar(event)">🔍</div>
             <div class="profile-btn" onclick="openProfile()"><img id="homeProfileImg" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100" alt="User"></div>
         </div>
-
+        
         <div id="searchWrapper" onclick="event.stopPropagation()">
             <input type="text" class="search-bar" id="searchInput" placeholder="Search tracks or YouTube..." oninput="handleSearchInput()" onkeydown="if(event.key==='Enter'){event.preventDefault(); searchYouTube();}">
             <button class="search-back" onclick="closeSearch()">BACK</button>
         </div>
-
+        
         <div class="menu-dropdown" id="globalPopup" onclick="event.stopPropagation()">
             <div class="menu-header">ADD TO PLAYLIST</div>
             <div id="playlistOptions"></div>
         </div>
-
+        
         <div id="homeView" class="view active">
             <p class="section-title">Playlists</p>
             <div class="playlist-grid" id="mainPlaylistGrid"></div>
-
+            
             <p class="section-title">Tracks</p>
             <div id="singleTracksContainer"></div>
-
+            
             <div id="ytResultsSection" style="display:none;">
-                <p class="section-title">🎵 Adify Results</p>
+                <p class="section-title">🎵 YouTube Results</p>
                 <div id="ytResults"></div>
             </div>
         </div>
-
+        
         <div id="playlistView" class="view">
             <div style="margin-bottom:20px;">
-                <button style="background:var(--glass); color:white; border:1px solid var(--border); padding:10px 18px; border-radius:10px; font-size:11px; cursor:pointer;" onclick="resetToHome()">🏠 Back</button>
+                <button style="background:var(--glass); color:white; border:1px solid var(--border); padding:10px 18px; border-radius:10px; font-size:11px; cursor:pointer;" onclick="resetToHome()">🏠 HOME</button>
             </div>
             <h2 id="playlistTitle" style="font-size:24px; margin-bottom:15px; color:var(--primary);"></h2>
             <div class="playlist-actions">
@@ -386,7 +386,7 @@
             </div>
             <div id="songsContainer"></div>
         </div>
-
+        
         <div class="player">
             <div class="player-main">
                 <div class="player-info">
@@ -496,6 +496,7 @@
             <i class="fas fa-headset"></i>
         </div>
     </div>
+
     <script>
         // ===== YOUTUBE API CONFIG =====
         const YOUTUBE_API_KEY = "AIzaSyB3qn_Mk8ct7ePFztqObXUvptoCvNt7kzU";
@@ -512,50 +513,12 @@
         let ytTimeInterval = null;
         let ytPlayerReady = false;
 
-        // ===== PLAYLIST PERSISTENCE FUNCTIONS =====
-        // NEW: These functions save/load playlists per user in localStorage
-        function getPlaylistStorageKey() {
-            if (currentUser && currentUser.email) {
-                return 'adify_playlists_' + currentUser.email.replace(/\./g, '_');
-            }
-            return 'adify_playlists_default';
-        }
-
-        function saveUserPlaylists() {
-            const key = getPlaylistStorageKey();
-            try {
-                localStorage.setItem(key, JSON.stringify(userPlaylists));
-                console.log("[Adify] Playlists saved for", currentUser ? currentUser.email : 'default');
-            } catch(e) {
-                console.error("[Adify] Failed to save playlists:", e);
-            }
-        }
-
-        function loadUserPlaylists() {
-            const key = getPlaylistStorageKey();
-            try {
-                const saved = localStorage.getItem(key);
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    // Merge saved playlists with defaults to ensure all keys exist
-                    Object.keys(userPlaylists).forEach(pName => {
-                        if (parsed[pName] && Array.isArray(parsed[pName])) {
-                            userPlaylists[pName] = parsed[pName];
-                        }
-                    });
-                    console.log("[Adify] Playlists loaded:", Object.keys(userPlaylists).map(k => k + "=" + userPlaylists[k].length).join(", "));
-                }
-            } catch(e) {
-                console.error("[Adify] Failed to load playlists:", e);
-            }
-        }
-
         // ===== YOUTUBE SEARCH - REALTIME =====
         function handleSearchInput() {
             const query = document.getElementById('searchInput').value.trim();
-
+            
             if (searchTimeout) clearTimeout(searchTimeout);
-
+            
             if (!query) {
                 document.getElementById('singleTracksContainer').style.display = 'block';
                 document.getElementById('ytResultsSection').style.display = 'none';
@@ -563,11 +526,11 @@
                 renderAll();
                 return;
             }
-
+            
             searchQuery = query.toLowerCase();
             document.getElementById('singleTracksContainer').style.display = 'block';
             renderAll();
-
+            
             if (query.length >= 3) {
                 searchTimeout = setTimeout(() => {
                     searchYouTubeRealtime(query);
@@ -578,25 +541,25 @@
         async function searchYouTubeRealtime(query) {
             const resultsDiv = document.getElementById('ytResults');
             const section = document.getElementById('ytResultsSection');
-
+            
             section.style.display = 'block';
             resultsDiv.innerHTML = '<div class="yt-loading">🔍 Searching YouTube...</div>';
-
+            
             try {
                 const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query + " song")}&type=video&videoCategoryId=10&key=${YOUTUBE_API_KEY}&maxResults=10`;
                 const response = await fetch(url);
                 const data = await response.json();
-
+                
                 if (data.error) {
                     section.style.display = 'none';
                     return;
                 }
-
+                
                 if (!data.items || data.items.length === 0) {
                     section.style.display = 'none';
                     return;
                 }
-
+                
                 youtubeResults = data.items.map((item, idx) => ({
                     id: 'yt_' + idx,
                     videoId: item.id.videoId,
@@ -604,14 +567,14 @@
                     artist: item.snippet.channelTitle,
                     image: item.snippet.thumbnails.medium ? item.snippet.thumbnails.medium.url : item.snippet.thumbnails.default.url
                 }));
-
+                
                 let html = '';
                 youtubeResults.forEach((song) => {
                     html += ytSongItemTemplate(song);
                 });
-
+                
                 resultsDiv.innerHTML = html;
-
+                
             } catch (err) {
                 console.error("[Adify] YouTube search error:", err);
                 section.style.display = 'none';
@@ -628,7 +591,7 @@
         function ytSongItemTemplate(s) {
             const isP = currentYouTubeId === s.videoId;
             return `
-                <div class="song-item ${isP ? 'playing-active' : ''}" onclick="playYouTubeSong('${s.videoId}', '${s.title.replace(/'/g, "\'")}', '${s.artist.replace(/'/g, "\'")}', '${s.image}')">
+                <div class="song-item ${isP ? 'playing-active' : ''}" onclick="playYouTubeSong('${s.videoId}', '${s.title.replace(/'/g, "\\'")}', '${s.artist.replace(/'/g, "\\'")}', '${s.image}')">
                     <div style="display:flex; align-items:center; flex:1">
                         <div class="img-container">
                             <img src="${s.image}" class="song-img">
@@ -671,19 +634,20 @@
                     showToast("Added!");
                 }
             }
-            // SAVE PLAYLISTS AFTER EVERY CHANGE
-            saveUserPlaylists();
             document.getElementById('globalPopup').classList.remove('show');
         }
 
+        // ===== FIXED: playYouTubeSong - Properly stops local audio, resets UI, loads player =====
         function playYouTubeSong(videoId, title, channel, thumbUrl) {
+            // Stop local audio first
             stopLocalAudio();
-
+            
             currentYouTubeId = videoId;
             isYouTubePlaying = true;
             currentUrl = 'youtube://' + videoId;
             isPlaying = true;
-
+            
+            // Update player UI
             document.getElementById('pTitle').innerText = title.substring(0, 30);
             document.getElementById('pArtist').innerText = channel;
             const art = document.getElementById('playerImgArt');
@@ -691,22 +655,26 @@
             art.style.backgroundSize = 'cover';
             art.classList.add('music-playing');
             updatePlayIcon(true);
-
+            
+            // Reset time display
             document.getElementById('currentTime').innerText = "0:00";
             document.getElementById('totalDuration').innerText = "0:00";
             document.getElementById('fill').style.width = '0%';
             document.getElementById('seekSlider').value = 0;
-
+            
+            // Load YouTube player
             loadYouTubePlayer(videoId);
-
+            
             showPopup("▶ PLAYING", "success");
             refreshView();
         }
 
+        // ===== FIXED: loadYouTubePlayer - Loads API then creates player =====
         function loadYouTubePlayer(videoId) {
             const wrapper = document.getElementById('yt-player-wrapper');
             wrapper.innerHTML = '';
-
+            
+            // Load YouTube IFrame API first
             if (!window.YT || !YT.Player) {
                 const tag = document.createElement('script');
                 tag.src = "https://www.youtube.com/iframe_api";
@@ -719,6 +687,7 @@
             }
         }
 
+        // ===== FIXED: onYouTubeIframeAPIReady - Handles pending video =====
         window.onYouTubeIframeAPIReady = function() {
             if (window._pendingVideoId) {
                 createYouTubePlayer(window._pendingVideoId);
@@ -726,10 +695,11 @@
             }
         };
 
+        // ===== FIXED: createYouTubePlayer - Proper player with time updates =====
         function createYouTubePlayer(videoId) {
             const wrapper = document.getElementById('yt-player-wrapper');
             wrapper.innerHTML = '<div id="youtube-player"></div>';
-
+            
             try {
                 youtubePlayer = new YT.Player('youtube-player', {
                     height: '1',
@@ -782,6 +752,7 @@
             }
         }
 
+        // ===== FIXED: startYtTimeUpdate - Interval for YouTube time/progress =====
         function startYtTimeUpdate() {
             if (ytTimeInterval) clearInterval(ytTimeInterval);
             ytTimeInterval = setInterval(() => {
@@ -789,7 +760,7 @@
                 try {
                     ytCurrentTime = youtubePlayer.getCurrentTime();
                     ytDuration = youtubePlayer.getDuration();
-
+                    
                     if (ytDuration > 0) {
                         const pct = (ytCurrentTime / ytDuration) * 100;
                         document.getElementById('fill').style.width = pct + '%';
@@ -801,6 +772,7 @@
             }, 500);
         }
 
+        // ===== FIXED: stopYtTimeUpdate - Clears interval =====
         function stopYtTimeUpdate() {
             if (ytTimeInterval) {
                 clearInterval(ytTimeInterval);
@@ -808,6 +780,7 @@
             }
         }
 
+        // ===== FIXED: stopYouTubePlayer - Proper cleanup =====
         function stopYouTubePlayer() {
             stopYtTimeUpdate();
             if (youtubePlayer) {
@@ -824,6 +797,7 @@
             ytCurrentTime = 0;
         }
 
+        // ===== FIXED: stopLocalAudio - Stops audio and resets UI =====
         function stopLocalAudio() {
             audio.pause();
             audio.src = "";
@@ -831,6 +805,7 @@
             isPlaying = false;
         }
 
+        // ===== FIXED: stopAllPlayback - Stops everything =====
         function stopAllPlayback() {
             stopLocalAudio();
             stopYouTubePlayer();
@@ -842,15 +817,15 @@
             document.getElementById('seekSlider').value = 0;
         }
 
+        // ===== FIXED: updatePlayIcon - Centralized icon update =====
         function updatePlayIcon(playing) {
             const icon = document.getElementById('playIcon');
             if (playing) {
-                icon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+                icon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'; // Pause icon
             } else {
-                icon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+                icon.innerHTML = '<path d="M8 5v14l11-7z"/>'; // Play icon
             }
         }
-
         // ===== SESSION BACKUP FUNCTIONS =====
         function saveSession(userData) {
             const data = JSON.stringify(userData);
@@ -858,7 +833,7 @@
             sessionStorage.setItem('adify_backup_session', data);
             localStorage.setItem(userData.email, data);
         }
-
+        
         function getSession() {
             let session = localStorage.getItem('adify_current_session');
             if (session) {
@@ -920,7 +895,7 @@
             messagingSenderId: "534415071027",
             appId: "1:534415071027:web:255cb8f8869d87459a5046"
         };
-
+        
         let db = null;
         try {
             firebase.initializeApp(firebaseConfig);
@@ -952,10 +927,7 @@
         // ===== AUDIO STATE =====
         const audio = document.getElementById("mainAudio");
         let currentUrl = "", searchQuery = "", activeP = null, isDragging = false, isSelectionMode = false, currentTrackData = null, selectedSongs = new Set();
-
-        // Default empty playlists - will be populated from localStorage on login
         const userPlaylists = { "Lo-Fi Sleep 😴": [], "Study Focus 📖": [], "Traveling ✈️": [], "My Playlist 💖": [] };
-
         const allSongs = [
             { id: 1, title: "Udariyan", artist: "Aditya", url: "https://www.image2url.com/r2/default/audio/1778420635219-a057d459-d0af-413e-bd2f-5f148740396c.mp3", image: "https://files.catbox.moe/0j9stc.jpeg" },
             { id: 2, title: "BEST SHORT SONG", artist: "Aditya", url: "https://www.image2url.com/r2/default/audio/1778446960362-cacf9cfe-95fa-4724-80cd-79e9e3e38a08.mp3", image: "https://files.catbox.moe/0j9stc.jpeg" },
@@ -1078,7 +1050,7 @@
                     resolve({ error: "FIREBASE NOT CONNECTED" }); 
                     return; 
                 }
-
+                
                 const checkUser = (user) => {
                     if (!user) return resolve(null);
                     if (user.password === lpass) {
@@ -1089,7 +1061,7 @@
                         resolve({ error: "WRONG PASSWORD" });
                     }
                 };
-
+                
                 if (lid.includes('@')) {
                     const safeKey = lid.replace(/\./g, '_');
                     console.log("[Adify] Firebase lookup by email:", safeKey);
@@ -1128,8 +1100,6 @@
         function finalizeLogin(user) {
             currentUser = user;
             saveSession(user);
-            // NEW: Load user's saved playlists
-            loadUserPlaylists();
             loadUserFromCloud(user.email).then(cloudData => {
                 if (cloudData) {
                     currentUser = cloudData;
@@ -1148,16 +1118,15 @@
             if (!isRegisterMode) {
                 const lid = document.getElementById('login-id').value.toLowerCase().trim();
                 const lpass = document.getElementById('login-pass').value;
-
+                
                 if (lid === "1" && lpass === "1") {
                     showPopup("MASTER LOGIN SUCCESS", "success");
                     currentUser = { name: 'Master', email: 'master@adify.com', phone: '0000000000', gender: 'Male', age: 21 };
                     saveSession(currentUser);
-                    loadUserPlaylists();
                     setTimeout(() => { openHome(); }, 1000); 
                     return;
                 }
-
+                
                 const localUser = findUserLocal(lid);
                 if (localUser) {
                     if (localUser.password === lpass) {
@@ -1167,10 +1136,10 @@
                     }
                     return;
                 }
-
+                
                 showPopup("VERIFYING USER...", "success");
                 const result = await tryFirebaseLogin(lid, lpass);
-
+                
                 if (result === null) {
                     showPopup("USER NOT FOUND", "error");
                 } else if (result.error) {
@@ -1183,7 +1152,7 @@
                 } else {
                     finalizeLogin(result);
                 }
-
+                
             } else {
                 const name = document.getElementById('full-name').value;
                 const emailInput = document.getElementById('reg-email').value;
@@ -1191,20 +1160,20 @@
                 const phone = document.getElementById('reg-phone').value;
                 const pass = document.getElementById('reg-pass').value;
                 const age = document.getElementById('reg-age').value;
-
+                
                 if (localStorage.getItem(email)) { showPopup("EMAIL ALREADY REGISTERED", "error"); return; }
-
+                
                 let phoneCountKey = "count_" + phone;
                 let currentCount = parseInt(localStorage.getItem(phoneCountKey)) || 0;
                 if (currentCount >= 3) { showPopup("MAX 3 ACCOUNTS PER NUMBER", "error"); return; }
-
+                
                 if (name && emailRegex.test(emailInput) && phone.length === 10 && pass.length >= 8 && age >= 18) {
                     const userData = { name: name, email: email, phone: phone, password: pass, gender: selectedGender, age: age, photo: null };
                     localStorage.setItem(email, JSON.stringify(userData));
                     localStorage.setItem(phone, JSON.stringify(userData));
                     localStorage.setItem(phoneCountKey, currentCount + 1);
                     saveSession(userData);
-
+                    
                     showPopup("SYNCING TO CLOUD...", "success");
                     try {
                         await saveUserToCloud(userData);
@@ -1213,7 +1182,7 @@
                         console.error("[Adify] Cloud save failed:", e);
                         showPopup("REGISTERED - CLOUD SYNC FAILED", "error");
                     }
-
+                    
                     setTimeout(() => {
                         toggleAuth(false);
                         showPopup("PLEASE LOG IN WITH YOUR DETAILS", "success");
@@ -1223,7 +1192,6 @@
                 }
             }
         }
-
         // ===== HOME FUNCTIONS =====
         function handleGlobalClick() {
             document.getElementById('globalPopup').classList.remove('show');
@@ -1238,7 +1206,7 @@
                 document.getElementById('searchInput').focus();
             }
         }
-
+        
         function closeSearch() { 
             searchQuery = ""; 
             document.getElementById('searchInput').value = ""; 
@@ -1262,35 +1230,38 @@
             if (ex) userPlaylists[pN] = userPlaylists[pN].filter(s => s.id !== id);
             else userPlaylists[pN].push(allSongs.find(s => s.id === id));
             showToast(ex ? "Removed!" : "Added!");
-            // NEW: Save playlists after every change
-            saveUserPlaylists();
             document.getElementById('globalPopup').classList.remove('show'); refreshView();
         }
         function songItemTemplate(s) {
             const isP = currentUrl === s.url, isS = selectedSongs.has(s.id);
-            return `<div class="song-item ${isP ? 'playing-active' : ''} ${isS ? 'selected-to-remove' : ''}" onclick="${isSelectionMode ? `toggleSelectSong(${s.id})` : `playSong('${s.title.replace(/'/g, "\'")}','${s.artist.replace(/'/g, "\'")}','${s.url}','${s.image}')`}"><div style="display:flex; align-items:center; flex:1"><div class="img-container"><img src="${s.image}" class="song-img"></div><div style="overflow:hidden; flex:1"><h4>${s.title}</h4><p style="font-size:10px; opacity:0.5">${s.artist}</p></div></div>${!isSelectionMode ? `<div class="more-btn" onclick="openMenu(event, ${s.id})">⋮</div>` : `<div style="color:var(--danger); font-weight:bold; margin-right:10px;">${isS ? '✓' : ''}</div>`}</div>`;
+            return `<div class="song-item ${isP ? 'playing-active' : ''} ${isS ? 'selected-to-remove' : ''}" onclick="${isSelectionMode ? `toggleSelectSong(${s.id})` : `playSong('${s.title.replace(/'/g, "\\'")}','${s.artist.replace(/'/g, "\\'")}','${s.url}','${s.image}')`}"><div style="display:flex; align-items:center; flex:1"><div class="img-container"><img src="${s.image}" class="song-img"></div><div style="overflow:hidden; flex:1"><h4>${s.title}</h4><p style="font-size:10px; opacity:0.5">${s.artist}</p></div></div>${!isSelectionMode ? `<div class="more-btn" onclick="openMenu(event, ${s.id})">⋮</div>` : `<div style="color:var(--danger); font-weight:bold; margin-right:10px;">${isS ? '✓' : ''}</div>`}</div>`;
         }
         function renderAll() {
             document.getElementById('mainPlaylistGrid').innerHTML = playlistsData.filter(p => p.name.toLowerCase().includes(searchQuery)).map(p => `<div class="card" onclick="openPlaylist('${p.name}')"><div class="art" style="background: url('${p.img}');"></div><p style="font-size:10px;">${p.name}</p></div>`).join('');
             document.getElementById('singleTracksContainer').innerHTML = allSongs.filter(s => s.title.toLowerCase().includes(searchQuery)).map(s => songItemTemplate(s)).join('');
         }
-
+        
+        // ===== FIXED: playSong - Better error handling, no popup spam =====
         function playSong(t, a, u, i) {
+            // Stop YouTube if playing
             if (isYouTubePlaying) {
                 stopYouTubePlayer();
             }
-
+            
             currentTrackData = { title: t, artist: a, url: u, image: i };
             currentUrl = u;
             isPlaying = true;
-
+            
+            // Reset audio and set new source
             audio.pause();
             audio.src = u;
             audio.load();
-
+            
+            // Play with error handling
             const playPromise = audio.play();
             if (playPromise !== undefined) {
                 playPromise.then(() => {
+                    // Playback started successfully
                     document.getElementById('pTitle').innerText = t;
                     document.getElementById('pArtist').innerText = a;
                     const art = document.getElementById('playerImgArt');
@@ -1300,6 +1271,7 @@
                     updatePlayIcon(true);
                 }).catch(err => {
                     console.error("[Adify] Audio play error:", err);
+                    // Don't show popup - just update UI to show it's trying to play
                     document.getElementById('pTitle').innerText = t;
                     document.getElementById('pArtist').innerText = a;
                     const art = document.getElementById('playerImgArt');
@@ -1309,6 +1281,7 @@
                     isPlaying = false;
                 });
             } else {
+                // For browsers that don't return promise
                 document.getElementById('pTitle').innerText = t;
                 document.getElementById('pArtist').innerText = a;
                 const art = document.getElementById('playerImgArt');
@@ -1317,10 +1290,11 @@
                 art.classList.add('music-playing');
                 updatePlayIcon(true);
             }
-
+            
             refreshView();
         }
-
+        
+        // ===== FIXED: togglePlay - Works for both Audio and YouTube =====
         function togglePlay() {
             if (isYouTubePlaying && youtubePlayer && ytPlayerReady) {
                 try {
@@ -1340,12 +1314,13 @@
                 }
                 return;
             }
-
+            
+            // Local audio play/pause
             if (!audio.src || audio.src === window.location.href) {
                 nextTrack();
                 return;
             }
-
+            
             if (audio.paused) {
                 const playPromise = audio.play();
                 if (playPromise !== undefined) {
@@ -1366,12 +1341,13 @@
                 document.getElementById('playerImgArt').classList.remove('music-playing');
             }
         }
-
+        
+        // ===== FIXED: handleSeekInput =====
         function handleSeekInput() {
             const s = document.getElementById('seekSlider');
             const pct = (s.value / s.max) * 100;
             document.getElementById('fill').style.width = pct + '%';
-
+            
             if (!isYouTubePlaying && audio.duration && isFinite(audio.duration)) {
                 isDragging = true;
                 const time = audio.duration * (s.value / 1000);
@@ -1382,10 +1358,11 @@
                 document.getElementById('currentTime').innerText = formatTime(time);
             }
         }
-
+        
+        // ===== FIXED: handleSeekChange =====
         function handleSeekChange() {
             const s = document.getElementById('seekSlider');
-
+            
             if (isYouTubePlaying && youtubePlayer && ytPlayerReady && ytDuration > 0) {
                 const seekTime = ytDuration * (s.value / 1000);
                 try {
@@ -1399,7 +1376,8 @@
                 isDragging = false;
             }
         }
-
+        
+        // ===== FIXED: audio.ontimeupdate - Check for valid duration =====
         audio.ontimeupdate = () => {
             if (!isDragging && audio.duration && isFinite(audio.duration) && !isYouTubePlaying) {
                 const p = (audio.currentTime / audio.duration) * 100;
@@ -1409,27 +1387,30 @@
                 document.getElementById('totalDuration').innerText = formatTime(audio.duration);
             }
         };
-
+        
         audio.onended = () => { 
             isPlaying = false;
             updatePlayIcon(false);
             document.getElementById('playerImgArt').classList.remove('music-playing');
             nextTrack(); 
         };
-
+        
         audio.onloadedmetadata = () => {
             if (!isYouTubePlaying && audio.duration && isFinite(audio.duration)) {
                 document.getElementById('totalDuration').innerText = formatTime(audio.duration);
             }
         };
-
+        
+        // ===== FIXED: audio.onerror - Silent fail, no popup spam =====
         audio.onerror = () => {
             console.error("[Adify] Audio error:", audio.error);
             isPlaying = false;
             updatePlayIcon(false);
             document.getElementById('playerImgArt').classList.remove('music-playing');
+            // Don't show popup - just log to console
+            // The song title still shows in player so user knows what was selected
         };
-
+        
         function openPlaylist(n) {
             activeP = n;
             document.getElementById('homeView').classList.remove('active');
@@ -1462,25 +1443,21 @@
             renderPlaylistSongs();
         }
         function toggleSelectSong(id) { selectedSongs.has(id) ? selectedSongs.delete(id) : selectedSongs.add(id); renderPlaylistSongs(); }
-        function confirmRemoval() { 
-            userPlaylists[activeP] = userPlaylists[activeP].filter(s => !selectedSongs.has(s.id)); 
-            // NEW: Save playlists after removal
-            saveUserPlaylists();
-            showToast("Songs Removed!"); 
-            disableSelectionMode(); 
-        }
+        function confirmRemoval() { userPlaylists[activeP] = userPlaylists[activeP].filter(s => !selectedSongs.has(s.id)); showToast("Songs Removed!"); disableSelectionMode(); }
         function renderPlaylistSongs() {
             let list = userPlaylists[activeP] || [];
             document.getElementById('songsContainer').innerHTML = list.length ? list.map(s => songItemTemplate(s)).join('') : "<p style='text-align:center; opacity:0.3; padding:20px;'>Empty.</p>";
         }
         function refreshView() { if (activeP) renderPlaylistSongs(); else renderAll(); }
-
+        
+        // ===== FIXED: nextTrack =====
         function nextTrack() {
             stopAllPlayback();
             const r = allSongs[Math.floor(Math.random() * allSongs.length)];
             playSong(r.title, r.artist, r.url, r.image);
         }
-
+        
+        // ===== FIXED: prevTrack =====
         function prevTrack() {
             stopAllPlayback();
             const r = allSongs[Math.floor(Math.random() * allSongs.length)];
@@ -1524,15 +1501,15 @@
                 currentUser.age = newAge;
                 currentUser.gender = selectedGenderProfile;
                 if (currentPhoto) currentUser.photo = currentPhoto;
-
+                
                 localStorage.setItem(currentUser.email, JSON.stringify(currentUser));
                 if (currentUser.phone) localStorage.setItem(currentUser.phone, JSON.stringify(currentUser));
                 saveSession(currentUser);
-
+                
                 updateProfileInCloud(currentUser.email, {
                     name: newName, age: newAge, gender: selectedGenderProfile, photo: currentUser.photo
                 });
-
+                
                 document.getElementById('display-name').innerText = newName;
                 document.getElementById('p-gender').innerText = selectedGenderProfile;
                 document.getElementById('p-age').innerText = newAge + " Years";
@@ -1601,24 +1578,22 @@
         // ===== window.onload =====
         window.onload = function() {
             const user = getSession();
-
+            
             if (user) {
                 currentUser = user;
-                // NEW: Load saved playlists for this user
-                loadUserPlaylists();
                 updateProfileUI(currentUser);
                 document.getElementById('loginScreen').classList.remove('active');
                 document.getElementById('homeScreen').classList.add('active');
                 renderAll();
                 detectDevice();
-
+                
                 const loader = document.getElementById('loadingOverlay');
                 if (loader) loader.classList.add('hidden');
-
+                
                 setTimeout(() => {
                     showPopup("WELCOME BACK, " + (currentUser.name || "USER").toUpperCase(), "success");
                 }, 500);
-
+                
                 loadUserFromCloud(currentUser.email).then(cloudData => {
                     if (cloudData) {
                         currentUser = cloudData;
@@ -1626,19 +1601,19 @@
                         updateProfileUI(currentUser);
                     }
                 }).catch(() => {});
-
+                
                 setupBackButton();
                 return;
             }
-
+            
             document.getElementById('homeScreen').classList.remove('active');
             document.getElementById('loginScreen').classList.add('active');
             renderAll();
             detectDevice();
-
+            
             const loader = document.getElementById('loadingOverlay');
             if (loader) loader.classList.add('hidden');
-
+            
             setupBackButton();
         };
     </script>
