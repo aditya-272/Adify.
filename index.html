@@ -136,7 +136,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
-<body onclick="handleGlobalClick(event)">
+<body>
 
 <div id="loadingOverlay">
     <div class="loading-spinner"></div>
@@ -155,8 +155,8 @@
         <p class="subtitle">Premium Sound Experience</p>
         <div id="login-section">
             <div class="input-group"><p class="label">Email or Phone</p><input type="text" id="login-id" class="auth-input" placeholder="Email or 10-digit phone"></div>
-            <div class="input-group"><p class="label">Password</p><input type="password" id="login-pass" class="auth-input" placeholder="••••••••"><i class="fas fa-eye eye-icon" onclick="togglePass('login-pass', this)"></i></div>
-            <div class="forgot-link" onclick="openForgotModal()">Forgot Password?</div>
+            <div class="input-group"><p class="label">Password</p><input type="password" id="login-pass" class="auth-input" placeholder="••••••••"><i class="fas fa-eye eye-icon" onclick="window.togglePass('login-pass', this)"></i></div>
+            <div class="forgot-link" onclick="window.openForgotModal()">Forgot Password?</div>
         </div>
         <div id="reg-fields">
             <div class="input-group"><p class="label">Full Name</p><input type="text" id="full-name" class="auth-input"></div>
@@ -164,40 +164,40 @@
             <div class="input-group"><p class="label">Contact Number</p><input type="tel" id="reg-phone" class="auth-input" placeholder="10 digits" maxlength="10"></div>
             <div style="display:flex;gap:10px;">
                 <div class="input-group" style="flex:1"><p class="label">Age</p><input type="number" id="reg-age" class="auth-input" placeholder="18+"></div>
-                <div class="input-group" style="flex:2"><p class="label">Gender</p><div class="gender-container"><div class="gender-opt active" onclick="setGender(this,'Male')">M</div><div class="gender-opt" onclick="setGender(this,'Female')">F</div><div class="gender-opt" onclick="setGender(this,'Other')">O</div></div></div>
+                <div class="input-group" style="flex:2"><p class="label">Gender</p><div class="gender-container"><div class="gender-opt active" onclick="window.setGender(this,'Male')">M</div><div class="gender-opt" onclick="window.setGender(this,'Female')">F</div><div class="gender-opt" onclick="window.setGender(this,'Other')">O</div></div></div>
             </div>
-            <div class="input-group"><p class="label">Password</p><input type="password" id="reg-pass" class="auth-input" placeholder="Min 8 chars"><i class="fas fa-eye eye-icon" onclick="togglePass('reg-pass', this)"></i><div id="reg-pass-err" class="err-msg">Min 8 characters</div></div>
-            <div class="input-group"><button type="button" class="btn-auth" style="margin-top:0;background:#333;" onclick="sendOTP()">Send OTP</button><input type="text" id="otp-code" class="auth-input" placeholder="Enter OTP" style="margin-top:10px;"><div id="otp-status" class="err-msg"></div></div>
+            <div class="input-group"><p class="label">Password</p><input type="password" id="reg-pass" class="auth-input" placeholder="Min 8 chars"><i class="fas fa-eye eye-icon" onclick="window.togglePass('reg-pass', this)"></i><div id="reg-pass-err" class="err-msg">Min 8 characters</div></div>
+            <div class="input-group"><button type="button" class="btn-auth" style="margin-top:0;background:#333;" onclick="window.sendOTP()">Send OTP</button><input type="text" id="otp-code" class="auth-input" placeholder="Enter OTP" style="margin-top:10px;"><div id="otp-status" class="err-msg"></div></div>
         </div>
-        <button class="btn-auth" id="main-btn" onclick="handleSubmit()">LOG IN</button>
-        <p class="toggle-text" id="switch-text">New here? <span onclick="toggleAuth(true)">Create Account</span></p>
+        <button class="btn-auth" id="main-btn" onclick="window.handleSubmit()">LOG IN</button>
+        <p class="toggle-text" id="switch-text">New here? <span onclick="window.toggleAuth(true)">Create Account</span></p>
     </div>
 </div>
 
 <!-- HOME SCREEN -->
 <div id="homeScreen" class="app-screen">
-    <div class="home-header"><div class="logo" onclick="resetToHome()">ADIFY</div><div id="searchToggleBtn" onclick="openSearchScreen(event)">🔍</div><div class="profile-btn" onclick="openProfile()"><img id="homeProfileImg" src="https://api.dicebear.com/7.x/avataaars/svg?seed=user"></div></div>
+    <div class="home-header"><div class="logo" onclick="window.resetToHome()">ADIFY</div><div id="searchToggleBtn" onclick="window.openSearchScreen(event)">🔍</div><div class="profile-btn" onclick="window.openProfile()"><img id="homeProfileImg" src="https://api.dicebear.com/7.x/avataaars/svg?seed=user"></div></div>
     <div id="homeView" class="view active"><p class="section-title">Playlists</p><div class="playlist-grid" id="mainPlaylistGrid"></div><p class="section-title">Tracks</p><div id="singleTracksContainer"></div><p class="section-title">Recently Played</p><div id="recentlyPlayedContainer"></div></div>
-    <div id="playlistView" class="view"><button class="back-home-btn" onclick="resetToHome()">🏠 HOME</button><h2 id="playlistTitle" style="font-size:24px;margin-bottom:15px;color:var(--primary);"></h2><div id="songsContainer"></div></div>
-    <div class="player"><div class="player-main"><div class="player-info"><div class="player-art" id="playerImgArt"></div><div><h4 id="pTitle" style="font-size:11px;">Select a song</h4><p id="pArtist" style="font-size:9px;color:var(--primary);">---</p></div></div><div class="controls"><div class="nav-btn" onclick="prevTrack()"><svg viewBox="0 0 24 24" width="22" fill="white"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></div><div class="play-btn" id="playBtn" onclick="togglePlay()"><svg id="playIcon" viewBox="0 0 24 24" width="22" fill="white"><path d="M8 5v14l11-7z"/></svg></div><div class="nav-btn" onclick="nextTrack()"><svg viewBox="0 0 24 24" width="22" fill="white"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></div></div></div><div class="time-container"><div class="time-info"><span id="currentTime">0:00</span><span id="totalDuration">0:00</span></div><div class="time-bar"><div class="fill" id="fill"></div><input type="range" id="seekSlider" min="0" max="1000" value="0" oninput="handleSeekInput()" onchange="handleSeekChange()"></div></div></div>
+    <div id="playlistView" class="view"><button class="back-home-btn" onclick="window.resetToHome()">🏠 HOME</button><h2 id="playlistTitle" style="font-size:24px;margin-bottom:15px;color:var(--primary);"></h2><div id="songsContainer"></div></div>
+    <div class="player"><div class="player-main"><div class="player-info"><div class="player-art" id="playerImgArt"></div><div><h4 id="pTitle" style="font-size:11px;">Select a song</h4><p id="pArtist" style="font-size:9px;color:var(--primary);">---</p></div></div><div class="controls"><div class="nav-btn" onclick="window.prevTrack()"><svg viewBox="0 0 24 24" width="22" fill="white"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></div><div class="play-btn" id="playBtn" onclick="window.togglePlay()"><svg id="playIcon" viewBox="0 0 24 24" width="22" fill="white"><path d="M8 5v14l11-7z"/></svg></div><div class="nav-btn" onclick="window.nextTrack()"><svg viewBox="0 0 24 24" width="22" fill="white"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></div></div></div><div class="time-container"><div class="time-info"><span id="currentTime">0:00</span><span id="totalDuration">0:00</span></div><div class="time-bar"><div class="fill" id="fill"></div><input type="range" id="seekSlider" min="0" max="1000" value="0" oninput="window.handleSeekInput()" onchange="window.handleSeekChange()"></div></div></div>
     <div class="watermark">Made by Aditya</div>
 </div>
 
 <!-- SEARCH SCREEN -->
-<div id="searchScreen" class="app-screen"><div class="search-header"><div class="search-back-btn" onclick="closeSearch()"><i class="fas fa-arrow-left"></i></div><div class="search-input-wrapper"><input type="text" class="search-page-input" id="searchPageInput" placeholder="Search tracks, artists, YouTube..." oninput="handleSearchPageInput()"><i class="fas fa-times search-clear-btn" id="searchClearBtn" onclick="clearSearchInput()"></i></div></div><div class="search-content" id="searchContent"><div id="recentSearchesSection"><div class="recent-searches-header"><span class="recent-searches-title">Recent Searches</span><span class="clear-all-btn" onclick="clearAllRecentSearches()">Clear All</span></div><div id="recentSearchesList"></div></div><div id="searchResultsSection" style="display:none;"><p class="section-title">Tracks</p><div id="searchResultsTracks"></div><div id="ytSearchResultsSection" style="display:none;"><p class="section-title">YouTube Results</p><div id="searchResultsYouTube"></div></div></div></div></div>
+<div id="searchScreen" class="app-screen"><div class="search-header"><div class="search-back-btn" onclick="window.closeSearch()"><i class="fas fa-arrow-left"></i></div><div class="search-input-wrapper"><input type="text" class="search-page-input" id="searchPageInput" placeholder="Search tracks, artists, YouTube..." oninput="window.handleSearchPageInput()"><i class="fas fa-times search-clear-btn" id="searchClearBtn" onclick="window.clearSearchInput()"></i></div></div><div class="search-content" id="searchContent"><div id="recentSearchesSection"><div class="recent-searches-header"><span class="recent-searches-title">Recent Searches</span><span class="clear-all-btn" onclick="window.clearAllRecentSearches()">Clear All</span></div><div id="recentSearchesList"></div></div><div id="searchResultsSection" style="display:none;"><p class="section-title">Tracks</p><div id="searchResultsTracks"></div><div id="ytSearchResultsSection" style="display:none;"><p class="section-title">YouTube Results</p><div id="searchResultsYouTube"></div></div></div></div></div>
 
 <!-- PROFILE SCREEN -->
-<div id="profileScreen" class="profile-screen"><div class="profile-back-btn" onclick="closeProfile()"><i class="fas fa-arrow-left"></i></div><div id="profile-content"><div class="p-header"><img id="main-pfp" src="https://api.dicebear.com/7.x/avataaars/svg?seed=user" class="p-avatar"><h2 id="display-name" style="margin-top:20px;">User</h2><div style="background:rgba(0,191,255,0.1);display:inline-block;padding:5px 15px;border-radius:20px;margin-top:10px;"><p style="color:var(--sky-blue);font-size:11px;">PREMIUM MODE</p></div></div><p class="info-label">Identity Data</p><div class="glass-card"><div class="row"><span>Gender</span><span id="p-gender" class="val">Male</span></div><div class="row"><span>Current Age</span><span id="p-age" class="val">22 Years</span></div></div><p class="info-label">Security</p><div class="glass-card"><div class="row"><span>Email</span><span id="p-email" class="val"></span></div><div class="row"><span>Phone</span><span id="p-phone" class="val"></span></div><div class="row"><span>Device</span><span id="p-device" class="val">Scanning...</span></div></div><div style="padding:10px 20px 120px;"><button class="btn-blue btn-outline" onclick="openEdit()">UPDATE PROFILE</button><button class="btn-blue" style="background:transparent;color:var(--danger);border:1px solid var(--danger);" onclick="showLogout()">LOG OUT</button></div></div>
-<div id="edit-screen"><div style="display:flex;justify-content:space-between;margin-bottom:40px;"><h2>Update Profile</h2><div onclick="closeEdit()" style="width:40px;height:40px;background:rgba(255,255,255,0.05);border-radius:50%;display:flex;align-items:center;justify-content:center;"><i class="fas fa-times"></i></div></div><label for="img-up" class="btn-blue" style="background:rgba(0,191,255,0.1);color:var(--sky-blue);display:block;text-align:center;margin-bottom:20px;">📸 UPLOAD PIC</label><input type="file" id="img-up" style="display:none;" accept="image/*" onchange="handleImg(event)"><p style="color:var(--sky-blue);font-size:10px;">Full Name</p><input type="text" id="edit-name" class="edit-input"><p style="color:var(--sky-blue);font-size:10px;">Gender</p><div style="display:flex;gap:10px;margin-bottom:20px;"><div class="gender-opt" onclick="setGenderProfile(this,'Male')">MALE</div><div class="gender-opt" onclick="setGenderProfile(this,'Female')">FEMALE</div><div class="gender-opt" onclick="setGenderProfile(this,'Other')">OTHER</div></div><p style="color:var(--sky-blue);font-size:10px;">Age</p><input type="number" id="edit-age" class="edit-input"><p style="color:var(--sky-blue);font-size:10px;">New Password (optional)</p><input type="password" id="edit-password" class="edit-input" placeholder="Leave blank to keep same"><button class="btn-blue" onclick="saveProfile()">SAVE CHANGES</button></div>
-<div id="logout-modal"><div class="warn-card"><i class="fas fa-power-off" style="font-size:50px;color:var(--danger);"></i><h3>Logout?</h3><button class="btn-blue" style="background:var(--danger);color:white;margin-top:20px;" onclick="doLogout()">LOGOUT</button><p style="margin-top:20px;color:#555;cursor:pointer;" onclick="hideLogout()">CANCEL</p></div></div>
-<div class="support-fab" onclick="contactSupport()"><i class="fas fa-headset"></i></div>
+<div id="profileScreen" class="profile-screen"><div class="profile-back-btn" onclick="window.closeProfile()"><i class="fas fa-arrow-left"></i></div><div id="profile-content"><div class="p-header"><img id="main-pfp" src="https://api.dicebear.com/7.x/avataaars/svg?seed=user" class="p-avatar"><h2 id="display-name" style="margin-top:20px;">User</h2><div style="background:rgba(0,191,255,0.1);display:inline-block;padding:5px 15px;border-radius:20px;margin-top:10px;"><p style="color:var(--sky-blue);font-size:11px;">PREMIUM MODE</p></div></div><p class="info-label">Identity Data</p><div class="glass-card"><div class="row"><span>Gender</span><span id="p-gender" class="val">Male</span></div><div class="row"><span>Current Age</span><span id="p-age" class="val">22 Years</span></div></div><p class="info-label">Security</p><div class="glass-card"><div class="row"><span>Email</span><span id="p-email" class="val"></span></div><div class="row"><span>Phone</span><span id="p-phone" class="val"></span></div><div class="row"><span>Device</span><span id="p-device" class="val">Scanning...</span></div></div><div style="padding:10px 20px 120px;"><button class="btn-blue btn-outline" onclick="window.openEdit()">UPDATE PROFILE</button><button class="btn-blue" style="background:transparent;color:var(--danger);border:1px solid var(--danger);" onclick="window.showLogout()">LOG OUT</button></div></div>
+<div id="edit-screen"><div style="display:flex;justify-content:space-between;margin-bottom:40px;"><h2>Update Profile</h2><div onclick="window.closeEdit()" style="width:40px;height:40px;background:rgba(255,255,255,0.05);border-radius:50%;display:flex;align-items:center;justify-content:center;"><i class="fas fa-times"></i></div></div><label for="img-up" class="btn-blue" style="background:rgba(0,191,255,0.1);color:var(--sky-blue);display:block;text-align:center;margin-bottom:20px;">📸 UPLOAD PIC</label><input type="file" id="img-up" style="display:none;" accept="image/*" onchange="window.handleImg(event)"><p style="color:var(--sky-blue);font-size:10px;">Full Name</p><input type="text" id="edit-name" class="edit-input"><p style="color:var(--sky-blue);font-size:10px;">Gender</p><div style="display:flex;gap:10px;margin-bottom:20px;"><div class="gender-opt" onclick="window.setGenderProfile(this,'Male')">MALE</div><div class="gender-opt" onclick="window.setGenderProfile(this,'Female')">FEMALE</div><div class="gender-opt" onclick="window.setGenderProfile(this,'Other')">OTHER</div></div><p style="color:var(--sky-blue);font-size:10px;">Age</p><input type="number" id="edit-age" class="edit-input"><p style="color:var(--sky-blue);font-size:10px;">New Password (optional)</p><input type="password" id="edit-password" class="edit-input" placeholder="Leave blank to keep same"><button class="btn-blue" onclick="window.saveProfile()">SAVE CHANGES</button></div>
+<div id="logout-modal"><div class="warn-card"><i class="fas fa-power-off" style="font-size:50px;color:var(--danger);"></i><h3>Logout?</h3><button class="btn-blue" style="background:var(--danger);color:white;margin-top:20px;" onclick="window.doLogout()">LOGOUT</button><p style="margin-top:20px;color:#555;cursor:pointer;" onclick="window.hideLogout()">CANCEL</p></div></div>
+<div class="support-fab" onclick="window.contactSupport()"><i class="fas fa-headset"></i></div>
 </div>
 
 <!-- FORGOT MODAL -->
-<div id="forgot-modal"><div class="warn-card"><h3>Reset Password</h3><input type="text" id="forgot-identifier" class="auth-input" style="margin:20px 0;" placeholder="Email or Phone"><button class="btn-blue" onclick="resetPassword()">Send Temporary Password</button><p style="margin-top:20px;color:#555;cursor:pointer;" onclick="closeForgotModal()">Cancel</p></div></div>
+<div id="forgot-modal"><div class="warn-card"><h3>Reset Password</h3><input type="text" id="forgot-identifier" class="auth-input" style="margin:20px 0;" placeholder="Email or Phone"><button class="btn-blue" onclick="window.resetPassword()">Send Temporary Password</button><p style="margin-top:20px;color:#555;cursor:pointer;" onclick="window.closeForgotModal()">Cancel</p></div></div>
 
 <script>
-// ==================== FULL WORKING CODE - FIXED LOADING ISSUE ====================
+// All functions exposed to window for inline onclick handlers
 (function() {
     // Firebase Config
     const firebaseConfig = {
@@ -213,8 +213,8 @@
     try {
         firebase.initializeApp(firebaseConfig);
         db = firebase.database();
-        console.log("Firebase initialized");
-    } catch(e) { console.warn("Firebase init error", e); }
+        console.log("Firebase ready");
+    } catch(e) { console.warn("Firebase error", e); }
 
     // GLOBALS
     const YOUTUBE_API_KEY = "AIzaSyBIpUJaQat1LYezbd3DYfteoVOBHAjxems";
@@ -245,7 +245,7 @@
     function togglePass(id, icon) { const i=document.getElementById(id); i.type=i.type==="password"?"text":"password"; icon.classList.toggle('fa-eye'); icon.classList.toggle('fa-eye-slash'); }
     function setGender(el,val) { document.querySelectorAll('#reg-fields .gender-opt').forEach(o=>o.classList.remove('active')); el.classList.add('active'); selectedGender=val; }
     function setGenderProfile(el,val) { el.parentElement.querySelectorAll('.gender-opt').forEach(o=>o.classList.remove('active')); el.classList.add('active'); selectedGenderProfile=val; }
-    function toggleAuth(isReg) { isRegisterMode=isReg; document.getElementById('reg-fields').style.display=isReg?'block':'none'; document.getElementById('login-section').style.display=isReg?'none':'block'; document.getElementById('main-btn').innerText=isReg?"SIGN UP":"LOG IN"; document.getElementById('switch-text').innerHTML=isReg?'Already a member? <span onclick="toggleAuth(false)">Log In</span>':'New here? <span onclick="toggleAuth(true)">Create Account</span>'; }
+    function toggleAuth(isReg) { isRegisterMode=isReg; document.getElementById('reg-fields').style.display=isReg?'block':'none'; document.getElementById('login-section').style.display=isReg?'none':'block'; document.getElementById('main-btn').innerText=isReg?"SIGN UP":"LOG IN"; document.getElementById('switch-text').innerHTML=isReg?'Already a member? <span onclick="window.toggleAuth(false)">Log In</span>':'New here? <span onclick="window.toggleAuth(true)">Create Account</span>'; }
     async function loadUserFromCloud(email) { if(!db) return null; try { const snap=await db.ref('users/'+email.replace(/\./g,'_')).once('value'); return snap.val(); } catch(e) { return null; } }
     async function saveUserToCloud(user) { if(!db) return; return db.ref('users/'+user.email.replace(/\./g,'_')).set(user); }
     async function updateProfileInCloud(email,updates) { if(!db) return; await db.ref('users/'+email.replace(/\./g,'_')).update(updates); }
@@ -305,6 +305,8 @@
             else await finalizeLogin(res);
         } else {
             if(!pendingOTP || !pendingRegData) { showPopup("Please verify OTP first","error"); return; }
+            const enteredOtp = document.getElementById('otp-code').value;
+            if(enteredOtp !== pendingOTP) { showPopup("Invalid OTP","error"); return; }
             const {name,email,phone,age,gender,password}=pendingRegData;
             if(await loadUserFromCloud(email)) { showPopup("Email already exists","error"); return; }
             if(await getPhoneCount(phone)>=3) { showPopup("Max 3 accounts per phone","error"); return; }
@@ -331,15 +333,8 @@
         const statusDiv = document.getElementById('otp-status');
         statusDiv.innerText = `OTP sent: ${otp} (simulated)`;
         statusDiv.style.display='block';
+        statusDiv.style.color = "var(--sky-blue)";
         showToast(`Demo OTP: ${otp}`);
-        // Auto-verify after 2 seconds for demo convenience
-        setTimeout(() => {
-            const entered = document.getElementById('otp-code').value;
-            if(entered === otp) {
-                statusDiv.innerText = "OTP verified! You can now sign up.";
-                statusDiv.style.color = "var(--success)";
-            }
-        }, 100);
     }
     // Forgot Password
     function openForgotModal() { document.getElementById('forgot-modal').style.display='flex'; }
@@ -402,14 +397,14 @@
     function songItemTemplate(s) {
         const isP = currentUrl === s.url || (s.ytId && currentYouTubeId === s.ytId);
         let clickAction;
-        if(s.ytId) clickAction = `playTrackFromUI('${s.ytId}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}','youtube')`;
-        else clickAction = `playTrackFromUI('${s.id}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}','local')`;
-        const moreBtn = s.ytId ? `<div class="more-btn" onclick="event.stopPropagation(); openYtMenu(event,'${s.ytId}')">⋮</div>` : `<div class="more-btn" onclick="openMenu(event,${s.id})">⋮</div>`;
+        if(s.ytId) clickAction = `window.playTrackFromUI('${s.ytId}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}','youtube')`;
+        else clickAction = `window.playTrackFromUI('${s.id}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}','local')`;
+        const moreBtn = s.ytId ? `<div class="more-btn" onclick="event.stopPropagation(); window.openYtMenu(event,'${s.ytId}')">⋮</div>` : `<div class="more-btn" onclick="event.stopPropagation(); window.openMenu(event,${s.id})">⋮</div>`;
         return `<div class="song-item ${isP?'playing-active':''}" onclick="${clickAction}"><div style="display:flex;align-items:center;flex:1"><div class="img-container"><img src="${s.image}" class="song-img"></div><div><h4>${s.title}</h4><p style="font-size:10px;opacity:0.5">${s.artist}</p></div></div>${moreBtn}</div>`;
     }
-    function openMenu(e,id) { e.stopPropagation(); const popup=document.getElementById('globalPopup'); document.getElementById('playlistOptions').innerHTML=playlistsData.map(p=>{ const ex=userPlaylists[p.name].some(x=>x.id===id); return `<div class="menu-item" onclick="playlistAction(${id},'${p.name}',${ex})"><span>${p.name}</span><span>${ex?'REMOVE':'ADD'}</span></div>`; }).join(''); popup.classList.add('show'); }
+    function openMenu(e,id) { e.stopPropagation(); const popup=document.getElementById('globalPopup'); document.getElementById('playlistOptions').innerHTML=playlistsData.map(p=>{ const ex=userPlaylists[p.name].some(x=>x.id===id); return `<div class="menu-item" onclick="window.playlistAction(${id},'${p.name}',${ex})"><span>${p.name}</span><span>${ex?'REMOVE':'ADD'}</span></div>`; }).join(''); popup.classList.add('show'); }
     function playlistAction(id,pName,ex) { if(ex) userPlaylists[pName]=userPlaylists[pName].filter(s=>s.id!==id); else { let song=allSongs.find(s=>s.id===id); if(!song) song=youtubeSongs.find(s=>s.id===id); if(song) userPlaylists[pName].push(song); } saveUserPlaylists(); showToast(ex?"Removed":"Added"); document.getElementById('globalPopup').classList.remove('show'); refreshView(); }
-    function openYtMenu(e,videoId) { e.stopPropagation(); const popup=document.getElementById('globalPopup'); document.getElementById('playlistOptions').innerHTML=playlistsData.map(p=>{ const ex=userPlaylists[p.name].some(x=>x.ytId===videoId); return `<div class="menu-item" onclick="addYtToPlaylist('${videoId}','${p.name}',${ex})"><span>${p.name}</span><span>${ex?'REMOVE':'ADD'}</span></div>`; }).join(''); popup.classList.add('show'); }
+    function openYtMenu(e,videoId) { e.stopPropagation(); const popup=document.getElementById('globalPopup'); document.getElementById('playlistOptions').innerHTML=playlistsData.map(p=>{ const ex=userPlaylists[p.name].some(x=>x.ytId===videoId); return `<div class="menu-item" onclick="window.addYtToPlaylist('${videoId}','${p.name}',${ex})"><span>${p.name}</span><span>${ex?'REMOVE':'ADD'}</span></div>`; }).join(''); popup.classList.add('show'); }
     async function addYtToPlaylist(videoId,pName,isRemove) { if(isRemove) userPlaylists[pName]=userPlaylists[pName].filter(s=>s.ytId!==videoId); else { const song=youtubeSongs.find(s=>s.ytId===videoId); if(song) userPlaylists[pName].push(song); } await saveUserPlaylists(); showToast(isRemove?"Removed":"Added"); document.getElementById('globalPopup').classList.remove('show'); refreshView(); }
     function playTrackFromUI(id,title,artist,image,type) { if(type==='youtube') playYouTubeSong(id,title,artist,image); else { const s=allSongs.find(s=>s.id==id); if(s) playSong(s.title,s.artist,s.url,s.image); } }
     function openPlaylist(n) { activeP=n; document.getElementById('homeView').classList.remove('active'); document.getElementById('playlistView').classList.add('active'); document.getElementById('playlistTitle').innerText=n; document.getElementById('searchToggleBtn').style.display='none'; renderPlaylistSongs(); }
@@ -417,7 +412,7 @@
     function renderPlaylistSongs() { let list=userPlaylists[activeP]||[]; document.getElementById('songsContainer').innerHTML=list.length?list.map(s=>songItemTemplate(s)).join(''):"<p style='text-align:center;opacity:0.3;padding:20px;'>Empty.</p>"; }
     function refreshView() { if(activeP) renderPlaylistSongs(); else renderAll(); }
     function renderAll() {
-        document.getElementById('mainPlaylistGrid').innerHTML=playlistsData.map(p=>`<div class="card" onclick="openPlaylist('${p.name}')"><div class="art" style="background:url('${p.img}');"></div><p>${p.name}</p></div>`).join('');
+        document.getElementById('mainPlaylistGrid').innerHTML=playlistsData.map(p=>`<div class="card" onclick="window.openPlaylist('${p.name}')"><div class="art" style="background:url('${p.img}');"></div><p>${p.name}</p></div>`).join('');
         const merged=[...allSongs,...youtubeSongs.filter(yt=>!allSongs.some(l=>l.url===yt.url))];
         document.getElementById('singleTracksContainer').innerHTML=merged.map(s=>songItemTemplate(s)).join('');
         renderRecentlyPlayed();
@@ -426,7 +421,7 @@
     // SEARCH
     async function getRecentSearches() { if(!currentUser || !db) return []; const snap=await db.ref(userPath(currentUser.email,'recentSearches')).once('value'); return snap.val()||[]; }
     async function saveRecentSearch(q) { if(!currentUser || !db || q.length<2) return; let s=await getRecentSearches(); s=s.filter(x=>x!==q); s.unshift(q); await db.ref(userPath(currentUser.email,'recentSearches')).set(s.slice(0,10)); renderRecentSearches(); }
-    async function renderRecentSearches() { const list=document.getElementById('recentSearchesList'); const s=await getRecentSearches(); if(s.length===0) { list.innerHTML='<div class="no-recent">No recent searches</div>'; return; } list.innerHTML=s.map(q=>`<div class="recent-search-item" onclick="searchFromRecent('${q.replace(/'/g,"\\'")}')"><div class="recent-search-left"><i class="fas fa-clock"></i><span class="recent-search-text">${q}</span></div><i class="fas fa-times recent-search-delete" onclick="event.stopPropagation(); removeRecentSearch('${q.replace(/'/g,"\\'")}')"></i></div>`).join(''); }
+    async function renderRecentSearches() { const list=document.getElementById('recentSearchesList'); const s=await getRecentSearches(); if(s.length===0) { list.innerHTML='<div class="no-recent">No recent searches</div>'; return; } list.innerHTML=s.map(q=>`<div class="recent-search-item" onclick="window.searchFromRecent('${q.replace(/'/g,"\\'")}')"><div class="recent-search-left"><i class="fas fa-clock"></i><span class="recent-search-text">${q}</span></div><i class="fas fa-times recent-search-delete" onclick="event.stopPropagation(); window.removeRecentSearch('${q.replace(/'/g,"\\'")}')"></i></div>`).join(''); }
     async function removeRecentSearch(q) { let s=await getRecentSearches(); s=s.filter(x=>x!==q); await db.ref(userPath(currentUser.email,'recentSearches')).set(s); renderRecentSearches(); }
     async function clearAllRecentSearches() { await db.ref(userPath(currentUser.email,'recentSearches')).remove(); renderRecentSearches(); }
     function searchFromRecent(q) { document.getElementById('searchPageInput').value=q; executeSearch(); }
@@ -435,7 +430,7 @@
     function clearSearchInput() { document.getElementById('searchPageInput').value=''; document.getElementById('searchClearBtn').style.display='none'; document.getElementById('recentSearchesSection').style.display='block'; document.getElementById('searchResultsSection').style.display='none'; }
     function handleSearchPageInput() { const q=document.getElementById('searchPageInput').value.trim(); if(q.length>0) document.getElementById('searchClearBtn').style.display='block'; else { document.getElementById('searchClearBtn').style.display='none'; document.getElementById('recentSearchesSection').style.display='block'; document.getElementById('searchResultsSection').style.display='none'; return; } clearTimeout(searchTimeout); searchTimeout=setTimeout(()=>executeSearch(),500); }
     async function executeSearch() { const q=document.getElementById('searchPageInput').value.trim(); if(q.length<2) return; await saveRecentSearch(q); document.getElementById('recentSearchesSection').style.display='none'; document.getElementById('searchResultsSection').style.display='block'; const merged=[...allSongs,...youtubeSongs]; const local=merged.filter(s=>s.title.toLowerCase().includes(q.toLowerCase())||s.artist.toLowerCase().includes(q.toLowerCase())); document.getElementById('searchResultsTracks').innerHTML=local.length?local.map(s=>songItemTemplate(s)).join(''):'<div class="no-recent">No tracks</div>'; document.getElementById('ytSearchResultsSection').style.display='block'; document.getElementById('searchResultsYouTube').innerHTML='<div class="yt-loading">Searching YouTube...</div>'; try { const url=`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q+" song")}&type=video&videoCategoryId=10&key=${YOUTUBE_API_KEY}&maxResults=8`; const res=await fetch(url); const data=await res.json(); if(data.items) { const ytItems=data.items.map((item,idx)=>({id:'yt_'+idx, videoId:item.id.videoId, title:item.snippet.title, artist:item.snippet.channelTitle, image:item.snippet.thumbnails.medium?.url||item.snippet.thumbnails.default.url})); ytItems.forEach(yt=>{ if(!youtubeSongs.some(s=>s.videoId===yt.videoId)) youtubeSongs.push({id:'yt_'+Date.now()+'_'+Math.random().toString(36).substr(2,5), ytId:yt.videoId, title:yt.title, artist:yt.artist, url:'youtube://'+yt.videoId, image:yt.image}); }); await saveYoutubeSongs(); document.getElementById('searchResultsYouTube').innerHTML=ytItems.map(s=>ytSongItemTemplate(s)).join(''); } else document.getElementById('searchResultsYouTube').innerHTML='<div class="no-recent">No YouTube results</div>'; } catch(e) { document.getElementById('searchResultsYouTube').innerHTML='<div class="no-recent">Search failed</div>'; } }
-    function ytSongItemTemplate(s) { return `<div class="song-item" onclick="playYouTubeSong('${s.videoId}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}')"><div style="display:flex;align-items:center;flex:1"><div class="img-container"><img src="${s.image}" class="song-img"></div><div><h4>${s.title}</h4><p style="font-size:10px;">${s.artist}</p></div></div><div class="more-btn" onclick="event.stopPropagation(); openYtMenu(event,'${s.videoId}')">⋮</div></div>`; }
+    function ytSongItemTemplate(s) { return `<div class="song-item" onclick="window.playYouTubeSong('${s.videoId}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}')"><div style="display:flex;align-items:center;flex:1"><div class="img-container"><img src="${s.image}" class="song-img"></div><div><h4>${s.title}</h4><p style="font-size:10px;">${s.artist}</p></div></div><div class="more-btn" onclick="event.stopPropagation(); window.openYtMenu(event,'${s.videoId}')">⋮</div></div>`; }
 
     // PLAYBACK
     let isAutoPlayMode=false, youtubeShuffleQueue=[], currentYoutubeQueueIndex=-1;
@@ -462,7 +457,49 @@
     audio.onended=()=>{ isPlaying=false; updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); nextTrack(); };
     function handleGlobalClick() { document.getElementById('globalPopup').classList.remove('show'); }
 
-    // INITIALIZATION with error handling and forced hide of loading overlay
+    // Expose all required functions to window
+    window.togglePass = togglePass;
+    window.setGender = setGender;
+    window.setGenderProfile = setGenderProfile;
+    window.toggleAuth = toggleAuth;
+    window.handleSubmit = handleSubmit;
+    window.sendOTP = sendOTP;
+    window.openForgotModal = openForgotModal;
+    window.closeForgotModal = closeForgotModal;
+    window.resetPassword = resetPassword;
+    window.openEdit = openEdit;
+    window.closeEdit = closeEdit;
+    window.saveProfile = saveProfile;
+    window.handleImg = handleImg;
+    window.showLogout = showLogout;
+    window.hideLogout = hideLogout;
+    window.doLogout = doLogout;
+    window.openProfile = openProfile;
+    window.closeProfile = closeProfile;
+    window.contactSupport = contactSupport;
+    window.openPlaylist = openPlaylist;
+    window.resetToHome = resetToHome;
+    window.openMenu = openMenu;
+    window.playlistAction = playlistAction;
+    window.openYtMenu = openYtMenu;
+    window.addYtToPlaylist = addYtToPlaylist;
+    window.playTrackFromUI = playTrackFromUI;
+    window.playYouTubeSong = playYouTubeSong;
+    window.prevTrack = prevTrack;
+    window.nextTrack = nextTrack;
+    window.togglePlay = togglePlay;
+    window.handleSeekInput = handleSeekInput;
+    window.handleSeekChange = handleSeekChange;
+    window.openSearchScreen = openSearchScreen;
+    window.closeSearch = closeSearch;
+    window.clearSearchInput = clearSearchInput;
+    window.handleSearchPageInput = handleSearchPageInput;
+    window.clearAllRecentSearches = clearAllRecentSearches;
+    window.searchFromRecent = searchFromRecent;
+    window.removeRecentSearch = removeRecentSearch;
+    window.handleGlobalClick = handleGlobalClick;
+
+    // INIT
     window.addEventListener('load', async () => {
         try {
             await detectDevice();
@@ -487,11 +524,8 @@
             console.error("Init error", err);
             showScreen('loginScreen');
         } finally {
-            // Force hide loading overlay
-            const overlay = document.getElementById('loadingOverlay');
-            overlay.classList.add('hidden');
-            // Also ensure it's hidden after 1.5 seconds max
-            setTimeout(() => { overlay.classList.add('hidden'); }, 1500);
+            document.getElementById('loadingOverlay').classList.add('hidden');
+            setTimeout(() => { document.getElementById('loadingOverlay').classList.add('hidden'); }, 1000);
         }
     });
 })();
