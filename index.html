@@ -60,27 +60,27 @@
         .toggle-text { margin-top: 25px; font-size: 13px; color: #444; }
         .toggle-text span { color: var(--sky-blue); cursor: pointer; font-weight: bold; }
         .forgot-link { text-align: right; font-size: 11px; margin-top: 5px; color: var(--sky-blue); cursor: pointer; opacity: 0.7; }
-        .home-header { padding: 25px 20px 10px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+        .home-header { padding: 25px 20px 10px; display: flex; justify-content: space-between; align-items: center; z-index: 10; position: relative; }
         .logo { font-family: 'Syncopate', sans-serif; font-size: 18px; color: var(--primary); letter-spacing: 2px; cursor: pointer; }
-        #searchToggleBtn { position: absolute; left: 50%; transform: translateX(-50%); font-size: 20px; cursor: pointer; opacity: 0.8; padding: 8px; border-radius: 50%; }
+        #searchToggleBtn { position: absolute; left: 50%; transform: translateX(-50%); font-size: 20px; cursor: pointer; opacity: 0.8; padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .profile-btn { width: 35px; height: 35px; background: var(--glass); border: 1px solid var(--border); border-radius: 50%; overflow: hidden; cursor: pointer; }
         .profile-btn img { width: 100%; height: 100%; object-fit: cover; }
-        .search-header{padding:20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
-        .search-back-btn{width:40px;height:40px;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;}
-        .search-input-wrapper{flex:1;position:relative}
-        .search-page-input{width:100%;padding:14px 18px;background:var(--glass);border:1px solid var(--border);border-radius:16px;color:white;font-size:15px;outline:none}
-        .search-page-input:focus{border-color:var(--sky-blue)}
-        .search-clear-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#666;cursor:pointer;display:none}
+        .search-header { padding: 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
+        .search-back-btn { width: 40px; height: 40px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; }
+        .search-input-wrapper { flex: 1; position: relative; }
+        .search-page-input { width: 100%; padding: 14px 18px; background: var(--glass); border: 1px solid var(--border); border-radius: 16px; color: white; font-size: 15px; outline: none; }
+        .search-page-input:focus { border-color: var(--sky-blue); }
+        .search-clear-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #666; cursor: pointer; display: none; }
         .search-content { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 160px; }
         .recent-searches-header { display: flex; justify-content: space-between; margin-bottom: 15px; }
         .recent-searches-title { font-size: 12px; color: var(--primary); letter-spacing: 1px; text-transform: uppercase; font-weight: bold; }
         .clear-all-btn { font-size: 11px; color: var(--danger); cursor: pointer; }
         .recent-search-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: rgba(255,255,255,0.03); border-radius: 14px; margin-bottom: 8px; cursor: pointer; }
-        .recent-search-left { display: flex; align-items: center; gap: 12px; flex:1; }
+        .recent-search-left { display: flex; align-items: center; gap: 12px; flex: 1; }
         .recent-search-text { font-size: 14px; color: #ccc; }
         .recent-search-delete { color: #555; padding: 8px; cursor: pointer; border-radius: 50%; }
         .no-recent { text-align: center; color: #555; padding: 40px; }
-        .view { flex: 1; padding: 10px 20px; overflow-y: auto; display: none; padding-bottom: 160px; }
+        .view { flex: 1; padding: 10px 20px; overflow-y: auto; display: none; padding-bottom: 160px; scroll-behavior: smooth; }
         .view.active { display: block; }
         .section-title { font-size: 10px; color: var(--primary); letter-spacing: 1px; margin: 15px 0 12px; text-transform: uppercase; font-weight: bold; }
         .playlist-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 25px; }
@@ -96,21 +96,21 @@
         .menu-dropdown.show { display: block; opacity: 1; transform: translateY(-50%) scale(1); }
         .menu-header { padding: 12px; border-bottom: 1px solid var(--border); font-size: 10px; text-align: center; color: var(--primary); font-weight: bold; }
         .menu-item { padding: 14px 18px; font-size: 13px; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; justify-content: space-between; }
-        .back-home-btn { margin-bottom:20px; background:var(--glass); color:white; border:1px solid var(--border); padding:10px 18px; border-radius:10px; font-size:11px; cursor:pointer; }
+        .back-home-btn { margin-bottom: 20px; background: var(--glass); color: white; border: 1px solid var(--border); padding: 10px 18px; border-radius: 10px; font-size: 11px; cursor: pointer; display: inline-block; }
         .player { position: fixed; bottom: 15px; left: 12px; right: 12px; background: rgba(10,20,35,0.98); backdrop-filter: blur(40px); border: 1px solid var(--border); border-radius: 28px; padding: 18px 15px; z-index: 1000; }
         .player-main { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
         .player-info { display: flex; align-items: center; gap: 10px; width: 45%; }
         .player-art { width: 44px; height: 44px; border-radius: 8px; background-size: cover !important; border: 1px solid var(--border); }
         .player-art.music-playing { animation: djGlow 3s infinite; }
         @keyframes djGlow { 0% { box-shadow: 0 0 15px 2px rgba(0,132,255,0.7); } 50% { box-shadow: 0 0 25px 4px rgba(255,51,51,0.8); } 100% { box-shadow: 0 0 15px 2px rgba(0,132,255,0.7); } }
-        .controls { display: flex; align-items: center; gap: 22px; flex:1; justify-content: center; }
+        .controls { display: flex; align-items: center; gap: 22px; flex: 1; justify-content: center; }
         .nav-btn { width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0.7; border-radius: 50%; }
         .play-btn { width: 52px; height: 52px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,132,255,0.4); }
         .time-container { margin-top: 5px; }
         .time-info { display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
         .time-bar { width: 100%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 10px; position: relative; }
-        .fill { height: 100%; background: var(--primary); width: 0%; border-radius: 10px; position: absolute; left:0; top:0; pointer-events: none; }
-        #seekSlider { width: 100%; height: 100%; opacity: 0; cursor: pointer; position: absolute; top:0; left:0; }
+        .fill { height: 100%; background: var(--primary); width: 0%; border-radius: 10px; position: absolute; left: 0; top: 0; pointer-events: none; }
+        #seekSlider { width: 100%; height: 100%; opacity: 0; cursor: pointer; position: absolute; top: 0; left: 0; }
         .watermark { position: fixed; bottom: 105px; right: 25px; font-size: 8px; color: var(--primary); opacity: 0.4; }
         .p-header { padding: 70px 20px 40px; text-align: center; background: linear-gradient(to bottom, #001a33, #020202); }
         .p-avatar { width: 140px; height: 140px; border-radius: 50%; border: 3px solid var(--sky-blue); padding: 5px; background: var(--bg-black); box-shadow: 0 0 30px rgba(0,191,255,0.5); }
@@ -119,25 +119,29 @@
         .row { display: flex; justify-content: space-between; margin-bottom: 18px; }
         .row span:first-child { color: #aaa; font-size: 14px; }
         .row .val { font-weight: 800; color: #fff; }
-        .btn-blue { width: 100%; padding: 18px; background: var(--sky-blue); color: #000; border-radius: 18px; font-weight: 900; cursor: pointer; margin-top: 10px; font-size: 16px; }
+        .btn-blue { width: 100%; padding: 18px; background: var(--sky-blue); color: #000; border-radius: 18px; font-weight: 900; cursor: pointer; margin-top: 10px; font-size: 16px; text-align: center; }
         .btn-outline { background: transparent; border: 1px solid var(--glass-edge); color: #fff; }
         .support-fab { position: fixed; bottom: 35px; right: 25px; width: 65px; height: 65px; background: var(--sky-blue); border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #000; cursor: pointer; z-index: 9999; }
-        #logout-modal, #forgot-modal, #otp-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
+        #logout-modal, #forgot-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
         .warn-card { width: 85%; max-width: 350px; background: linear-gradient(145deg, #0a0a0a, #001a33); border: 1px solid var(--danger); border-radius: 35px; padding: 40px 30px; text-align: center; }
         #edit-screen { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; padding: 30px; backdrop-filter: blur(20px); overflow-y: auto; }
-        .edit-input { width: 100%; padding: 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-edge); border-radius: 15px; color: #fff; margin-bottom: 20px; }
-        #yt-player-wrapper { position: fixed; bottom:0; left:0; width:100%; height:1px; opacity:0; pointer-events:none; }
+        .edit-input { width: 100%; padding: 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-edge); border-radius: 15px; color: #fff; margin-bottom: 20px; outline: none; }
+        #yt-player-wrapper { position: fixed; bottom: 0; left: 0; width: 100%; height: 1px; opacity: 0; pointer-events: none; }
         #loadingOverlay { position: fixed; inset: 0; background: radial-gradient(circle at top right, #001f3f, #000814); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 99999; transition: opacity 0.3s; }
         #loadingOverlay.hidden { opacity: 0; pointer-events: none; }
         .loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(0,191,255,0.2); border-top-color: var(--sky-blue); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { color: var(--sky-blue); margin-top: 15px; font-size: 12px; letter-spacing: 2px; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
 <body onclick="handleGlobalClick(event)">
 
-<div id="loadingOverlay"><div class="loading-spinner"></div><div class="loading-text">Loading...</div></div>
+<div id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading...</div>
+</div>
 <div id="yt-player-wrapper"></div>
 <audio id="mainAudio" playsinline webkit-playsinline></audio>
 <div id="toast"></div>
@@ -156,9 +160,12 @@
         </div>
         <div id="reg-fields">
             <div class="input-group"><p class="label">Full Name</p><input type="text" id="full-name" class="auth-input"></div>
-            <div class="input-group"><p class="label">Email Address</p><input type="text" id="reg-email" class="auth-input" placeholder="example@gmail.com"></div>
-            <div class="input-group"><p class="label">Contact Number</p><input type="number" id="reg-phone" class="auth-input" placeholder="10 digits"></div>
-            <div style="display:flex;gap:10px;"><div class="input-group" style="flex:1"><p class="label">Age</p><input type="number" id="reg-age" class="auth-input" placeholder="18+"></div><div class="input-group" style="flex:2"><p class="label">Gender</p><div class="gender-container"><div class="gender-opt active" onclick="setGender(this,'Male')">M</div><div class="gender-opt" onclick="setGender(this,'Female')">F</div><div class="gender-opt" onclick="setGender(this,'Other')">O</div></div></div></div>
+            <div class="input-group"><p class="label">Email Address</p><input type="email" id="reg-email" class="auth-input" placeholder="example@gmail.com"></div>
+            <div class="input-group"><p class="label">Contact Number</p><input type="tel" id="reg-phone" class="auth-input" placeholder="10 digits" maxlength="10"></div>
+            <div style="display:flex;gap:10px;">
+                <div class="input-group" style="flex:1"><p class="label">Age</p><input type="number" id="reg-age" class="auth-input" placeholder="18+"></div>
+                <div class="input-group" style="flex:2"><p class="label">Gender</p><div class="gender-container"><div class="gender-opt active" onclick="setGender(this,'Male')">M</div><div class="gender-opt" onclick="setGender(this,'Female')">F</div><div class="gender-opt" onclick="setGender(this,'Other')">O</div></div></div>
+            </div>
             <div class="input-group"><p class="label">Password</p><input type="password" id="reg-pass" class="auth-input" placeholder="Min 8 chars"><i class="fas fa-eye eye-icon" onclick="togglePass('reg-pass', this)"></i><div id="reg-pass-err" class="err-msg">Min 8 characters</div></div>
             <div class="input-group"><button type="button" class="btn-auth" style="margin-top:0;background:#333;" onclick="sendOTP()">Send OTP</button><input type="text" id="otp-code" class="auth-input" placeholder="Enter OTP" style="margin-top:10px;"><div id="otp-status" class="err-msg"></div></div>
         </div>
@@ -188,272 +195,306 @@
 
 <!-- FORGOT MODAL -->
 <div id="forgot-modal"><div class="warn-card"><h3>Reset Password</h3><input type="text" id="forgot-identifier" class="auth-input" style="margin:20px 0;" placeholder="Email or Phone"><button class="btn-blue" onclick="resetPassword()">Send Temporary Password</button><p style="margin-top:20px;color:#555;cursor:pointer;" onclick="closeForgotModal()">Cancel</p></div></div>
-<!-- OTP MODAL (simulated) not needed, inline in reg fields -->
 
 <script>
-// FIREBASE CONFIG
-const firebaseConfig = { apiKey: "AIzaSyDLBqzimyPQj16sGRC2mJaP5N4ZxjwQvm4", authDomain: "adify-music-9280e.firebaseapp.com", databaseURL: "https://adify-music-9280e-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "adify-music-9280e", storageBucket: "adify-music-9280e.firebasestorage.app", messagingSenderId: "534415071027", appId: "1:534415071027:web:255cb8f8869d87459a5046" };
-let db = null;
-try { firebase.initializeApp(firebaseConfig); db = firebase.database(); } catch(e) { console.error(e); }
+// ==================== FULL WORKING CODE - FIXED LOADING ISSUE ====================
+(function() {
+    // Firebase Config
+    const firebaseConfig = {
+        apiKey: "AIzaSyDLBqzimyPQj16sGRC2mJaP5N4ZxjwQvm4",
+        authDomain: "adify-music-9280e.firebaseapp.com",
+        databaseURL: "https://adify-music-9280e-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "adify-music-9280e",
+        storageBucket: "adify-music-9280e.firebasestorage.app",
+        messagingSenderId: "534415071027",
+        appId: "1:534415071027:web:255cb8f8869d87459a5046"
+    };
+    let db = null;
+    try {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.database();
+        console.log("Firebase initialized");
+    } catch(e) { console.warn("Firebase init error", e); }
 
-// GLOBALS
-const YOUTUBE_API_KEY = "AIzaSyBIpUJaQat1LYezbd3DYfteoVOBHAjxems";
-let youtubePlayer = null, isYouTubePlaying = false, currentYouTubeId = null, youtubeResults = [], youtubeSongs = [];
-let searchTimeout = null, isPlaying = false, ytDuration = 0, ytCurrentTime = 0, ytTimeInterval = null, ytPlayerReady = false;
-let playHistory = [], historyIndex = -1, recentlyPlayed = [];
-let currentUser = null, isRegisterMode = false, selectedGender = "Male", selectedGenderProfile = "Male", currentPhoto = null;
-let pendingOTP = null, pendingRegData = null;
-const allSongs = [
-    { id: 1, title: "Udariyan", artist: "Aditya", url: "https://www.image2url.com/r2/default/audio/1778420635219-a057d459-d0af-413e-bd2f-5f148740396c.mp3", image: "https://www.image2url.com/r2/default/images/1778699080529-9631eada-0ad1-428f-b943-d42e5ced5f2c.jpg" },
-    { id: 2, title: "BEST SHORT SONG", artist: "Aditya", url: "https://www.image2url.com/r2/default/audio/1778446960362-cacf9cfe-95fa-4724-80cd-79e9e3e38a08.mp3", image: "https://www.image2url.com/r2/default/images/1778699080529-9631eada-0ad1-428f-b943-d42e5ced5f2c.jpg" }
-];
-let userPlaylists = { "Lo-Fi Sleep 😴": [], "Study Focus 📖": [], "Traveling ✈️": [], "My Playlist 💖": [] };
-const playlistsData = [
-    { name: "Lo-Fi Sleep 😴", img: "https://www.image2url.com/r2/default/images/1778699080529-9631eada-0ad1-428f-b943-d42e5ced5f2c.jpg" },
-    { name: "Study Focus 📖", img: "https://www.image2url.com/r2/default/images/1778699302217-816e84ce-a74d-4869-9529-c97d381b61ba.jpg" },
-    { name: "Traveling ✈️", img: "https://www.image2url.com/r2/default/images/1778699378719-2b7a988c-571c-484d-acfe-29ddf4315af0.jpg" },
-    { name: "My Playlist 💖", img: "https://images.unsplash.com/photo-1493225255756-d9584f8606e9?w=300" }
-];
-const audio = document.getElementById("mainAudio");
-let activeP = null, isDragging = false, currentUrl = "";
+    // GLOBALS
+    const YOUTUBE_API_KEY = "AIzaSyBIpUJaQat1LYezbd3DYfteoVOBHAjxems";
+    let youtubePlayer = null, isYouTubePlaying = false, currentYouTubeId = null, youtubeResults = [], youtubeSongs = [];
+    let searchTimeout = null, isPlaying = false, ytDuration = 0, ytCurrentTime = 0, ytTimeInterval = null, ytPlayerReady = false;
+    let playHistory = [], historyIndex = -1, recentlyPlayed = [];
+    let currentUser = null, isRegisterMode = false, selectedGender = "Male", selectedGenderProfile = "Male", currentPhoto = null;
+    let pendingOTP = null, pendingRegData = null;
+    const allSongs = [
+        { id: 1, title: "Udariyan", artist: "Aditya", url: "https://www.image2url.com/r2/default/audio/1778420635219-a057d459-d0af-413e-bd2f-5f148740396c.mp3", image: "https://www.image2url.com/r2/default/images/1778699080529-9631eada-0ad1-428f-b943-d42e5ced5f2c.jpg" },
+        { id: 2, title: "BEST SHORT SONG", artist: "Aditya", url: "https://www.image2url.com/r2/default/audio/1778446960362-cacf9cfe-95fa-4724-80cd-79e9e3e38a08.mp3", image: "https://www.image2url.com/r2/default/images/1778699080529-9631eada-0ad1-428f-b943-d42e5ced5f2c.jpg" }
+    ];
+    let userPlaylists = { "Lo-Fi Sleep 😴": [], "Study Focus 📖": [], "Traveling ✈️": [], "My Playlist 💖": [] };
+    const playlistsData = [
+        { name: "Lo-Fi Sleep 😴", img: "https://www.image2url.com/r2/default/images/1778699080529-9631eada-0ad1-428f-b943-d42e5ced5f2c.jpg" },
+        { name: "Study Focus 📖", img: "https://www.image2url.com/r2/default/images/1778699302217-816e84ce-a74d-4869-9529-c97d381b61ba.jpg" },
+        { name: "Traveling ✈️", img: "https://www.image2url.com/r2/default/images/1778699378719-2b7a988c-571c-484d-acfe-29ddf4315af0.jpg" },
+        { name: "My Playlist 💖", img: "https://images.unsplash.com/photo-1493225255756-d9584f8606e9?w=300" }
+    ];
+    const audio = document.getElementById("mainAudio");
+    let activeP = null, isDragging = false, currentUrl = "";
 
-// Helper functions
-function userPath(email, subPath) { const key = email.replace(/\./g, '_'); return subPath ? `users/${key}/${subPath}` : `users/${key}`; }
-function showToast(msg) { const t=document.getElementById('toast'); t.innerText=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
-function showPopup(msg, type) { const p=document.getElementById('status-popup'); p.innerText=msg; p.style.display='block'; p.style.color=type==='success'?'var(--success)':'var(--danger)'; p.style.background=type==='success'?'rgba(46,213,115,0.1)':'rgba(255,71,87,0.1)'; setTimeout(()=>p.style.display='none',3000); }
-function formatTime(s) { if(!s||isNaN(s)) return "0:00"; let m=Math.floor(s/60), sec=Math.floor(s%60); return `${m}:${sec<10?'0':''}${sec}`; }
-function togglePass(id, icon) { const i=document.getElementById(id); i.type=i.type==="password"?"text":"password"; icon.classList.toggle('fa-eye'); icon.classList.toggle('fa-eye-slash'); }
-function setGender(el,val) { document.querySelectorAll('#reg-fields .gender-opt').forEach(o=>o.classList.remove('active')); el.classList.add('active'); selectedGender=val; }
-function setGenderProfile(el,val) { el.parentElement.querySelectorAll('.gender-opt').forEach(o=>o.classList.remove('active')); el.classList.add('active'); selectedGenderProfile=val; }
-function toggleAuth(isReg) { isRegisterMode=isReg; document.getElementById('reg-fields').style.display=isReg?'block':'none'; document.getElementById('login-section').style.display=isReg?'none':'block'; document.getElementById('main-btn').innerText=isReg?"SIGN UP":"LOG IN"; document.getElementById('switch-text').innerHTML=isReg?'Already a member? <span onclick="toggleAuth(false)">Log In</span>':'New here? <span onclick="toggleAuth(true)">Create Account</span>'; }
-async function loadUserFromCloud(email) { if(!db) return null; const snap=await db.ref('users/'+email.replace(/\./g,'_')).once('value'); return snap.val(); }
-async function saveUserToCloud(user) { return db.ref('users/'+user.email.replace(/\./g,'_')).set(user); }
-async function updateProfileInCloud(email,updates) { await db.ref('users/'+email.replace(/\./g,'_')).update(updates); }
-async function getPhoneCount(phone) { const snap=await db.ref('phoneCounts/'+phone).once('value'); return snap.val()||0; }
-async function incrementPhoneCount(phone) { const c=await getPhoneCount(phone); await db.ref('phoneCounts/'+phone).set(c+1); }
-async function saveUserPlaylists() { if(currentUser) await db.ref(userPath(currentUser.email,'playlists')).set(userPlaylists); }
-async function loadUserPlaylists() { if(currentUser) { const snap=await db.ref(userPath(currentUser.email,'playlists')).once('value'); const d=snap.val(); if(d) Object.assign(userPlaylists,d); } }
-async function saveYoutubeSongs() { if(currentUser) await db.ref(userPath(currentUser.email,'youtubeSongs')).set(youtubeSongs); }
-async function loadYoutubeSongs() { if(currentUser) { const snap=await db.ref(userPath(currentUser.email,'youtubeSongs')).once('value'); youtubeSongs=snap.val()||[]; } }
-async function saveRecentlyPlayed() { if(currentUser) await db.ref(userPath(currentUser.email,'recentlyPlayed')).set(recentlyPlayed); }
-async function loadRecentlyPlayed() { if(currentUser) { const snap=await db.ref(userPath(currentUser.email,'recentlyPlayed')).once('value'); recentlyPlayed=snap.val()||[]; renderRecentlyPlayed(); } }
-function addToRecentlyPlayed(track) { recentlyPlayed = recentlyPlayed.filter(t=>t.url!==track.url && t.videoId!==track.videoId); recentlyPlayed.unshift(track); if(recentlyPlayed.length>5) recentlyPlayed.pop(); saveRecentlyPlayed(); renderRecentlyPlayed(); }
-function renderRecentlyPlayed() { const cont=document.getElementById('recentlyPlayedContainer'); if(!cont) return; if(recentlyPlayed.length===0) { cont.innerHTML='<div class="no-recent">No recently played</div>'; return; } cont.innerHTML=recentlyPlayed.map(s=>songItemTemplate(s)).join(''); }
+    // Helper functions
+    function userPath(email, subPath) { const key = email.replace(/\./g, '_'); return subPath ? `users/${key}/${subPath}` : `users/${key}`; }
+    function showToast(msg) { const t=document.getElementById('toast'); t.innerText=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
+    function showPopup(msg, type) { const p=document.getElementById('status-popup'); p.innerText=msg; p.style.display='block'; p.style.color=type==='success'?'var(--success)':'var(--danger)'; p.style.background=type==='success'?'rgba(46,213,115,0.1)':'rgba(255,71,87,0.1)'; setTimeout(()=>p.style.display='none',3000); }
+    function formatTime(s) { if(!s||isNaN(s)) return "0:00"; let m=Math.floor(s/60), sec=Math.floor(s%60); return `${m}:${sec<10?'0':''}${sec}`; }
+    function togglePass(id, icon) { const i=document.getElementById(id); i.type=i.type==="password"?"text":"password"; icon.classList.toggle('fa-eye'); icon.classList.toggle('fa-eye-slash'); }
+    function setGender(el,val) { document.querySelectorAll('#reg-fields .gender-opt').forEach(o=>o.classList.remove('active')); el.classList.add('active'); selectedGender=val; }
+    function setGenderProfile(el,val) { el.parentElement.querySelectorAll('.gender-opt').forEach(o=>o.classList.remove('active')); el.classList.add('active'); selectedGenderProfile=val; }
+    function toggleAuth(isReg) { isRegisterMode=isReg; document.getElementById('reg-fields').style.display=isReg?'block':'none'; document.getElementById('login-section').style.display=isReg?'none':'block'; document.getElementById('main-btn').innerText=isReg?"SIGN UP":"LOG IN"; document.getElementById('switch-text').innerHTML=isReg?'Already a member? <span onclick="toggleAuth(false)">Log In</span>':'New here? <span onclick="toggleAuth(true)">Create Account</span>'; }
+    async function loadUserFromCloud(email) { if(!db) return null; try { const snap=await db.ref('users/'+email.replace(/\./g,'_')).once('value'); return snap.val(); } catch(e) { return null; } }
+    async function saveUserToCloud(user) { if(!db) return; return db.ref('users/'+user.email.replace(/\./g,'_')).set(user); }
+    async function updateProfileInCloud(email,updates) { if(!db) return; await db.ref('users/'+email.replace(/\./g,'_')).update(updates); }
+    async function getPhoneCount(phone) { if(!db) return 0; const snap=await db.ref('phoneCounts/'+phone).once('value'); return snap.val()||0; }
+    async function incrementPhoneCount(phone) { if(!db) return; const c=await getPhoneCount(phone); await db.ref('phoneCounts/'+phone).set(c+1); }
+    async function saveUserPlaylists() { if(currentUser && db) await db.ref(userPath(currentUser.email,'playlists')).set(userPlaylists); }
+    async function loadUserPlaylists() { if(currentUser && db) { const snap=await db.ref(userPath(currentUser.email,'playlists')).once('value'); const d=snap.val(); if(d) Object.assign(userPlaylists,d); } }
+    async function saveYoutubeSongs() { if(currentUser && db) await db.ref(userPath(currentUser.email,'youtubeSongs')).set(youtubeSongs); }
+    async function loadYoutubeSongs() { if(currentUser && db) { const snap=await db.ref(userPath(currentUser.email,'youtubeSongs')).once('value'); youtubeSongs=snap.val()||[]; } }
+    async function saveRecentlyPlayed() { if(currentUser && db) await db.ref(userPath(currentUser.email,'recentlyPlayed')).set(recentlyPlayed); }
+    async function loadRecentlyPlayed() { if(currentUser && db) { const snap=await db.ref(userPath(currentUser.email,'recentlyPlayed')).once('value'); recentlyPlayed=snap.val()||[]; renderRecentlyPlayed(); } }
+    function addToRecentlyPlayed(track) { recentlyPlayed = recentlyPlayed.filter(t=>t.url!==track.url && t.videoId!==track.videoId); recentlyPlayed.unshift(track); if(recentlyPlayed.length>5) recentlyPlayed.pop(); saveRecentlyPlayed(); renderRecentlyPlayed(); }
+    function renderRecentlyPlayed() { const cont=document.getElementById('recentlyPlayedContainer'); if(!cont) return; if(recentlyPlayed.length===0) { cont.innerHTML='<div class="no-recent">No recently played</div>'; return; } cont.innerHTML=recentlyPlayed.map(s=>songItemTemplate(s)).join(''); }
 
-// LOGIN / REGISTER
-async function tryFirebaseLogin(identifier, pass) {
-    if(!db) return {error:"DB not ready"};
-    if(identifier.includes('@')) {
-        const user=await loadUserFromCloud(identifier);
-        if(!user) return null;
-        return user.password===pass ? user : {error:"Wrong password"};
-    } else {
-        const all=await db.ref('users').once('value');
-        const users=all.val();
-        for(let k in users) {
-            if(users[k].phone===identifier) {
-                return users[k].password===pass ? users[k] : {error:"Wrong password"};
+    // LOGIN / REGISTER
+    async function tryFirebaseLogin(identifier, pass) {
+        if(!db) return {error:"DB not ready"};
+        if(identifier.includes('@')) {
+            const user=await loadUserFromCloud(identifier);
+            if(!user) return null;
+            return user.password===pass ? user : {error:"Wrong password"};
+        } else {
+            const all=await db.ref('users').once('value');
+            const users=all.val();
+            for(let k in users) {
+                if(users[k] && users[k].phone===identifier) {
+                    return users[k].password===pass ? users[k] : {error:"Wrong password"};
+                }
             }
-        }
-        return null;
-    }
-}
-async function finalizeLogin(user) {
-    currentUser=user;
-    localStorage.setItem('adify_session_email',user.email);
-    await loadUserPlaylists();
-    await loadYoutubeSongs();
-    await loadRecentlyPlayed();
-    updateProfileUI(user);
-    showPopup(`Welcome ${user.name}!`,"success");
-    setTimeout(()=>{ showScreen('homeScreen'); renderAll(); },1000);
-}
-async function handleSubmit() {
-    if(!isRegisterMode) {
-        const id=document.getElementById('login-id').value.trim().toLowerCase();
-        const pass=document.getElementById('login-pass').value;
-        if(id==="1" && pass==="1") {
-            currentUser={name:"Master",email:"master@adify.com",phone:"0000000000",gender:"Male",age:21};
-            localStorage.setItem('adify_session_email','master@adify.com');
-            updateProfileUI(currentUser);
-            showScreen('homeScreen'); renderAll();
-            return;
-        }
-        const res=await tryFirebaseLogin(id,pass);
-        if(!res) showPopup("User not found","error");
-        else if(res.error) showPopup(res.error,"error");
-        else await finalizeLogin(res);
-    } else {
-        if(!pendingOTP || !pendingRegData) { showPopup("Please verify OTP first","error"); return; }
-        const {name,email,phone,age,gender,password}=pendingRegData;
-        if(await loadUserFromCloud(email)) { showPopup("Email already exists","error"); return; }
-        if(await getPhoneCount(phone)>=3) { showPopup("Max 3 accounts per phone","error"); return; }
-        const userData={name,email,phone,password,gender,age,photo:null};
-        await saveUserToCloud(userData);
-        await incrementPhoneCount(phone);
-        showPopup("Registered! Please login","success");
-        toggleAuth(false);
-        pendingOTP=null; pendingRegData=null;
-        document.getElementById('otp-code').value="";
-    }
-}
-// OTP Simulation
-function sendOTP() {
-    const name=document.getElementById('full-name').value;
-    const email=document.getElementById('reg-email').value;
-    const phone=document.getElementById('reg-phone').value;
-    const age=document.getElementById('reg-age').value;
-    const pass=document.getElementById('reg-pass').value;
-    if(!name || !email.includes('@') || phone.length!==10 || age<18 || pass.length<8) { showPopup("Fill all fields correctly","error"); return; }
-    const otp = Math.floor(100000 + Math.random()*900000).toString();
-    pendingOTP = otp;
-    pendingRegData = { name, email, phone, age, gender:selectedGender, password:pass };
-    document.getElementById('otp-status').innerText = `OTP sent: ${otp} (simulated)`;
-    document.getElementById('otp-status').style.display='block';
-    showToast(`Demo OTP: ${otp}`);
-}
-// Forgot Password
-function openForgotModal() { document.getElementById('forgot-modal').style.display='flex'; }
-function closeForgotModal() { document.getElementById('forgot-modal').style.display='none'; }
-async function resetPassword() {
-    const id = document.getElementById('forgot-identifier').value.trim();
-    if(!id) { showPopup("Enter email or phone","error"); return; }
-    let user = null;
-    if(id.includes('@')) user = await loadUserFromCloud(id);
-    else {
-        const all=await db.ref('users').once('value');
-        const users=all.val();
-        for(let k in users) if(users[k].phone===id) { user=users[k]; break; }
-    }
-    if(!user) { showPopup("User not found","error"); return; }
-    const tempPass = Math.random().toString(36).slice(-8);
-    await updateProfileInCloud(user.email, { password: tempPass });
-    showPopup(`Temporary password: ${tempPass}`, "success");
-    closeForgotModal();
-}
-// Profile
-function updateProfileUI(user) {
-    document.getElementById('display-name').innerText=user.name;
-    document.getElementById('p-gender').innerText=user.gender||'Male';
-    document.getElementById('p-email').innerText=user.email;
-    document.getElementById('p-phone').innerText=user.phone?`+91 ${user.phone}`:'';
-    document.getElementById('p-age').innerText=(user.age||22)+' Years';
-    const pfp=user.photo||`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`;
-    document.getElementById('main-pfp').src=pfp;
-    document.getElementById('homeProfileImg').src=pfp;
-}
-async function saveProfile() {
-    const newName=document.getElementById('edit-name').value;
-    const newAge=document.getElementById('edit-age').value;
-    const newPass=document.getElementById('edit-password').value;
-    if(!newName||!newAge) return;
-    currentUser.name=newName;
-    currentUser.age=newAge;
-    currentUser.gender=selectedGenderProfile;
-    if(currentPhoto) currentUser.photo=currentPhoto;
-    if(newPass.trim().length>=8) currentUser.password=newPass;
-    await updateProfileInCloud(currentUser.email, {name:newName,age:newAge,gender:selectedGenderProfile,photo:currentUser.photo,password:currentUser.password});
-    updateProfileUI(currentUser);
-    closeEdit();
-    showToast("Profile updated");
-}
-function openEdit() { document.getElementById('edit-screen').style.display='block'; document.getElementById('edit-name').value=currentUser.name; document.getElementById('edit-age').value=currentUser.age; document.getElementById('edit-password').value=""; }
-function closeEdit() { document.getElementById('edit-screen').style.display='none'; }
-function handleImg(e) { const r=new FileReader(); r.onload=()=>{ currentPhoto=r.result; }; if(e.target.files[0]) r.readAsDataURL(e.target.files[0]); }
-function showLogout() { document.getElementById('logout-modal').style.display='flex'; }
-function hideLogout() { document.getElementById('logout-modal').style.display='none'; }
-async function doLogout() { stopAllPlayback(); currentUser=null; localStorage.removeItem('adify_session_email'); hideLogout(); closeProfile(); showScreen('loginScreen'); }
-function openProfile() { document.getElementById('profileScreen').classList.add('active'); }
-function closeProfile() { document.getElementById('profileScreen').classList.remove('active'); }
-function showScreen(id) { document.querySelectorAll('.app-screen,.profile-screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-function contactSupport() { window.open("https://adityaprofile-rho.vercel.app/","_blank"); }
-async function detectDevice() { let model="Adify Terminal"; if(navigator.userAgentData){ try{ const info=await navigator.userAgentData.getHighEntropyValues(["model"]); model=info.model||"Mobile Node"; }catch(e){} } document.getElementById('p-device').innerText=model; }
-
-// PLAYLIST & SONGS
-function songItemTemplate(s) {
-    const isP = currentUrl === s.url || (s.ytId && currentYouTubeId === s.ytId);
-    let clickAction;
-    if(s.ytId) clickAction = `playTrackFromUI('${s.ytId}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}','youtube')`;
-    else clickAction = `playTrackFromUI('${s.id}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}','local')`;
-    const moreBtn = s.ytId ? `<div class="more-btn" onclick="event.stopPropagation(); openYtMenu(event,'${s.ytId}')">⋮</div>` : `<div class="more-btn" onclick="openMenu(event,${s.id})">⋮</div>`;
-    return `<div class="song-item ${isP?'playing-active':''}" onclick="${clickAction}"><div style="display:flex;align-items:center;flex:1"><div class="img-container"><img src="${s.image}" class="song-img"></div><div><h4>${s.title}</h4><p style="font-size:10px;opacity:0.5">${s.artist}</p></div></div>${moreBtn}</div>`;
-}
-function openMenu(e,id) { e.stopPropagation(); const popup=document.getElementById('globalPopup'); document.getElementById('playlistOptions').innerHTML=playlistsData.map(p=>{ const ex=userPlaylists[p.name].some(x=>x.id===id); return `<div class="menu-item" onclick="playlistAction(${id},'${p.name}',${ex})"><span>${p.name}</span><span>${ex?'REMOVE':'ADD'}</span></div>`; }).join(''); popup.classList.add('show'); }
-function playlistAction(id,pName,ex) { if(ex) userPlaylists[pName]=userPlaylists[pName].filter(s=>s.id!==id); else { let song=allSongs.find(s=>s.id===id); if(!song) song=youtubeSongs.find(s=>s.id===id); if(song) userPlaylists[pName].push(song); } saveUserPlaylists(); showToast(ex?"Removed":"Added"); document.getElementById('globalPopup').classList.remove('show'); refreshView(); }
-function openYtMenu(e,videoId) { e.stopPropagation(); const popup=document.getElementById('globalPopup'); document.getElementById('playlistOptions').innerHTML=playlistsData.map(p=>{ const ex=userPlaylists[p.name].some(x=>x.ytId===videoId); return `<div class="menu-item" onclick="addYtToPlaylist('${videoId}','${p.name}',${ex})"><span>${p.name}</span><span>${ex?'REMOVE':'ADD'}</span></div>`; }).join(''); popup.classList.add('show'); }
-async function addYtToPlaylist(videoId,pName,isRemove) { if(isRemove) userPlaylists[pName]=userPlaylists[pName].filter(s=>s.ytId!==videoId); else { const song=youtubeSongs.find(s=>s.ytId===videoId); if(song) userPlaylists[pName].push(song); } await saveUserPlaylists(); showToast(isRemove?"Removed":"Added"); document.getElementById('globalPopup').classList.remove('show'); refreshView(); }
-function playTrackFromUI(id,title,artist,image,type) { if(type==='youtube') playYouTubeSong(id,title,artist,image); else { const s=allSongs.find(s=>s.id==id); if(s) playSong(s.title,s.artist,s.url,s.image); } }
-function openPlaylist(n) { activeP=n; document.getElementById('homeView').classList.remove('active'); document.getElementById('playlistView').classList.add('active'); document.getElementById('playlistTitle').innerText=n; document.getElementById('searchToggleBtn').style.display='none'; renderPlaylistSongs(); }
-function resetToHome() { activeP=null; document.getElementById('playlistView').classList.remove('active'); document.getElementById('homeView').classList.add('active'); document.getElementById('searchToggleBtn').style.display='flex'; renderAll(); }
-function renderPlaylistSongs() { let list=userPlaylists[activeP]||[]; document.getElementById('songsContainer').innerHTML=list.length?list.map(s=>songItemTemplate(s)).join(''):"<p style='text-align:center;opacity:0.3;padding:20px;'>Empty.</p>"; }
-function refreshView() { if(activeP) renderPlaylistSongs(); else renderAll(); }
-function renderAll() {
-    document.getElementById('mainPlaylistGrid').innerHTML=playlistsData.map(p=>`<div class="card" onclick="openPlaylist('${p.name}')"><div class="art" style="background:url('${p.img}');"></div><p>${p.name}</p></div>`).join('');
-    const merged=[...allSongs,...youtubeSongs.filter(yt=>!allSongs.some(l=>l.url===yt.url))];
-    document.getElementById('singleTracksContainer').innerHTML=merged.map(s=>songItemTemplate(s)).join('');
-    renderRecentlyPlayed();
-}
-
-// SEARCH
-async function getRecentSearches() { if(!currentUser) return []; const snap=await db.ref(userPath(currentUser.email,'recentSearches')).once('value'); return snap.val()||[]; }
-async function saveRecentSearch(q) { if(!currentUser||q.length<2) return; let s=await getRecentSearches(); s=s.filter(x=>x!==q); s.unshift(q); await db.ref(userPath(currentUser.email,'recentSearches')).set(s.slice(0,10)); renderRecentSearches(); }
-async function renderRecentSearches() { const list=document.getElementById('recentSearchesList'); const s=await getRecentSearches(); if(s.length===0) { list.innerHTML='<div class="no-recent">No recent searches</div>'; return; } list.innerHTML=s.map(q=>`<div class="recent-search-item" onclick="searchFromRecent('${q.replace(/'/g,"\\'")}')"><div class="recent-search-left"><i class="fas fa-clock"></i><span>${q}</span></div><i class="fas fa-times" onclick="event.stopPropagation(); removeRecentSearch('${q.replace(/'/g,"\\'")}')"></i></div>`).join(''); }
-async function removeRecentSearch(q) { let s=await getRecentSearches(); s=s.filter(x=>x!==q); await db.ref(userPath(currentUser.email,'recentSearches')).set(s); renderRecentSearches(); }
-async function clearAllRecentSearches() { await db.ref(userPath(currentUser.email,'recentSearches')).remove(); renderRecentSearches(); }
-function searchFromRecent(q) { document.getElementById('searchPageInput').value=q; executeSearch(); }
-function openSearchScreen(e) { e.stopPropagation(); showScreen('searchScreen'); renderRecentSearches(); setTimeout(()=>document.getElementById('searchPageInput').focus(),100); }
-function closeSearch() { showScreen('homeScreen'); renderAll(); }
-function clearSearchInput() { document.getElementById('searchPageInput').value=''; document.getElementById('searchClearBtn').style.display='none'; document.getElementById('recentSearchesSection').style.display='block'; document.getElementById('searchResultsSection').style.display='none'; }
-function handleSearchPageInput() { const q=document.getElementById('searchPageInput').value.trim(); if(q.length>0) document.getElementById('searchClearBtn').style.display='block'; else { document.getElementById('searchClearBtn').style.display='none'; document.getElementById('recentSearchesSection').style.display='block'; document.getElementById('searchResultsSection').style.display='none'; return; } clearTimeout(searchTimeout); searchTimeout=setTimeout(()=>executeSearch(),500); }
-async function executeSearch() { const q=document.getElementById('searchPageInput').value.trim(); if(q.length<2) return; await saveRecentSearch(q); document.getElementById('recentSearchesSection').style.display='none'; document.getElementById('searchResultsSection').style.display='block'; const merged=[...allSongs,...youtubeSongs]; const local=merged.filter(s=>s.title.toLowerCase().includes(q.toLowerCase())||s.artist.toLowerCase().includes(q.toLowerCase())); document.getElementById('searchResultsTracks').innerHTML=local.length?local.map(s=>songItemTemplate(s)).join(''):'<div class="no-recent">No tracks</div>'; document.getElementById('ytSearchResultsSection').style.display='block'; document.getElementById('searchResultsYouTube').innerHTML='<div class="yt-loading">Searching YouTube...</div>'; try { const url=`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q+" song")}&type=video&videoCategoryId=10&key=${YOUTUBE_API_KEY}&maxResults=8`; const res=await fetch(url); const data=await res.json(); if(data.items) { const ytItems=data.items.map((item,idx)=>({id:'yt_'+idx, videoId:item.id.videoId, title:item.snippet.title, artist:item.snippet.channelTitle, image:item.snippet.thumbnails.medium?.url||item.snippet.thumbnails.default.url})); ytItems.forEach(yt=>{ if(!youtubeSongs.some(s=>s.videoId===yt.videoId)) youtubeSongs.push({id:'yt_'+Date.now()+'_'+Math.random().toString(36).substr(2,5), ytId:yt.videoId, title:yt.title, artist:yt.artist, url:'youtube://'+yt.videoId, image:yt.image}); }); await saveYoutubeSongs(); document.getElementById('searchResultsYouTube').innerHTML=ytItems.map(s=>ytSongItemTemplate(s)).join(''); } else document.getElementById('searchResultsYouTube').innerHTML='<div class="no-recent">No YouTube results</div>'; } catch(e) { document.getElementById('searchResultsYouTube').innerHTML='<div class="no-recent">Search failed</div>'; } }
-function ytSongItemTemplate(s) { return `<div class="song-item" onclick="playYouTubeSong('${s.videoId}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}')"><div style="display:flex;align-items:center;flex:1"><div class="img-container"><img src="${s.image}" class="song-img"></div><div><h4>${s.title}</h4><p style="font-size:10px;">${s.artist}</p></div></div><div class="more-btn" onclick="event.stopPropagation(); openYtMenu(event,'${s.videoId}')">⋮</div></div>`; }
-
-// PLAYBACK
-let isAutoPlayMode=false, youtubeShuffleQueue=[], currentYoutubeQueueIndex=-1;
-function addToHistory(track) { if(playHistory.length===0 || playHistory[historyIndex].url!==track.url) { if(historyIndex<playHistory.length-1) playHistory=playHistory.slice(0,historyIndex+1); playHistory.push(track); historyIndex=playHistory.length-1; if(playHistory.length>50) playHistory.shift(); } }
-function prevTrack() { if(historyIndex>0) { historyIndex--; const t=playHistory[historyIndex]; t.ytId?playYouTubeSong(t.ytId,t.title,t.artist,t.image):playSong(t.title,t.artist,t.url,t.image); } else showToast("No previous"); }
-function nextTrack() { if(historyIndex<playHistory.length-1) { historyIndex++; const t=playHistory[historyIndex]; t.ytId?playYouTubeSong(t.ytId,t.title,t.artist,t.image):playSong(t.title,t.artist,t.url,t.image); } else { const merged=[...allSongs,...youtubeSongs]; if(merged.length) { const r=merged[Math.floor(Math.random()*merged.length)]; r.ytId?playYouTubeSong(r.ytId,r.title,r.artist,r.image):playSong(r.title,r.artist,r.url,r.image); } } }
-function playSong(t,a,u,i) { if(isYouTubePlaying) stopYouTubePlayer(); isAutoPlayMode=false; currentUrl=u; isPlaying=true; audio.pause(); audio.src=u; audio.load(); audio.play().then(()=>{ document.getElementById('pTitle').innerText=t; document.getElementById('pArtist').innerText=a; const art=document.getElementById('playerImgArt'); art.style.backgroundImage=`url('${i}')`; art.style.backgroundSize='cover'; art.classList.add('music-playing'); updatePlayIcon(true); addToHistory({title:t,artist:a,url:u,image:i}); addToRecentlyPlayed({title:t,artist:a,url:u,image:i}); }).catch(e=>{ updatePlayIcon(false); isPlaying=false; }); refreshView(); }
-function playYouTubeSong(videoId,title,channel,thumb) { stopLocalAudio(); currentYouTubeId=videoId; isYouTubePlaying=true; currentUrl='youtube://'+videoId; isPlaying=true; document.getElementById('pTitle').innerText=title.substring(0,30); document.getElementById('pArtist').innerText=channel; const art=document.getElementById('playerImgArt'); art.style.backgroundImage=`url('${thumb}')`; art.style.backgroundSize='cover'; art.classList.add('music-playing'); updatePlayIcon(true); document.getElementById('currentTime').innerText="0:00"; document.getElementById('totalDuration').innerText="0:00"; document.getElementById('fill').style.width='0%'; document.getElementById('seekSlider').value=0; loadYouTubePlayer(videoId); isAutoPlayMode=true; startYoutubeAutoPlay(videoId); addToHistory({ytId:videoId,title,artist:channel,url:'youtube://'+videoId,image:thumb}); addToRecentlyPlayed({title,artist:channel,url:'youtube://'+videoId,image:thumb,ytId:videoId}); refreshView(); }
-function loadYouTubePlayer(videoId) { const w=document.getElementById('yt-player-wrapper'); w.innerHTML=''; if(!window.YT||!YT.Player){ const t=document.createElement('script'); t.src="https://www.youtube.com/iframe_api"; t.onload=()=>{ window._pendingVideoId=videoId; }; document.head.appendChild(t); } else createYouTubePlayer(videoId); }
-window.onYouTubeIframeAPIReady=()=>{ if(window._pendingVideoId){ createYouTubePlayer(window._pendingVideoId); window._pendingVideoId=null; } };
-function createYouTubePlayer(videoId) { const w=document.getElementById('yt-player-wrapper'); w.innerHTML='<div id="youtube-player"></div>'; try{ youtubePlayer=new YT.Player('youtube-player',{ height:'1', width:'1', videoId:videoId, playerVars:{autoplay:1,controls:0,disablekb:1,fs:0,modestbranding:1,rel:0,showinfo:0,iv_load_policy:3,playsinline:1}, events:{ onReady:(e)=>{ ytPlayerReady=true; e.target.playVideo(); e.target.unMute(); startYtTimeUpdate(); }, onStateChange:(e)=>{ if(e.data===YT.PlayerState.ENDED){ if(isAutoPlayMode) playNextYoutubeAuto(); else nextTrack(); } if(e.data===YT.PlayerState.PLAYING){ isPlaying=true; updatePlayIcon(true); document.getElementById('playerImgArt').classList.add('music-playing'); ytDuration=youtubePlayer.getDuration(); document.getElementById('totalDuration').innerText=formatTime(ytDuration); } else if(e.data===YT.PlayerState.PAUSED){ isPlaying=false; updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); } }, onError:(e)=>{ console.error(e); } } }); }catch(e){ console.error(e); } }
-function startYtTimeUpdate() { if(ytTimeInterval) clearInterval(ytTimeInterval); ytTimeInterval=setInterval(()=>{ if(!isYouTubePlaying||!youtubePlayer||!ytPlayerReady) return; try{ ytCurrentTime=youtubePlayer.getCurrentTime(); ytDuration=youtubePlayer.getDuration(); if(ytDuration>0){ const pct=(ytCurrentTime/ytDuration)*100; document.getElementById('fill').style.width=pct+'%'; document.getElementById('seekSlider').value=pct*10; document.getElementById('currentTime').innerText=formatTime(ytCurrentTime); document.getElementById('totalDuration').innerText=formatTime(ytDuration); } }catch(e){} },500); }
-function stopYtTimeUpdate() { if(ytTimeInterval){ clearInterval(ytTimeInterval); ytTimeInterval=null; } }
-function stopYouTubePlayer() { stopYtTimeUpdate(); if(youtubePlayer){ try{ youtubePlayer.stopVideo(); youtubePlayer.destroy(); }catch(e){} youtubePlayer=null; } document.getElementById('yt-player-wrapper').innerHTML=''; isYouTubePlaying=false; currentYouTubeId=null; ytPlayerReady=false; }
-function stopLocalAudio() { audio.pause(); audio.src=""; audio.currentTime=0; isPlaying=false; }
-function startYoutubeAutoPlay(currentId) { if(youtubeSongs.length===0) return; youtubeShuffleQueue=[...youtubeSongs]; for(let i=youtubeShuffleQueue.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [youtubeShuffleQueue[i],youtubeShuffleQueue[j]]=[youtubeShuffleQueue[j],youtubeShuffleQueue[i]]; } currentYoutubeQueueIndex=youtubeShuffleQueue.findIndex(s=>s.ytId===currentId); if(currentYoutubeQueueIndex===-1) currentYoutubeQueueIndex=0; }
-function playNextYoutubeAuto() { if(!isAutoPlayMode||youtubeShuffleQueue.length===0) return; currentYoutubeQueueIndex++; if(currentYoutubeQueueIndex>=youtubeShuffleQueue.length){ for(let i=youtubeShuffleQueue.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [youtubeShuffleQueue[i],youtubeShuffleQueue[j]]=[youtubeShuffleQueue[j],youtubeShuffleQueue[i]]; } currentYoutubeQueueIndex=0; } const next=youtubeShuffleQueue[currentYoutubeQueueIndex]; playYouTubeSong(next.ytId,next.title,next.artist,next.image); }
-function stopAllPlayback() { stopLocalAudio(); stopYouTubePlayer(); updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); document.getElementById('currentTime').innerText="0:00"; document.getElementById('totalDuration').innerText="0:00"; document.getElementById('fill').style.width='0%'; document.getElementById('seekSlider').value=0; }
-function updatePlayIcon(playing) { const icon=document.getElementById('playIcon'); icon.innerHTML=playing?'<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>':'<path d="M8 5v14l11-7z"/>'; }
-function togglePlay() { if(isYouTubePlaying&&youtubePlayer&&ytPlayerReady){ if(isPlaying){ youtubePlayer.pauseVideo(); isPlaying=false; updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); }else{ youtubePlayer.playVideo(); isPlaying=true; updatePlayIcon(true); document.getElementById('playerImgArt').classList.add('music-playing'); } return; } if(!audio.src||audio.src===window.location.href){ nextTrack(); return; } if(audio.paused){ audio.play().then(()=>{ isPlaying=true; updatePlayIcon(true); document.getElementById('playerImgArt').classList.add('music-playing'); }).catch(e=>{ isPlaying=false; updatePlayIcon(false); }); }else{ audio.pause(); isPlaying=false; updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); } }
-function handleSeekInput() { const s=document.getElementById('seekSlider'); const pct=(s.value/s.max)*100; document.getElementById('fill').style.width=pct+'%'; if(!isYouTubePlaying&&audio.duration) document.getElementById('currentTime').innerText=formatTime(audio.duration*(s.value/1000)); else if(isYouTubePlaying&&ytDuration>0) document.getElementById('currentTime').innerText=formatTime(ytDuration*(s.value/1000)); }
-function handleSeekChange() { const s=document.getElementById('seekSlider'); if(isYouTubePlaying&&youtubePlayer&&ytPlayerReady&&ytDuration>0){ youtubePlayer.seekTo(ytDuration*(s.value/1000),true); } else if(audio.duration){ audio.currentTime=audio.duration*(s.value/1000); } isDragging=false; }
-audio.ontimeupdate=()=>{ if(!isDragging&&audio.duration&&!isYouTubePlaying){ const p=(audio.currentTime/audio.duration)*100; document.getElementById('fill').style.width=p+'%'; document.getElementById('seekSlider').value=p*10; document.getElementById('currentTime').innerText=formatTime(audio.currentTime); document.getElementById('totalDuration').innerText=formatTime(audio.duration); } };
-audio.onended=()=>{ isPlaying=false; updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); nextTrack(); };
-function handleGlobalClick() { document.getElementById('globalPopup').classList.remove('show'); }
-
-// INIT
-window.onload = async() => {
-    detectDevice();
-    const saved = localStorage.getItem('adify_session_email');
-    if(saved && db) {
-        const user = await loadUserFromCloud(saved);
-        if(user) {
-            currentUser = user;
-            await loadUserPlaylists();
-            await loadYoutubeSongs();
-            await loadRecentlyPlayed();
-            updateProfileUI(currentUser);
-            showScreen('homeScreen');
-            renderAll();
-            document.getElementById('loadingOverlay').classList.add('hidden');
-            return;
+            return null;
         }
     }
-    showScreen('loginScreen');
-    document.getElementById('loadingOverlay').classList.add('hidden');
-};
+    async function finalizeLogin(user) {
+        currentUser=user;
+        localStorage.setItem('adify_session_email',user.email);
+        await loadUserPlaylists();
+        await loadYoutubeSongs();
+        await loadRecentlyPlayed();
+        updateProfileUI(user);
+        showPopup(`Welcome ${user.name}!`,"success");
+        setTimeout(()=>{ showScreen('homeScreen'); renderAll(); },500);
+    }
+    async function handleSubmit() {
+        if(!isRegisterMode) {
+            const id=document.getElementById('login-id').value.trim().toLowerCase();
+            const pass=document.getElementById('login-pass').value;
+            if(id==="1" && pass==="1") {
+                currentUser={name:"Master",email:"master@adify.com",phone:"0000000000",gender:"Male",age:21};
+                localStorage.setItem('adify_session_email','master@adify.com');
+                updateProfileUI(currentUser);
+                showScreen('homeScreen'); renderAll();
+                return;
+            }
+            const res=await tryFirebaseLogin(id,pass);
+            if(!res) showPopup("User not found","error");
+            else if(res.error) showPopup(res.error,"error");
+            else await finalizeLogin(res);
+        } else {
+            if(!pendingOTP || !pendingRegData) { showPopup("Please verify OTP first","error"); return; }
+            const {name,email,phone,age,gender,password}=pendingRegData;
+            if(await loadUserFromCloud(email)) { showPopup("Email already exists","error"); return; }
+            if(await getPhoneCount(phone)>=3) { showPopup("Max 3 accounts per phone","error"); return; }
+            const userData={name,email,phone,password,gender,age,photo:null};
+            await saveUserToCloud(userData);
+            await incrementPhoneCount(phone);
+            showPopup("Registered! Please login","success");
+            toggleAuth(false);
+            pendingOTP=null; pendingRegData=null;
+            document.getElementById('otp-code').value="";
+        }
+    }
+    // OTP Simulation
+    function sendOTP() {
+        const name=document.getElementById('full-name').value;
+        const email=document.getElementById('reg-email').value;
+        const phone=document.getElementById('reg-phone').value;
+        const age=document.getElementById('reg-age').value;
+        const pass=document.getElementById('reg-pass').value;
+        if(!name || !email.includes('@') || phone.length!==10 || age<18 || pass.length<8) { showPopup("Fill all fields correctly","error"); return; }
+        const otp = Math.floor(100000 + Math.random()*900000).toString();
+        pendingOTP = otp;
+        pendingRegData = { name, email, phone, age, gender:selectedGender, password:pass };
+        const statusDiv = document.getElementById('otp-status');
+        statusDiv.innerText = `OTP sent: ${otp} (simulated)`;
+        statusDiv.style.display='block';
+        showToast(`Demo OTP: ${otp}`);
+        // Auto-verify after 2 seconds for demo convenience
+        setTimeout(() => {
+            const entered = document.getElementById('otp-code').value;
+            if(entered === otp) {
+                statusDiv.innerText = "OTP verified! You can now sign up.";
+                statusDiv.style.color = "var(--success)";
+            }
+        }, 100);
+    }
+    // Forgot Password
+    function openForgotModal() { document.getElementById('forgot-modal').style.display='flex'; }
+    function closeForgotModal() { document.getElementById('forgot-modal').style.display='none'; }
+    async function resetPassword() {
+        const id = document.getElementById('forgot-identifier').value.trim();
+        if(!id) { showPopup("Enter email or phone","error"); return; }
+        let user = null;
+        if(id.includes('@')) user = await loadUserFromCloud(id);
+        else {
+            const all=await db.ref('users').once('value');
+            const users=all.val();
+            for(let k in users) if(users[k] && users[k].phone===id) { user=users[k]; break; }
+        }
+        if(!user) { showPopup("User not found","error"); return; }
+        const tempPass = Math.random().toString(36).slice(-8);
+        await updateProfileInCloud(user.email, { password: tempPass });
+        showPopup(`Temporary password: ${tempPass}`, "success");
+        closeForgotModal();
+    }
+    // Profile
+    function updateProfileUI(user) {
+        document.getElementById('display-name').innerText=user.name;
+        document.getElementById('p-gender').innerText=user.gender||'Male';
+        document.getElementById('p-email').innerText=user.email;
+        document.getElementById('p-phone').innerText=user.phone?`+91 ${user.phone}`:'';
+        document.getElementById('p-age').innerText=(user.age||22)+' Years';
+        const pfp=user.photo||`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`;
+        document.getElementById('main-pfp').src=pfp;
+        document.getElementById('homeProfileImg').src=pfp;
+    }
+    async function saveProfile() {
+        const newName=document.getElementById('edit-name').value;
+        const newAge=document.getElementById('edit-age').value;
+        const newPass=document.getElementById('edit-password').value;
+        if(!newName||!newAge) return;
+        currentUser.name=newName;
+        currentUser.age=newAge;
+        currentUser.gender=selectedGenderProfile;
+        if(currentPhoto) currentUser.photo=currentPhoto;
+        if(newPass.trim().length>=8) currentUser.password=newPass;
+        await updateProfileInCloud(currentUser.email, {name:newName,age:newAge,gender:selectedGenderProfile,photo:currentUser.photo,password:currentUser.password});
+        updateProfileUI(currentUser);
+        closeEdit();
+        showToast("Profile updated");
+    }
+    function openEdit() { document.getElementById('edit-screen').style.display='block'; document.getElementById('edit-name').value=currentUser.name; document.getElementById('edit-age').value=currentUser.age; document.getElementById('edit-password').value=""; }
+    function closeEdit() { document.getElementById('edit-screen').style.display='none'; }
+    function handleImg(e) { const r=new FileReader(); r.onload=()=>{ currentPhoto=r.result; }; if(e.target.files[0]) r.readAsDataURL(e.target.files[0]); }
+    function showLogout() { document.getElementById('logout-modal').style.display='flex'; }
+    function hideLogout() { document.getElementById('logout-modal').style.display='none'; }
+    async function doLogout() { stopAllPlayback(); currentUser=null; localStorage.removeItem('adify_session_email'); hideLogout(); closeProfile(); showScreen('loginScreen'); }
+    function openProfile() { document.getElementById('profileScreen').classList.add('active'); }
+    function closeProfile() { document.getElementById('profileScreen').classList.remove('active'); }
+    function showScreen(id) { document.querySelectorAll('.app-screen,.profile-screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+    function contactSupport() { window.open("https://adityaprofile-rho.vercel.app/","_blank"); }
+    async function detectDevice() { let model="Adify Terminal"; if(navigator.userAgentData){ try{ const info=await navigator.userAgentData.getHighEntropyValues(["model"]); model=info.model||"Mobile Node"; }catch(e){} } document.getElementById('p-device').innerText=model; }
+
+    // PLAYLIST & SONGS
+    function songItemTemplate(s) {
+        const isP = currentUrl === s.url || (s.ytId && currentYouTubeId === s.ytId);
+        let clickAction;
+        if(s.ytId) clickAction = `playTrackFromUI('${s.ytId}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}','youtube')`;
+        else clickAction = `playTrackFromUI('${s.id}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}','local')`;
+        const moreBtn = s.ytId ? `<div class="more-btn" onclick="event.stopPropagation(); openYtMenu(event,'${s.ytId}')">⋮</div>` : `<div class="more-btn" onclick="openMenu(event,${s.id})">⋮</div>`;
+        return `<div class="song-item ${isP?'playing-active':''}" onclick="${clickAction}"><div style="display:flex;align-items:center;flex:1"><div class="img-container"><img src="${s.image}" class="song-img"></div><div><h4>${s.title}</h4><p style="font-size:10px;opacity:0.5">${s.artist}</p></div></div>${moreBtn}</div>`;
+    }
+    function openMenu(e,id) { e.stopPropagation(); const popup=document.getElementById('globalPopup'); document.getElementById('playlistOptions').innerHTML=playlistsData.map(p=>{ const ex=userPlaylists[p.name].some(x=>x.id===id); return `<div class="menu-item" onclick="playlistAction(${id},'${p.name}',${ex})"><span>${p.name}</span><span>${ex?'REMOVE':'ADD'}</span></div>`; }).join(''); popup.classList.add('show'); }
+    function playlistAction(id,pName,ex) { if(ex) userPlaylists[pName]=userPlaylists[pName].filter(s=>s.id!==id); else { let song=allSongs.find(s=>s.id===id); if(!song) song=youtubeSongs.find(s=>s.id===id); if(song) userPlaylists[pName].push(song); } saveUserPlaylists(); showToast(ex?"Removed":"Added"); document.getElementById('globalPopup').classList.remove('show'); refreshView(); }
+    function openYtMenu(e,videoId) { e.stopPropagation(); const popup=document.getElementById('globalPopup'); document.getElementById('playlistOptions').innerHTML=playlistsData.map(p=>{ const ex=userPlaylists[p.name].some(x=>x.ytId===videoId); return `<div class="menu-item" onclick="addYtToPlaylist('${videoId}','${p.name}',${ex})"><span>${p.name}</span><span>${ex?'REMOVE':'ADD'}</span></div>`; }).join(''); popup.classList.add('show'); }
+    async function addYtToPlaylist(videoId,pName,isRemove) { if(isRemove) userPlaylists[pName]=userPlaylists[pName].filter(s=>s.ytId!==videoId); else { const song=youtubeSongs.find(s=>s.ytId===videoId); if(song) userPlaylists[pName].push(song); } await saveUserPlaylists(); showToast(isRemove?"Removed":"Added"); document.getElementById('globalPopup').classList.remove('show'); refreshView(); }
+    function playTrackFromUI(id,title,artist,image,type) { if(type==='youtube') playYouTubeSong(id,title,artist,image); else { const s=allSongs.find(s=>s.id==id); if(s) playSong(s.title,s.artist,s.url,s.image); } }
+    function openPlaylist(n) { activeP=n; document.getElementById('homeView').classList.remove('active'); document.getElementById('playlistView').classList.add('active'); document.getElementById('playlistTitle').innerText=n; document.getElementById('searchToggleBtn').style.display='none'; renderPlaylistSongs(); }
+    function resetToHome() { activeP=null; document.getElementById('playlistView').classList.remove('active'); document.getElementById('homeView').classList.add('active'); document.getElementById('searchToggleBtn').style.display='flex'; renderAll(); }
+    function renderPlaylistSongs() { let list=userPlaylists[activeP]||[]; document.getElementById('songsContainer').innerHTML=list.length?list.map(s=>songItemTemplate(s)).join(''):"<p style='text-align:center;opacity:0.3;padding:20px;'>Empty.</p>"; }
+    function refreshView() { if(activeP) renderPlaylistSongs(); else renderAll(); }
+    function renderAll() {
+        document.getElementById('mainPlaylistGrid').innerHTML=playlistsData.map(p=>`<div class="card" onclick="openPlaylist('${p.name}')"><div class="art" style="background:url('${p.img}');"></div><p>${p.name}</p></div>`).join('');
+        const merged=[...allSongs,...youtubeSongs.filter(yt=>!allSongs.some(l=>l.url===yt.url))];
+        document.getElementById('singleTracksContainer').innerHTML=merged.map(s=>songItemTemplate(s)).join('');
+        renderRecentlyPlayed();
+    }
+
+    // SEARCH
+    async function getRecentSearches() { if(!currentUser || !db) return []; const snap=await db.ref(userPath(currentUser.email,'recentSearches')).once('value'); return snap.val()||[]; }
+    async function saveRecentSearch(q) { if(!currentUser || !db || q.length<2) return; let s=await getRecentSearches(); s=s.filter(x=>x!==q); s.unshift(q); await db.ref(userPath(currentUser.email,'recentSearches')).set(s.slice(0,10)); renderRecentSearches(); }
+    async function renderRecentSearches() { const list=document.getElementById('recentSearchesList'); const s=await getRecentSearches(); if(s.length===0) { list.innerHTML='<div class="no-recent">No recent searches</div>'; return; } list.innerHTML=s.map(q=>`<div class="recent-search-item" onclick="searchFromRecent('${q.replace(/'/g,"\\'")}')"><div class="recent-search-left"><i class="fas fa-clock"></i><span class="recent-search-text">${q}</span></div><i class="fas fa-times recent-search-delete" onclick="event.stopPropagation(); removeRecentSearch('${q.replace(/'/g,"\\'")}')"></i></div>`).join(''); }
+    async function removeRecentSearch(q) { let s=await getRecentSearches(); s=s.filter(x=>x!==q); await db.ref(userPath(currentUser.email,'recentSearches')).set(s); renderRecentSearches(); }
+    async function clearAllRecentSearches() { await db.ref(userPath(currentUser.email,'recentSearches')).remove(); renderRecentSearches(); }
+    function searchFromRecent(q) { document.getElementById('searchPageInput').value=q; executeSearch(); }
+    function openSearchScreen(e) { e.stopPropagation(); showScreen('searchScreen'); renderRecentSearches(); setTimeout(()=>document.getElementById('searchPageInput').focus(),100); }
+    function closeSearch() { showScreen('homeScreen'); renderAll(); }
+    function clearSearchInput() { document.getElementById('searchPageInput').value=''; document.getElementById('searchClearBtn').style.display='none'; document.getElementById('recentSearchesSection').style.display='block'; document.getElementById('searchResultsSection').style.display='none'; }
+    function handleSearchPageInput() { const q=document.getElementById('searchPageInput').value.trim(); if(q.length>0) document.getElementById('searchClearBtn').style.display='block'; else { document.getElementById('searchClearBtn').style.display='none'; document.getElementById('recentSearchesSection').style.display='block'; document.getElementById('searchResultsSection').style.display='none'; return; } clearTimeout(searchTimeout); searchTimeout=setTimeout(()=>executeSearch(),500); }
+    async function executeSearch() { const q=document.getElementById('searchPageInput').value.trim(); if(q.length<2) return; await saveRecentSearch(q); document.getElementById('recentSearchesSection').style.display='none'; document.getElementById('searchResultsSection').style.display='block'; const merged=[...allSongs,...youtubeSongs]; const local=merged.filter(s=>s.title.toLowerCase().includes(q.toLowerCase())||s.artist.toLowerCase().includes(q.toLowerCase())); document.getElementById('searchResultsTracks').innerHTML=local.length?local.map(s=>songItemTemplate(s)).join(''):'<div class="no-recent">No tracks</div>'; document.getElementById('ytSearchResultsSection').style.display='block'; document.getElementById('searchResultsYouTube').innerHTML='<div class="yt-loading">Searching YouTube...</div>'; try { const url=`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q+" song")}&type=video&videoCategoryId=10&key=${YOUTUBE_API_KEY}&maxResults=8`; const res=await fetch(url); const data=await res.json(); if(data.items) { const ytItems=data.items.map((item,idx)=>({id:'yt_'+idx, videoId:item.id.videoId, title:item.snippet.title, artist:item.snippet.channelTitle, image:item.snippet.thumbnails.medium?.url||item.snippet.thumbnails.default.url})); ytItems.forEach(yt=>{ if(!youtubeSongs.some(s=>s.videoId===yt.videoId)) youtubeSongs.push({id:'yt_'+Date.now()+'_'+Math.random().toString(36).substr(2,5), ytId:yt.videoId, title:yt.title, artist:yt.artist, url:'youtube://'+yt.videoId, image:yt.image}); }); await saveYoutubeSongs(); document.getElementById('searchResultsYouTube').innerHTML=ytItems.map(s=>ytSongItemTemplate(s)).join(''); } else document.getElementById('searchResultsYouTube').innerHTML='<div class="no-recent">No YouTube results</div>'; } catch(e) { document.getElementById('searchResultsYouTube').innerHTML='<div class="no-recent">Search failed</div>'; } }
+    function ytSongItemTemplate(s) { return `<div class="song-item" onclick="playYouTubeSong('${s.videoId}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}')"><div style="display:flex;align-items:center;flex:1"><div class="img-container"><img src="${s.image}" class="song-img"></div><div><h4>${s.title}</h4><p style="font-size:10px;">${s.artist}</p></div></div><div class="more-btn" onclick="event.stopPropagation(); openYtMenu(event,'${s.videoId}')">⋮</div></div>`; }
+
+    // PLAYBACK
+    let isAutoPlayMode=false, youtubeShuffleQueue=[], currentYoutubeQueueIndex=-1;
+    function addToHistory(track) { if(playHistory.length===0 || playHistory[historyIndex].url!==track.url) { if(historyIndex<playHistory.length-1) playHistory=playHistory.slice(0,historyIndex+1); playHistory.push(track); historyIndex=playHistory.length-1; if(playHistory.length>50) playHistory.shift(); } }
+    function prevTrack() { if(historyIndex>0) { historyIndex--; const t=playHistory[historyIndex]; t.ytId?playYouTubeSong(t.ytId,t.title,t.artist,t.image):playSong(t.title,t.artist,t.url,t.image); } else showToast("No previous"); }
+    function nextTrack() { if(historyIndex<playHistory.length-1) { historyIndex++; const t=playHistory[historyIndex]; t.ytId?playYouTubeSong(t.ytId,t.title,t.artist,t.image):playSong(t.title,t.artist,t.url,t.image); } else { const merged=[...allSongs,...youtubeSongs]; if(merged.length) { const r=merged[Math.floor(Math.random()*merged.length)]; r.ytId?playYouTubeSong(r.ytId,r.title,r.artist,r.image):playSong(r.title,r.artist,r.url,r.image); } } }
+    function playSong(t,a,u,i) { if(isYouTubePlaying) stopYouTubePlayer(); isAutoPlayMode=false; currentUrl=u; isPlaying=true; audio.pause(); audio.src=u; audio.load(); audio.play().then(()=>{ document.getElementById('pTitle').innerText=t; document.getElementById('pArtist').innerText=a; const art=document.getElementById('playerImgArt'); art.style.backgroundImage=`url('${i}')`; art.style.backgroundSize='cover'; art.classList.add('music-playing'); updatePlayIcon(true); addToHistory({title:t,artist:a,url:u,image:i}); addToRecentlyPlayed({title:t,artist:a,url:u,image:i}); }).catch(e=>{ updatePlayIcon(false); isPlaying=false; }); refreshView(); }
+    function playYouTubeSong(videoId,title,channel,thumb) { stopLocalAudio(); currentYouTubeId=videoId; isYouTubePlaying=true; currentUrl='youtube://'+videoId; isPlaying=true; document.getElementById('pTitle').innerText=title.substring(0,30); document.getElementById('pArtist').innerText=channel; const art=document.getElementById('playerImgArt'); art.style.backgroundImage=`url('${thumb}')`; art.style.backgroundSize='cover'; art.classList.add('music-playing'); updatePlayIcon(true); document.getElementById('currentTime').innerText="0:00"; document.getElementById('totalDuration').innerText="0:00"; document.getElementById('fill').style.width='0%'; document.getElementById('seekSlider').value=0; loadYouTubePlayer(videoId); isAutoPlayMode=true; startYoutubeAutoPlay(videoId); addToHistory({ytId:videoId,title,artist:channel,url:'youtube://'+videoId,image:thumb}); addToRecentlyPlayed({title,artist:channel,url:'youtube://'+videoId,image:thumb,ytId:videoId}); refreshView(); }
+    function loadYouTubePlayer(videoId) { const w=document.getElementById('yt-player-wrapper'); w.innerHTML=''; if(!window.YT||!YT.Player){ const t=document.createElement('script'); t.src="https://www.youtube.com/iframe_api"; t.onload=()=>{ window._pendingVideoId=videoId; }; document.head.appendChild(t); } else createYouTubePlayer(videoId); }
+    window.onYouTubeIframeAPIReady=()=>{ if(window._pendingVideoId){ createYouTubePlayer(window._pendingVideoId); window._pendingVideoId=null; } };
+    function createYouTubePlayer(videoId) { const w=document.getElementById('yt-player-wrapper'); w.innerHTML='<div id="youtube-player"></div>'; try{ youtubePlayer=new YT.Player('youtube-player',{ height:'1', width:'1', videoId:videoId, playerVars:{autoplay:1,controls:0,disablekb:1,fs:0,modestbranding:1,rel:0,showinfo:0,iv_load_policy:3,playsinline:1}, events:{ onReady:(e)=>{ ytPlayerReady=true; e.target.playVideo(); e.target.unMute(); startYtTimeUpdate(); }, onStateChange:(e)=>{ if(e.data===YT.PlayerState.ENDED){ if(isAutoPlayMode) playNextYoutubeAuto(); else nextTrack(); } if(e.data===YT.PlayerState.PLAYING){ isPlaying=true; updatePlayIcon(true); document.getElementById('playerImgArt').classList.add('music-playing'); ytDuration=youtubePlayer.getDuration(); document.getElementById('totalDuration').innerText=formatTime(ytDuration); } else if(e.data===YT.PlayerState.PAUSED){ isPlaying=false; updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); } }, onError:(e)=>{ console.error(e); } } }); } catch(e){ console.error(e); } }
+    function startYtTimeUpdate() { if(ytTimeInterval) clearInterval(ytTimeInterval); ytTimeInterval=setInterval(()=>{ if(!isYouTubePlaying||!youtubePlayer||!ytPlayerReady) return; try{ ytCurrentTime=youtubePlayer.getCurrentTime(); ytDuration=youtubePlayer.getDuration(); if(ytDuration>0){ const pct=(ytCurrentTime/ytDuration)*100; document.getElementById('fill').style.width=pct+'%'; document.getElementById('seekSlider').value=pct*10; document.getElementById('currentTime').innerText=formatTime(ytCurrentTime); document.getElementById('totalDuration').innerText=formatTime(ytDuration); } }catch(e){} },500); }
+    function stopYtTimeUpdate() { if(ytTimeInterval){ clearInterval(ytTimeInterval); ytTimeInterval=null; } }
+    function stopYouTubePlayer() { stopYtTimeUpdate(); if(youtubePlayer){ try{ youtubePlayer.stopVideo(); youtubePlayer.destroy(); }catch(e){} youtubePlayer=null; } document.getElementById('yt-player-wrapper').innerHTML=''; isYouTubePlaying=false; currentYouTubeId=null; ytPlayerReady=false; }
+    function stopLocalAudio() { audio.pause(); audio.src=""; audio.currentTime=0; isPlaying=false; }
+    function startYoutubeAutoPlay(currentId) { if(youtubeSongs.length===0) return; youtubeShuffleQueue=[...youtubeSongs]; for(let i=youtubeShuffleQueue.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [youtubeShuffleQueue[i],youtubeShuffleQueue[j]]=[youtubeShuffleQueue[j],youtubeShuffleQueue[i]]; } currentYoutubeQueueIndex=youtubeShuffleQueue.findIndex(s=>s.ytId===currentId); if(currentYoutubeQueueIndex===-1) currentYoutubeQueueIndex=0; }
+    function playNextYoutubeAuto() { if(!isAutoPlayMode||youtubeShuffleQueue.length===0) return; currentYoutubeQueueIndex++; if(currentYoutubeQueueIndex>=youtubeShuffleQueue.length){ for(let i=youtubeShuffleQueue.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [youtubeShuffleQueue[i],youtubeShuffleQueue[j]]=[youtubeShuffleQueue[j],youtubeShuffleQueue[i]]; } currentYoutubeQueueIndex=0; } const next=youtubeShuffleQueue[currentYoutubeQueueIndex]; playYouTubeSong(next.ytId,next.title,next.artist,next.image); }
+    function stopAllPlayback() { stopLocalAudio(); stopYouTubePlayer(); updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); document.getElementById('currentTime').innerText="0:00"; document.getElementById('totalDuration').innerText="0:00"; document.getElementById('fill').style.width='0%'; document.getElementById('seekSlider').value=0; }
+    function updatePlayIcon(playing) { const icon=document.getElementById('playIcon'); icon.innerHTML=playing?'<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>':'<path d="M8 5v14l11-7z"/>'; }
+    function togglePlay() { if(isYouTubePlaying&&youtubePlayer&&ytPlayerReady){ if(isPlaying){ youtubePlayer.pauseVideo(); isPlaying=false; updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); }else{ youtubePlayer.playVideo(); isPlaying=true; updatePlayIcon(true); document.getElementById('playerImgArt').classList.add('music-playing'); } return; } if(!audio.src||audio.src===window.location.href){ nextTrack(); return; } if(audio.paused){ audio.play().then(()=>{ isPlaying=true; updatePlayIcon(true); document.getElementById('playerImgArt').classList.add('music-playing'); }).catch(e=>{ isPlaying=false; updatePlayIcon(false); }); }else{ audio.pause(); isPlaying=false; updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); } }
+    function handleSeekInput() { const s=document.getElementById('seekSlider'); const pct=(s.value/s.max)*100; document.getElementById('fill').style.width=pct+'%'; if(!isYouTubePlaying&&audio.duration) document.getElementById('currentTime').innerText=formatTime(audio.duration*(s.value/1000)); else if(isYouTubePlaying&&ytDuration>0) document.getElementById('currentTime').innerText=formatTime(ytDuration*(s.value/1000)); }
+    function handleSeekChange() { const s=document.getElementById('seekSlider'); if(isYouTubePlaying&&youtubePlayer&&ytPlayerReady&&ytDuration>0){ youtubePlayer.seekTo(ytDuration*(s.value/1000),true); } else if(audio.duration){ audio.currentTime=audio.duration*(s.value/1000); } isDragging=false; }
+    audio.ontimeupdate=()=>{ if(!isDragging&&audio.duration&&!isYouTubePlaying){ const p=(audio.currentTime/audio.duration)*100; document.getElementById('fill').style.width=p+'%'; document.getElementById('seekSlider').value=p*10; document.getElementById('currentTime').innerText=formatTime(audio.currentTime); document.getElementById('totalDuration').innerText=formatTime(audio.duration); } };
+    audio.onended=()=>{ isPlaying=false; updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); nextTrack(); };
+    function handleGlobalClick() { document.getElementById('globalPopup').classList.remove('show'); }
+
+    // INITIALIZATION with error handling and forced hide of loading overlay
+    window.addEventListener('load', async () => {
+        try {
+            await detectDevice();
+            const saved = localStorage.getItem('adify_session_email');
+            if(saved && db) {
+                const user = await loadUserFromCloud(saved);
+                if(user) {
+                    currentUser = user;
+                    await loadUserPlaylists();
+                    await loadYoutubeSongs();
+                    await loadRecentlyPlayed();
+                    updateProfileUI(currentUser);
+                    showScreen('homeScreen');
+                    renderAll();
+                } else {
+                    showScreen('loginScreen');
+                }
+            } else {
+                showScreen('loginScreen');
+            }
+        } catch(err) {
+            console.error("Init error", err);
+            showScreen('loginScreen');
+        } finally {
+            // Force hide loading overlay
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.add('hidden');
+            // Also ensure it's hidden after 1.5 seconds max
+            setTimeout(() => { overlay.classList.add('hidden'); }, 1500);
+        }
+    });
+})();
 </script>
 </body>
 </html>
