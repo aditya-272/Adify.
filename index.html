@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Adify - Premium Music Experience</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Inter:wght@400;600&family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -35,11 +35,23 @@
         .profile-screen { position: fixed; inset: 0; display: none; flex-direction: column; overflow-y: auto; scrollbar-width: none; background: var(--bg-black); background-image: radial-gradient(circle at top right, #001a33, transparent); }
         .profile-screen::-webkit-scrollbar { display: none; }
         .profile-screen.active { display: flex; }
-        #toast, #custom-toast { display: none; position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: var(--sky-blue); padding: 15px 35px; border-radius: 50px; font-weight: 800; z-index: 10000; border: 1px solid var(--sky-blue); backdrop-filter: blur(20px); box-shadow: 0 0 20px rgba(0,191,255,0.4); animation: slideUp3D 0.5s cubic-bezier(0.175,0.885,0.32,1.275); text-transform: uppercase; letter-spacing: 1px; font-size: 14px; }
+        #toast {
+            display: none; position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); color: var(--sky-blue); padding: 15px 35px; border-radius: 50px;
+            font-weight: 800; z-index: 10000; border: 1px solid var(--sky-blue); backdrop-filter: blur(20px);
+            box-shadow: 0 0 20px rgba(0,191,255,0.4); animation: slideUp3D 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
+            text-transform: uppercase; letter-spacing: 1px; font-size: 14px;
+        }
         @keyframes slideUp3D { from { bottom: -100px; opacity: 0; } to { bottom: 40px; opacity: 1; } }
-        #status-popup { display: none; position: fixed; top: 30px; left: 50%; transform: translateX(-50%); padding: 15px 30px; border-radius: 20px; font-weight: 800; z-index: 10000; backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: slideDown 0.4s cubic-bezier(0.175,0.885,0.32,1.275); text-transform: uppercase; letter-spacing: 1px; font-size: 14px; }
+        #status-popup {
+            display: none; position: fixed; top: 30px; left: 50%; transform: translateX(-50%);
+            padding: 15px 30px; border-radius: 20px; font-weight: 800; z-index: 10000; backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: slideDown 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+            text-transform: uppercase; letter-spacing: 1px; font-size: 14px;
+        }
         @keyframes slideDown { from { top: -100px; opacity: 0; } to { top: 30px; opacity: 1; } }
         .profile-back-btn { position: absolute; top: 20px; left: 20px; width: 40px; height: 40px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; z-index: 10; }
+        .profile-back-btn:active { background: rgba(0,191,255,0.2); }
         .auth-card { width: 100%; max-width: 400px; text-align: center; margin: auto; padding: 20px; }
         .logo-area { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 5px; }
         .logo-area i { color: var(--sky-blue); font-size: 38px; filter: drop-shadow(0 0 10px rgba(0,191,255,0.4)); }
@@ -50,7 +62,7 @@
         .auth-input { width: 100%; padding: 16px; background: var(--glass); border: 1px solid #222; border-radius: 15px; color: #fff; font-size: 15px; outline: none !important; transition: 0.3s; }
         .auth-input:focus { border-color: var(--sky-blue); }
         .eye-icon { position: absolute; right: 15px; top: 42px; color: #555; cursor: pointer; font-size: 18px; transition: 0.3s; }
-        .err-msg { color: var(--danger); font-size: 11px; margin-top: 5px; padding-left: 5px; display: none; font-weight: 600; }
+        .err-msg { color: var(--danger); font-size: 11px; margin-top: 5px; padding-left: 5px; display: none; font-weight: 600; line-height: 1.4; }
         #reg-fields { display: none; }
         .gender-container { display: flex; gap: 8px; margin-top: 10px; }
         .gender-opt { flex: 1; padding: 12px; background: var(--glass); border: 1px solid #222; border-radius: 12px; text-align: center; cursor: pointer; color: #777; font-weight: bold; font-size: 13px; transition: 0.3s; }
@@ -59,476 +71,910 @@
         .btn-auth:active { transform: scale(0.98); }
         .toggle-text { margin-top: 25px; font-size: 13px; color: #444; }
         .toggle-text span { color: var(--sky-blue); cursor: pointer; font-weight: bold; }
-        .forgot-link { text-align: right; font-size: 11px; margin-top: 5px; color: var(--sky-blue); cursor: pointer; opacity: 0.7; }
         .home-header { padding: 25px 20px 10px; display: flex; justify-content: space-between; align-items: center; z-index: 10; position: relative; }
         .logo { font-family: 'Syncopate', sans-serif; font-size: 18px; color: var(--primary); letter-spacing: 2px; cursor: pointer; }
-        #searchToggleBtn { position: absolute; left: 50%; transform: translateX(-50%); font-size: 20px; cursor: pointer; opacity: 0.8; padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        #searchToggleBtn { position: absolute; left: 50%; transform: translateX(-50%); font-size: 20px; cursor: pointer; opacity: 0.8; padding: 8px; transition: 0.2s cubic-bezier(0.175,0.885,0.32,1.275); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        #searchToggleBtn:active { transform: translateX(-50%) scale(0.8); background: rgba(0,132,255,0.2); opacity: 1; }
         .profile-btn { width: 35px; height: 35px; background: var(--glass); border: 1px solid var(--border); border-radius: 50%; overflow: hidden; cursor: pointer; }
         .profile-btn img { width: 100%; height: 100%; object-fit: cover; }
-        .search-header { padding: 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
-        .search-back-btn { width: 40px; height: 40px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; }
-        .search-input-wrapper { flex: 1; position: relative; }
-        .search-page-input { width: 100%; padding: 14px 18px; background: var(--glass); border: 1px solid var(--border); border-radius: 16px; color: white; font-size: 15px; outline: none; }
-        .search-page-input:focus { border-color: var(--sky-blue); }
-        .search-clear-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #666; cursor: pointer; display: none; }
+
+        /* ===== SEARCH SCREEN STYLES ===== */
+        .search-header{padding:20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+        .search-back-btn{width:40px;height:40px;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;flex-shrink:0}
+        .search-back-btn:active{background:rgba(0,191,255,0.2)}
+        .search-input-wrapper{flex:1;position:relative}
+        .search-page-input{width:100%;padding:14px 18px;background:var(--glass);border:1px solid var(--border);border-radius:16px;color:white;font-size:15px;outline:none}
+        .search-page-input:focus{border-color:var(--sky-blue)}
+        .search-clear-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#666;cursor:pointer;font-size:18px;display:none}
         .search-content { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 160px; }
-        .recent-searches-header { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .recent-searches-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .recent-searches-title { font-size: 12px; color: var(--primary); letter-spacing: 1px; text-transform: uppercase; font-weight: bold; }
-        .clear-all-btn { font-size: 11px; color: var(--danger); cursor: pointer; }
-        .recent-search-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: rgba(255,255,255,0.03); border-radius: 14px; margin-bottom: 8px; cursor: pointer; }
+        .clear-all-btn { font-size: 11px; color: var(--danger); cursor: pointer; font-weight: 600; }
+        .recent-search-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: rgba(255,255,255,0.03); border-radius: 14px; margin-bottom: 8px; cursor: pointer; transition: 0.2s; }
+        .recent-search-item:active { background: rgba(0,132,255,0.1); }
         .recent-search-left { display: flex; align-items: center; gap: 12px; flex: 1; }
+        .recent-search-icon { color: var(--primary); font-size: 16px; opacity: 0.6; }
         .recent-search-text { font-size: 14px; color: #ccc; }
-        .recent-search-delete { color: #555; padding: 8px; cursor: pointer; border-radius: 50%; }
-        .no-recent { text-align: center; color: #555; padding: 40px; }
+        .recent-search-delete { color: #555; font-size: 16px; padding: 8px; cursor: pointer; border-radius: 50%; }
+        .recent-search-delete:active { color: var(--danger); background: rgba(255,71,87,0.1); }
+        .no-recent { text-align: center; color: #555; font-size: 13px; padding: 40px 20px; }
+
         .view { flex: 1; padding: 10px 20px; overflow-y: auto; display: none; padding-bottom: 160px; scroll-behavior: smooth; }
         .view.active { display: block; }
         .section-title { font-size: 10px; color: var(--primary); letter-spacing: 1px; margin: 15px 0 12px; text-transform: uppercase; font-weight: bold; }
         .playlist-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 25px; }
         .card { background: var(--glass); border: 1px solid var(--border); padding: 10px; border-radius: 18px; text-align: center; cursor: pointer; transition: 0.3s; }
-        .card:active { transform: scale(0.95); }
+        .card:active { transform: scale(0.95); border-color: var(--primary); }
         .card .art { width: 100%; aspect-ratio: 1; border-radius: 12px; margin-bottom: 10px; background-size: cover !important; }
-        .song-item { display: flex; align-items: center; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 8px; cursor: pointer; }
+        .song-item { display: flex; align-items: center; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 8px; position: relative; transition: 0.2s; }
         .playing-active { border-left: 3px solid var(--primary); background: rgba(0,132,255,0.08); }
+        .selected-to-remove { background: rgba(255,51,51,0.15); border: 1px solid var(--danger); }
         .img-container { width: 42px; height: 42px; margin-right: 12px; }
         .song-img { width: 100%; height: 100%; border-radius: 8px; object-fit: cover; }
-        .more-btn { padding: 10px; font-size: 20px; opacity: 0.6; cursor: pointer; border-radius: 50%; }
-        .menu-dropdown { position: fixed; right: 20px; top: 50%; transform: translateY(-50%) scale(0.9); background: var(--popup-bg); backdrop-filter: blur(25px); border: 1px solid var(--primary); border-radius: 20px; z-index: 3000; display: none; width: 240px; opacity: 0; transition: 0.3s; }
+        .more-btn { padding: 10px; font-size: 20px; opacity: 0.6; cursor: pointer; border-radius: 50%; transition: 0.2s; }
+        .more-btn:active { background: rgba(0,132,255,0.2); color: var(--primary); filter: drop-shadow(0 0 5px var(--primary)); }
+        .menu-dropdown { position: fixed; right: 20px; top: 50%; transform: translateY(-50%) scale(0.9); background: var(--popup-bg); backdrop-filter: blur(25px); border: 1px solid var(--primary); box-shadow: 0 10px 40px rgba(0,132,255,0.3); border-radius: 20px; z-index: 3000; display: none; width: 240px; opacity: 0; transition: 0.3s cubic-bezier(0.175,0.885,0.32,1.275); }
         .menu-dropdown.show { display: block; opacity: 1; transform: translateY(-50%) scale(1); }
         .menu-header { padding: 12px; border-bottom: 1px solid var(--border); font-size: 10px; text-align: center; color: var(--primary); font-weight: bold; }
-        .menu-item { padding: 14px 18px; font-size: 13px; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; justify-content: space-between; }
-        .back-home-btn { margin-bottom: 20px; background: var(--glass); color: white; border: 1px solid var(--border); padding: 10px 18px; border-radius: 10px; font-size: 11px; cursor: pointer; display: inline-block; }
+        .menu-item { padding: 14px 18px; font-size: 13px; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: 0.2s; }
+        .menu-item:active { background: rgba(0,132,255,0.1); box-shadow: inset 0 -4px 10px rgba(0,132,255,0.2); }
+        .playlist-actions { margin-bottom: 15px; display: flex; flex-direction: column; gap: 8px; }
+        .action-btn { width: 100%; padding: 12px; border-radius: 12px; font-size: 10px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
+        .btn-remove-mode { background: rgba(255,51,51,0.1); color: var(--danger); border: 1px solid rgba(255,51,51,0.3); }
         .player { position: fixed; bottom: 15px; left: 12px; right: 12px; background: rgba(10,20,35,0.98); backdrop-filter: blur(40px); border: 1px solid var(--border); border-radius: 28px; padding: 18px 15px; z-index: 1000; }
         .player-main { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
         .player-info { display: flex; align-items: center; gap: 10px; width: 45%; }
-        .player-art { width: 44px; height: 44px; border-radius: 8px; background-size: cover !important; border: 1px solid var(--border); }
-        .player-art.music-playing { animation: djGlow 3s infinite; }
+        .player-art { width: 44px; height: 44px; border-radius: 8px; background-size: cover !important; background-position: center !important; border: 1px solid var(--border); }
         @keyframes djGlow { 0% { box-shadow: 0 0 15px 2px rgba(0,132,255,0.7); } 50% { box-shadow: 0 0 25px 4px rgba(255,51,51,0.8); } 100% { box-shadow: 0 0 15px 2px rgba(0,132,255,0.7); } }
-        .controls { display: flex; align-items: center; gap: 22px; flex: 1; justify-content: center; }
-        .nav-btn { width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0.7; border-radius: 50%; }
-        .play-btn { width: 52px; height: 52px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,132,255,0.4); }
+        .player-art.music-playing { animation: djGlow 3s infinite ease-in-out; }
+        .controls { display: flex; align-items: center; justify-content: center; gap: 22px; flex: 1; }
+        .nav-btn { width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0.7; transition: 0.2s; border-radius: 50%; }
+        .nav-btn:active { transform: scale(0.85); opacity: 1; background: rgba(0,132,255,0.2); filter: drop-shadow(0 0 8px var(--primary)); }
+        .play-btn { width: 52px; height: 52px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(0,132,255,0.4); border: 1px solid rgba(255,255,255,0.1); }
+        .play-btn:active { transform: scale(0.9); box-shadow: 0 0 20px var(--primary); }
         .time-container { margin-top: 5px; }
-        .time-info { display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
-        .time-bar { width: 100%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 10px; position: relative; }
-        .fill { height: 100%; background: var(--primary); width: 0%; border-radius: 10px; position: absolute; left: 0; top: 0; pointer-events: none; }
-        #seekSlider { width: 100%; height: 100%; opacity: 0; cursor: pointer; position: absolute; top: 0; left: 0; }
-        .watermark { position: fixed; bottom: 105px; right: 25px; font-size: 8px; color: var(--primary); opacity: 0.4; }
-        .p-header { padding: 70px 20px 40px; text-align: center; background: linear-gradient(to bottom, #001a33, #020202); }
+        .time-info { display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,0.5); margin-bottom: 4px; font-weight: 500; }
+        .time-bar { width: 100%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 10px; position: relative; display: flex; align-items: center; }
+        .fill { height: 100%; background: var(--primary); width: 0%; border-radius: 10px; position: absolute; left: 0; top: 0; box-shadow: 0 0 10px var(--primary); pointer-events: none; }
+        #seekSlider { width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5; position: absolute; top: 0; left: 0; }
+        .watermark { position: fixed; bottom: 105px; right: 25px; font-size: 8px; color: var(--primary); opacity: 0.4; letter-spacing: 1px; }
+        .p-header { padding: 70px 20px 40px; text-align: center; background: linear-gradient(to bottom, #001a33, #020202); position: relative; }
         .p-avatar { width: 140px; height: 140px; border-radius: 50%; border: 3px solid var(--sky-blue); padding: 5px; background: var(--bg-black); box-shadow: 0 0 30px rgba(0,191,255,0.5); }
-        .info-label { padding: 25px 30px 10px; font-size: 11px; color: var(--sky-blue); letter-spacing: 3px; font-weight: 900; }
-        .glass-card { background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01)); border: 1px solid var(--glass-edge); margin: 0 20px 20px; border-radius: 24px; padding: 25px; backdrop-filter: blur(15px); }
-        .row { display: flex; justify-content: space-between; margin-bottom: 18px; }
-        .row span:first-child { color: #aaa; font-size: 14px; }
-        .row .val { font-weight: 800; color: #fff; }
-        .btn-blue { width: 100%; padding: 18px; background: var(--sky-blue); color: #000; border-radius: 18px; font-weight: 900; cursor: pointer; margin-top: 10px; font-size: 16px; text-align: center; }
+        .info-label { padding: 25px 30px 10px; font-size: 11px; color: var(--sky-blue); text-transform: uppercase; letter-spacing: 3px; font-weight: 900; opacity: 0.8; }
+        .glass-card { background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01)); border: 1px solid var(--glass-edge); margin: 0 20px 20px; border-radius: 24px; padding: 25px; backdrop-filter: blur(15px); box-shadow: var(--neon-shadow); transition: 0.3s; }
+        .glass-card:active { transform: scale(0.98); border-color: var(--sky-blue); }
+        .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .row span:first-child { color: #aaa; font-weight: 500; font-size: 14px; }
+        .row .val { font-weight: 800; font-size: 15px; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
+        .locked { color: var(--sky-blue) !important; font-family: monospace; }
+        .btn-blue { width: 100%; padding: 18px; background: var(--sky-blue); color: #000; border-radius: 18px; font-weight: 900; cursor: pointer; margin-top: 10px; font-size: 16px; letter-spacing: 1px; box-shadow: 0 10px 20px rgba(0,191,255,0.3); transition: 0.3s; }
+        .btn-blue:active { transform: scale(0.98); }
         .btn-outline { background: transparent; border: 1px solid var(--glass-edge); color: #fff; }
-        .support-fab { position: fixed; bottom: 35px; right: 25px; width: 65px; height: 65px; background: var(--sky-blue); border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #000; cursor: pointer; z-index: 9999; }
-        #logout-modal, #forgot-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
+        .btn-outline:active { border-color: var(--sky-blue); }
+        .support-fab { position: fixed; bottom: 35px; right: 25px; width: 65px; height: 65px; background: var(--sky-blue); border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #000; box-shadow: 0 15px 30px rgba(0,191,255,0.5); z-index: 9999; cursor: pointer; transition: 0.4s cubic-bezier(0.175,0.885,0.32,1.275); }
+        .support-fab:active { transform: scale(0.9); }
+        #logout-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
         .warn-card { width: 85%; max-width: 350px; background: linear-gradient(145deg, #0a0a0a, #001a33); border: 1px solid var(--danger); border-radius: 35px; padding: 40px 30px; text-align: center; }
         #edit-screen { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; padding: 30px; backdrop-filter: blur(20px); overflow-y: auto; }
-        .edit-input { width: 100%; padding: 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-edge); border-radius: 15px; color: #fff; margin-bottom: 20px; outline: none; }
-        #yt-player-wrapper { position: fixed; bottom: 0; left: 0; width: 100%; height: 1px; opacity: 0; pointer-events: none; }
-        #loadingOverlay { position: fixed; inset: 0; background: radial-gradient(circle at top right, #001f3f, #000814); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 99999; transition: opacity 0.3s; }
+        .edit-input { width: 100%; padding: 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-edge); border-radius: 15px; color: #fff; font-size: 15px; outline: none !important; transition: 0.3s; margin-bottom: 20px; }
+        .edit-input:focus { border-color: var(--sky-blue); }
+
+        #yt-player-wrapper { position: fixed; bottom: 0; left: 0; width: 100%; height: 1px; z-index: 1; overflow: hidden; opacity: 0; pointer-events: none; }
+        #yt-player-wrapper iframe { width: 100%; height: 200px; border: none; }
+
+        #loadingOverlay { position: fixed; inset: 0; background: radial-gradient(circle at top right, #001f3f, #000814); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 99999; transition: opacity 0.3s ease; }
         #loadingOverlay.hidden { opacity: 0; pointer-events: none; }
         .loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(0,191,255,0.2); border-top-color: var(--sky-blue); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-text { color: var(--sky-blue); margin-top: 15px; font-size: 12px; letter-spacing: 2px; }
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .loading-text{color:var(--sky-blue);margin-top:15px;font-size:12px;letter-spacing:2px;text-transform:uppercase}
+        .yt-loading{text-align:center;padding:20px;color:var(--primary);font-size:12px}
+        @media(max-width:400px){.auth-card h1{font-size:36px}.p-avatar{width:120px;height:120px}.playlist-grid{gap:10px}}
     </style>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
-<body>
+<body onclick="handleGlobalClick(event)">
 
-<div id="loadingOverlay">
-    <div class="loading-spinner"></div>
-    <div class="loading-text">Loading...</div>
-</div>
-<div id="yt-player-wrapper"></div>
-<audio id="mainAudio" playsinline webkit-playsinline></audio>
-<div id="toast"></div>
-<div id="status-popup"></div>
-<div class="menu-dropdown" id="globalPopup"><div class="menu-header">ADD TO PLAYLIST</div><div id="playlistOptions"></div></div>
-
-<!-- LOGIN SCREEN -->
-<div id="loginScreen" class="app-screen active">
-    <div class="auth-card">
-        <div class="logo-area"><i class="fas fa-headphones-alt"></i><h1>Adify</h1></div>
-        <p class="subtitle">Premium Sound Experience</p>
-        <div id="login-section">
-            <div class="input-group"><p class="label">Email or Phone</p><input type="text" id="login-id" class="auth-input" placeholder="Email or 10-digit phone"></div>
-            <div class="input-group"><p class="label">Password</p><input type="password" id="login-pass" class="auth-input" placeholder="••••••••"><i class="fas fa-eye eye-icon" onclick="window.togglePass('login-pass', this)"></i></div>
-            <div class="forgot-link" onclick="window.openForgotModal()">Forgot Password?</div>
-        </div>
-        <div id="reg-fields">
-            <div class="input-group"><p class="label">Full Name</p><input type="text" id="full-name" class="auth-input"></div>
-            <div class="input-group"><p class="label">Email Address</p><input type="email" id="reg-email" class="auth-input" placeholder="example@gmail.com"></div>
-            <div class="input-group"><p class="label">Contact Number</p><input type="tel" id="reg-phone" class="auth-input" placeholder="10 digits" maxlength="10"></div>
-            <div style="display:flex;gap:10px;">
-                <div class="input-group" style="flex:1"><p class="label">Age</p><input type="number" id="reg-age" class="auth-input" placeholder="18+"></div>
-                <div class="input-group" style="flex:2"><p class="label">Gender</p><div class="gender-container"><div class="gender-opt active" onclick="window.setGender(this,'Male')">M</div><div class="gender-opt" onclick="window.setGender(this,'Female')">F</div><div class="gender-opt" onclick="window.setGender(this,'Other')">O</div></div></div>
-            </div>
-            <div class="input-group"><p class="label">Password</p><input type="password" id="reg-pass" class="auth-input" placeholder="Min 8 chars"><i class="fas fa-eye eye-icon" onclick="window.togglePass('reg-pass', this)"></i><div id="reg-pass-err" class="err-msg">Min 8 characters</div></div>
-            <div class="input-group"><button type="button" class="btn-auth" style="margin-top:0;background:#333;" onclick="window.sendOTP()">Send OTP</button><input type="text" id="otp-code" class="auth-input" placeholder="Enter OTP" style="margin-top:10px;"><div id="otp-status" class="err-msg"></div></div>
-        </div>
-        <button class="btn-auth" id="main-btn" onclick="window.handleSubmit()">LOG IN</button>
-        <p class="toggle-text" id="switch-text">New here? <span onclick="window.toggleAuth(true)">Create Account</span></p>
+    <div id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading...</div>
     </div>
-</div>
 
-<!-- HOME SCREEN -->
-<div id="homeScreen" class="app-screen">
-    <div class="home-header"><div class="logo" onclick="window.resetToHome()">ADIFY</div><div id="searchToggleBtn" onclick="window.openSearchScreen(event)">🔍</div><div class="profile-btn" onclick="window.openProfile()"><img id="homeProfileImg" src="https://api.dicebear.com/7.x/avataaars/svg?seed=user"></div></div>
-    <div id="homeView" class="view active"><p class="section-title">Playlists</p><div class="playlist-grid" id="mainPlaylistGrid"></div><p class="section-title">Tracks</p><div id="singleTracksContainer"></div><p class="section-title">Recently Played</p><div id="recentlyPlayedContainer"></div></div>
-    <div id="playlistView" class="view"><button class="back-home-btn" onclick="window.resetToHome()">🏠 HOME</button><h2 id="playlistTitle" style="font-size:24px;margin-bottom:15px;color:var(--primary);"></h2><div id="songsContainer"></div></div>
-    <div class="player"><div class="player-main"><div class="player-info"><div class="player-art" id="playerImgArt"></div><div><h4 id="pTitle" style="font-size:11px;">Select a song</h4><p id="pArtist" style="font-size:9px;color:var(--primary);">---</p></div></div><div class="controls"><div class="nav-btn" onclick="window.prevTrack()"><svg viewBox="0 0 24 24" width="22" fill="white"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></div><div class="play-btn" id="playBtn" onclick="window.togglePlay()"><svg id="playIcon" viewBox="0 0 24 24" width="22" fill="white"><path d="M8 5v14l11-7z"/></svg></div><div class="nav-btn" onclick="window.nextTrack()"><svg viewBox="0 0 24 24" width="22" fill="white"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></div></div></div><div class="time-container"><div class="time-info"><span id="currentTime">0:00</span><span id="totalDuration">0:00</span></div><div class="time-bar"><div class="fill" id="fill"></div><input type="range" id="seekSlider" min="0" max="1000" value="0" oninput="window.handleSeekInput()" onchange="window.handleSeekChange()"></div></div></div>
-    <div class="watermark">Made by Aditya</div>
-</div>
+    <div id="yt-player-wrapper"></div>
 
-<!-- SEARCH SCREEN -->
-<div id="searchScreen" class="app-screen"><div class="search-header"><div class="search-back-btn" onclick="window.closeSearch()"><i class="fas fa-arrow-left"></i></div><div class="search-input-wrapper"><input type="text" class="search-page-input" id="searchPageInput" placeholder="Search tracks, artists, YouTube..." oninput="window.handleSearchPageInput()"><i class="fas fa-times search-clear-btn" id="searchClearBtn" onclick="window.clearSearchInput()"></i></div></div><div class="search-content" id="searchContent"><div id="recentSearchesSection"><div class="recent-searches-header"><span class="recent-searches-title">Recent Searches</span><span class="clear-all-btn" onclick="window.clearAllRecentSearches()">Clear All</span></div><div id="recentSearchesList"></div></div><div id="searchResultsSection" style="display:none;"><p class="section-title">Tracks</p><div id="searchResultsTracks"></div><div id="ytSearchResultsSection" style="display:none;"><p class="section-title">YouTube Results</p><div id="searchResultsYouTube"></div></div></div></div></div>
+    <audio id="mainAudio" playsinline webkit-playsinline></audio>
+    <div id="toast"><i class="fas fa-shield-alt"></i> PROFILE SECURED</div>
+    <div id="status-popup"></div>
 
-<!-- PROFILE SCREEN -->
-<div id="profileScreen" class="profile-screen"><div class="profile-back-btn" onclick="window.closeProfile()"><i class="fas fa-arrow-left"></i></div><div id="profile-content"><div class="p-header"><img id="main-pfp" src="https://api.dicebear.com/7.x/avataaars/svg?seed=user" class="p-avatar"><h2 id="display-name" style="margin-top:20px;">User</h2><div style="background:rgba(0,191,255,0.1);display:inline-block;padding:5px 15px;border-radius:20px;margin-top:10px;"><p style="color:var(--sky-blue);font-size:11px;">PREMIUM MODE</p></div></div><p class="info-label">Identity Data</p><div class="glass-card"><div class="row"><span>Gender</span><span id="p-gender" class="val">Male</span></div><div class="row"><span>Current Age</span><span id="p-age" class="val">22 Years</span></div></div><p class="info-label">Security</p><div class="glass-card"><div class="row"><span>Email</span><span id="p-email" class="val"></span></div><div class="row"><span>Phone</span><span id="p-phone" class="val"></span></div><div class="row"><span>Device</span><span id="p-device" class="val">Scanning...</span></div></div><div style="padding:10px 20px 120px;"><button class="btn-blue btn-outline" onclick="window.openEdit()">UPDATE PROFILE</button><button class="btn-blue" style="background:transparent;color:var(--danger);border:1px solid var(--danger);" onclick="window.showLogout()">LOG OUT</button></div></div>
-<div id="edit-screen"><div style="display:flex;justify-content:space-between;margin-bottom:40px;"><h2>Update Profile</h2><div onclick="window.closeEdit()" style="width:40px;height:40px;background:rgba(255,255,255,0.05);border-radius:50%;display:flex;align-items:center;justify-content:center;"><i class="fas fa-times"></i></div></div><label for="img-up" class="btn-blue" style="background:rgba(0,191,255,0.1);color:var(--sky-blue);display:block;text-align:center;margin-bottom:20px;">📸 UPLOAD PIC</label><input type="file" id="img-up" style="display:none;" accept="image/*" onchange="window.handleImg(event)"><p style="color:var(--sky-blue);font-size:10px;">Full Name</p><input type="text" id="edit-name" class="edit-input"><p style="color:var(--sky-blue);font-size:10px;">Gender</p><div style="display:flex;gap:10px;margin-bottom:20px;"><div class="gender-opt" onclick="window.setGenderProfile(this,'Male')">MALE</div><div class="gender-opt" onclick="window.setGenderProfile(this,'Female')">FEMALE</div><div class="gender-opt" onclick="window.setGenderProfile(this,'Other')">OTHER</div></div><p style="color:var(--sky-blue);font-size:10px;">Age</p><input type="number" id="edit-age" class="edit-input"><p style="color:var(--sky-blue);font-size:10px;">New Password (optional)</p><input type="password" id="edit-password" class="edit-input" placeholder="Leave blank to keep same"><button class="btn-blue" onclick="window.saveProfile()">SAVE CHANGES</button></div>
-<div id="logout-modal"><div class="warn-card"><i class="fas fa-power-off" style="font-size:50px;color:var(--danger);"></i><h3>Logout?</h3><button class="btn-blue" style="background:var(--danger);color:white;margin-top:20px;" onclick="window.doLogout()">LOGOUT</button><p style="margin-top:20px;color:#555;cursor:pointer;" onclick="window.hideLogout()">CANCEL</p></div></div>
-<div class="support-fab" onclick="window.contactSupport()"><i class="fas fa-headset"></i></div>
-</div>
+    <!-- Global Popup (always visible) -->
+    <div class="menu-dropdown" id="globalPopup" onclick="event.stopPropagation()">
+        <div class="menu-header">ADD TO PLAYLIST</div>
+        <div id="playlistOptions"></div>
+    </div>
 
-<!-- FORGOT MODAL -->
-<div id="forgot-modal"><div class="warn-card"><h3>Reset Password</h3><input type="text" id="forgot-identifier" class="auth-input" style="margin:20px 0;" placeholder="Email or Phone"><button class="btn-blue" onclick="window.resetPassword()">Send Temporary Password</button><p style="margin-top:20px;color:#555;cursor:pointer;" onclick="window.closeForgotModal()">Cancel</p></div></div>
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="app-screen active">
+        <div class="auth-card">
+            <div class="logo-area">
+                <i class="fas fa-headphones-alt"></i>
+                <h1>Adify</h1>
+            </div>
+            <p class="subtitle" id="auth-sub">Premium Sound Experience</p>
 
-<script>
-// All functions exposed to window for inline onclick handlers
-(function() {
-    // Firebase Config
-    const firebaseConfig = {
-        apiKey: "AIzaSyDLBqzimyPQj16sGRC2mJaP5N4ZxjwQvm4",
-        authDomain: "adify-music-9280e.firebaseapp.com",
-        databaseURL: "https://adify-music-9280e-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "adify-music-9280e",
-        storageBucket: "adify-music-9280e.firebasestorage.app",
-        messagingSenderId: "534415071027",
-        appId: "1:534415071027:web:255cb8f8869d87459a5046"
-    };
-    let db = null;
-    try {
-        firebase.initializeApp(firebaseConfig);
-        db = firebase.database();
-        console.log("Firebase ready");
-    } catch(e) { console.warn("Firebase error", e); }
+            <div id="login-section">
+                <div class="input-group">
+                    <p class="label">Email or Contact</p>
+                    <input type="text" id="login-id" class="auth-input" placeholder="abcde1234@gmail.com / 9876..." oninput="handleStrictLength(this, 'login-id-err')">
+                    <div id="login-id-err" class="err-msg"></div>
+                </div>
+                <div class="input-group">
+                    <p class="label">Password</p>
+                    <input type="password" id="login-pass" class="auth-input" placeholder="••••••••">
+                    <i class="fas fa-eye eye-icon" onclick="togglePass('login-pass', this)"></i>
+                </div>
+            </div>
 
-    // GLOBALS
-    const YOUTUBE_API_KEY = "AIzaSyBIpUJaQat1LYezbd3DYfteoVOBHAjxems";
-    let youtubePlayer = null, isYouTubePlaying = false, currentYouTubeId = null, youtubeResults = [], youtubeSongs = [];
-    let searchTimeout = null, isPlaying = false, ytDuration = 0, ytCurrentTime = 0, ytTimeInterval = null, ytPlayerReady = false;
-    let playHistory = [], historyIndex = -1, recentlyPlayed = [];
-    let currentUser = null, isRegisterMode = false, selectedGender = "Male", selectedGenderProfile = "Male", currentPhoto = null;
-    let pendingOTP = null, pendingRegData = null;
-    const allSongs = [
-        { id: 1, title: "Udariyan", artist: "Aditya", url: "https://www.image2url.com/r2/default/audio/1778420635219-a057d459-d0af-413e-bd2f-5f148740396c.mp3", image: "https://www.image2url.com/r2/default/images/1778699080529-9631eada-0ad1-428f-b943-d42e5ced5f2c.jpg" },
-        { id: 2, title: "BEST SHORT SONG", artist: "Aditya", url: "https://www.image2url.com/r2/default/audio/1778446960362-cacf9cfe-95fa-4724-80cd-79e9e3e38a08.mp3", image: "https://www.image2url.com/r2/default/images/1778699080529-9631eada-0ad1-428f-b943-d42e5ced5f2c.jpg" }
-    ];
-    let userPlaylists = { "Lo-Fi Sleep 😴": [], "Study Focus 📖": [], "Traveling ✈️": [], "My Playlist 💖": [] };
-    const playlistsData = [
-        { name: "Lo-Fi Sleep 😴", img: "https://www.image2url.com/r2/default/images/1778699080529-9631eada-0ad1-428f-b943-d42e5ced5f2c.jpg" },
-        { name: "Study Focus 📖", img: "https://www.image2url.com/r2/default/images/1778699302217-816e84ce-a74d-4869-9529-c97d381b61ba.jpg" },
-        { name: "Traveling ✈️", img: "https://www.image2url.com/r2/default/images/1778699378719-2b7a988c-571c-484d-acfe-29ddf4315af0.jpg" },
-        { name: "My Playlist 💖", img: "https://images.unsplash.com/photo-1493225255756-d9584f8606e9?w=300" }
-    ];
-    const audio = document.getElementById("mainAudio");
-    let activeP = null, isDragging = false, currentUrl = "";
+            <div id="reg-fields">
+                <div class="input-group">
+                    <p class="label">Full Name</p>
+                    <input type="text" id="full-name" class="auth-input" placeholder="Your Name">
+                </div>
+                <div class="input-group">
+                    <p class="label">Email Address</p>
+                    <input type="text" id="reg-email" class="auth-input" placeholder="abcde1234@gmail.com" oninput="handleStrictLength(this, 'reg-email-err', true)">
+                    <div id="reg-email-err" class="err-msg">Format: abcde1234@gmail.com (Max 30)</div>
+                </div>
+                <div class="input-group">
+                    <p class="label">Contact Number</p>
+                    <input type="number" id="reg-phone" class="auth-input" placeholder="10 Digits" oninput="handleStrictLength(this, 'reg-phone-err', false, true)">
+                    <div id="reg-phone-err" class="err-msg">Must be exactly 10 digits</div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <div class="input-group" style="flex: 1;">
+                        <p class="label">Age</p>
+                        <input type="number" id="reg-age" class="auth-input" placeholder="21" oninput="validateRegAge()">
+                        <div id="reg-age-err" class="err-msg">18+ Only</div>
+                    </div>
+                    <div class="input-group" style="flex: 2;">
+                        <p class="label">Gender</p>
+                        <div class="gender-container">
+                            <div class="gender-opt active" onclick="setGender(this, 'Male')">M</div>
+                            <div class="gender-opt" onclick="setGender(this, 'Female')">F</div>
+                            <div class="gender-opt" onclick="setGender(this, 'Other')">O</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <p class="label">Set Password</p>
+                    <input type="password" id="reg-pass" class="auth-input" placeholder="Min 8 chars" oninput="validateRegPass()">
+                    <i class="fas fa-eye eye-icon" onclick="togglePass('reg-pass', this)"></i>
+                    <div id="reg-pass-err" class="err-msg">Min 8 characters required.</div>
+                </div>
+            </div>
 
-    // Helper functions
-    function userPath(email, subPath) { const key = email.replace(/\./g, '_'); return subPath ? `users/${key}/${subPath}` : `users/${key}`; }
-    function showToast(msg) { const t=document.getElementById('toast'); t.innerText=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
-    function showPopup(msg, type) { const p=document.getElementById('status-popup'); p.innerText=msg; p.style.display='block'; p.style.color=type==='success'?'var(--success)':'var(--danger)'; p.style.background=type==='success'?'rgba(46,213,115,0.1)':'rgba(255,71,87,0.1)'; setTimeout(()=>p.style.display='none',3000); }
-    function formatTime(s) { if(!s||isNaN(s)) return "0:00"; let m=Math.floor(s/60), sec=Math.floor(s%60); return `${m}:${sec<10?'0':''}${sec}`; }
-    function togglePass(id, icon) { const i=document.getElementById(id); i.type=i.type==="password"?"text":"password"; icon.classList.toggle('fa-eye'); icon.classList.toggle('fa-eye-slash'); }
-    function setGender(el,val) { document.querySelectorAll('#reg-fields .gender-opt').forEach(o=>o.classList.remove('active')); el.classList.add('active'); selectedGender=val; }
-    function setGenderProfile(el,val) { el.parentElement.querySelectorAll('.gender-opt').forEach(o=>o.classList.remove('active')); el.classList.add('active'); selectedGenderProfile=val; }
-    function toggleAuth(isReg) { isRegisterMode=isReg; document.getElementById('reg-fields').style.display=isReg?'block':'none'; document.getElementById('login-section').style.display=isReg?'none':'block'; document.getElementById('main-btn').innerText=isReg?"SIGN UP":"LOG IN"; document.getElementById('switch-text').innerHTML=isReg?'Already a member? <span onclick="window.toggleAuth(false)">Log In</span>':'New here? <span onclick="window.toggleAuth(true)">Create Account</span>'; }
-    async function loadUserFromCloud(email) { if(!db) return null; try { const snap=await db.ref('users/'+email.replace(/\./g,'_')).once('value'); return snap.val(); } catch(e) { return null; } }
-    async function saveUserToCloud(user) { if(!db) return; return db.ref('users/'+user.email.replace(/\./g,'_')).set(user); }
-    async function updateProfileInCloud(email,updates) { if(!db) return; await db.ref('users/'+email.replace(/\./g,'_')).update(updates); }
-    async function getPhoneCount(phone) { if(!db) return 0; const snap=await db.ref('phoneCounts/'+phone).once('value'); return snap.val()||0; }
-    async function incrementPhoneCount(phone) { if(!db) return; const c=await getPhoneCount(phone); await db.ref('phoneCounts/'+phone).set(c+1); }
-    async function saveUserPlaylists() { if(currentUser && db) await db.ref(userPath(currentUser.email,'playlists')).set(userPlaylists); }
-    async function loadUserPlaylists() { if(currentUser && db) { const snap=await db.ref(userPath(currentUser.email,'playlists')).once('value'); const d=snap.val(); if(d) Object.assign(userPlaylists,d); } }
-    async function saveYoutubeSongs() { if(currentUser && db) await db.ref(userPath(currentUser.email,'youtubeSongs')).set(youtubeSongs); }
-    async function loadYoutubeSongs() { if(currentUser && db) { const snap=await db.ref(userPath(currentUser.email,'youtubeSongs')).once('value'); youtubeSongs=snap.val()||[]; } }
-    async function saveRecentlyPlayed() { if(currentUser && db) await db.ref(userPath(currentUser.email,'recentlyPlayed')).set(recentlyPlayed); }
-    async function loadRecentlyPlayed() { if(currentUser && db) { const snap=await db.ref(userPath(currentUser.email,'recentlyPlayed')).once('value'); recentlyPlayed=snap.val()||[]; renderRecentlyPlayed(); } }
-    function addToRecentlyPlayed(track) { recentlyPlayed = recentlyPlayed.filter(t=>t.url!==track.url && t.videoId!==track.videoId); recentlyPlayed.unshift(track); if(recentlyPlayed.length>5) recentlyPlayed.pop(); saveRecentlyPlayed(); renderRecentlyPlayed(); }
-    function renderRecentlyPlayed() { const cont=document.getElementById('recentlyPlayedContainer'); if(!cont) return; if(recentlyPlayed.length===0) { cont.innerHTML='<div class="no-recent">No recently played</div>'; return; } cont.innerHTML=recentlyPlayed.map(s=>songItemTemplate(s)).join(''); }
+            <button class="btn-auth" id="main-btn" onclick="handleSubmit()">LOG IN</button>
+            <p class="toggle-text" id="switch-text">New here? <span onclick="toggleAuth(true)">Create Account</span></p>
+        </div>
+    </div>
 
-    // LOGIN / REGISTER
-    async function tryFirebaseLogin(identifier, pass) {
-        if(!db) return {error:"DB not ready"};
-        if(identifier.includes('@')) {
-            const user=await loadUserFromCloud(identifier);
-            if(!user) return null;
-            return user.password===pass ? user : {error:"Wrong password"};
-        } else {
-            const all=await db.ref('users').once('value');
-            const users=all.val();
-            for(let k in users) {
-                if(users[k] && users[k].phone===identifier) {
-                    return users[k].password===pass ? users[k] : {error:"Wrong password"};
+    <!-- HOME SCREEN -->
+    <div id="homeScreen" class="app-screen">
+        <div class="home-header">
+            <div class="logo" onclick="resetToHome()">ADIFY</div>
+            <div id="searchToggleBtn" onclick="openSearchScreen(event)">🔍</div>
+            <div class="profile-btn" onclick="openProfile()"><img id="homeProfileImg" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100" alt="User"></div>
+        </div>
+
+        <div id="homeView" class="view active">
+            <p class="section-title">Playlists</p>
+            <div class="playlist-grid" id="mainPlaylistGrid"></div>
+
+            <p class="section-title">Tracks</p>
+            <div id="singleTracksContainer"></div>
+
+            <p class="section-title">Recently Played</p>
+            <div id="recentlyPlayedContainer"></div>
+        </div>
+
+        <div id="playlistView" class="view">
+            <div style="margin-bottom:20px;">
+                <button style="background:var(--glass); color:white; border:1px solid var(--border); padding:10px 18px; border-radius:10px; font-size:11px; cursor:pointer;" onclick="resetToHome()">🏠 HOME</button>
+            </div>
+            <h2 id="playlistTitle" style="font-size:24px; margin-bottom:15px; color:var(--primary);"></h2>
+            <div class="playlist-actions">
+                <button id="modeBtn" class="action-btn btn-remove-mode" onclick="enableSelectionMode()">Select songs to remove</button>
+                <button id="confirmBtn" class="action-btn" style="display:none; background:var(--success); color:white; border:none;" onclick="confirmRemoval()">Confirm Remove Selected</button>
+                <button id="cancelBtn" class="action-btn" style="display:none; background:var(--glass); color:white; border:1px solid var(--border);" onclick="disableSelectionMode()">Cancel</button>
+            </div>
+            <div id="songsContainer"></div>
+        </div>
+
+        <div class="player">
+            <div class="player-main">
+                <div class="player-info">
+                    <div class="player-art" id="playerImgArt"></div>
+                    <div style="overflow:hidden;">
+                        <h4 id="pTitle" style="font-size:11px; white-space:nowrap;">Select a song</h4>
+                        <p id="pArtist" style="font-size:9px; color:var(--primary);">---</p>
+                    </div>
+                </div>
+                <div class="controls">
+                    <div class="nav-btn" onclick="prevTrack()">
+                        <svg viewBox="0 0 24 24" width="22" fill="white"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                    </div>
+                    <div class="play-btn" id="playBtn" onclick="togglePlay()">
+                        <svg id="playIcon" viewBox="0 0 24 24" width="22" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                    <div class="nav-btn" onclick="nextTrack()">
+                        <svg viewBox="0 0 24 24" width="22" fill="white"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="time-container">
+                <div class="time-info">
+                    <span id="currentTime">0:00</span>
+                    <span id="totalDuration">0:00</span>
+                </div>
+                <div class="time-bar">
+                    <div class="fill" id="fill"></div>
+                    <input type="range" id="seekSlider" min="0" max="1000" value="0" oninput="handleSeekInput()" onchange="handleSeekChange()">
+                </div>
+            </div>
+        </div>
+        <div class="watermark">Made by Aditya</div>
+    </div>
+
+    <!-- SEARCH SCREEN -->
+    <div id="searchScreen" class="app-screen">
+        <div class="search-header">
+            <div class="search-back-btn" onclick="closeSearch()">
+                <i class="fas fa-arrow-left" style="color: #fff; font-size: 18px;"></i>
+            </div>
+            <div class="search-input-wrapper">
+                <input type="text" class="search-page-input" id="searchPageInput" placeholder="Search tracks, artists, or YouTube..." oninput="handleSearchPageInput()" onkeydown="if(event.key==='Enter'){event.preventDefault(); executeSearch();}">
+                <i class="fas fa-times search-clear-btn" id="searchClearBtn" onclick="clearSearchInput()"></i>
+            </div>
+        </div>
+
+        <div class="search-content" id="searchContent">
+            <div id="recentSearchesSection">
+                <div class="recent-searches-header">
+                    <span class="recent-searches-title">Recent Searches</span>
+                    <span class="clear-all-btn" onclick="clearAllRecentSearches()">Clear All</span>
+                </div>
+                <div id="recentSearchesList"></div>
+            </div>
+
+            <div id="searchResultsSection" style="display:none;">
+                <p class="section-title">Tracks</p>
+                <div id="searchResultsTracks"></div>
+
+                <div id="ytSearchResultsSection" style="display:none;">
+                    <p class="section-title">YouTube Results</p>
+                    <div id="searchResultsYouTube"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROFILE SCREEN -->
+    <div id="profileScreen" class="profile-screen">
+        <div class="profile-back-btn" onclick="closeProfile()">
+            <i class="fas fa-arrow-left" style="color: #fff; font-size: 18px;"></i>
+        </div>
+        <div id="profile-content">
+            <div class="p-header">
+                <img id="main-pfp" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Lucky" class="p-avatar">
+                <h2 id="display-name" style="margin-top: 20px; font-size: 28px; letter-spacing: 1px;">Adify User</h2>
+                <div style="background: rgba(0, 191, 255, 0.1); display: inline-block; padding: 5px 15px; border-radius: 20px; margin-top: 10px;">
+                    <p style="color:var(--sky-blue); font-size:11px; font-weight:900; letter-spacing:3px;">PREMIUM MODE</p>
+                </div>
+            </div>
+
+            <p class="info-label">Identity Data</p>
+            <div class="glass-card">
+                <div class="row"><span>Gender</span><span id="p-gender" class="val">Male</span></div>
+                <div class="row" style="margin-bottom:0;"><span>Current Age</span><span id="p-age" class="val">22 Years</span></div>
+            </div>
+
+            <p class="info-label">Security Protocol</p>
+            <div class="glass-card">
+                <div class="row"><span>System Email</span><span id="p-email" class="val locked">user@adify.com</span></div>
+                <div class="row"><span>Linked Contact</span><span id="p-phone" class="val locked">+91 98765 43210</span></div>
+                <div class="row" style="margin-bottom:0;"><span>Active Device</span><span id="p-device" class="val locked">Scanning...</span></div>
+            </div>
+
+            <div style="padding: 10px 20px 120px;">
+                <button class="btn-blue btn-outline" onclick="openEdit()">UPDATE YOUR PROFILE</button>
+                <button class="btn-blue" style="background: transparent; color: var(--danger); border: 1px solid var(--danger); box-shadow: none;" onclick="showLogout()">LOG OUT</button>
+            </div>
+        </div>
+
+        <div id="edit-screen">
+            <div style="display:flex; justify-content:space-between; margin-bottom:40px; align-items: center;">
+                <h2 style="font-size: 26px; font-weight: 900;">Update Node</h2>
+                <div onclick="closeEdit()" style="width:40px; height:40px; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; border-radius:50%; cursor:pointer;">
+                    <i class="fas fa-times" style="font-size: 20px; color: #555;"></i>
+                </div>
+            </div>
+
+            <label for="img-up" class="btn-blue" style="background:rgba(0, 191, 255, 0.1); color:var(--sky-blue); border: 1px solid var(--sky-blue); display:block; text-align:center; margin-bottom:30px; cursor:pointer;">📸 UPLOAD PROFILE PIC.</label>
+            <input type="file" id="img-up" style="display:none;" accept="image/*" onchange="handleImg(event)">
+
+            <p style="color: var(--sky-blue); font-size: 10px; margin-bottom: 10px; font-weight: 900; letter-spacing: 1px;">FULL USERNAME</p>
+            <input type="text" id="edit-name" class="edit-input" style="text-align: left;">
+
+            <p style="color: var(--sky-blue); font-size: 10px; margin-bottom: 10px; font-weight: 900; letter-spacing: 1px;">GENDER BIOMETRIC</p>
+            <div style="display:flex; gap:10px; margin-bottom:25px;">
+                <div class="gender-opt active" onclick="setGenderProfile(this, 'Male')">MALE</div>
+                <div class="gender-opt" onclick="setGenderProfile(this, 'Female')">FEMALE</div>
+                <div class="gender-opt" onclick="setGenderProfile(this, 'Other')">OTHER</div>
+            </div>
+
+            <p style="color: var(--sky-blue); font-size: 10px; margin-bottom: 10px; font-weight: 900; letter-spacing: 1px;">LIFE CYCLES (AGE)</p>
+            <input type="number" id="edit-age" class="edit-input" style="text-align: left;">
+
+            <button class="btn-blue" onclick="saveProfile()">SYNC CHANGES</button>
+        </div>
+
+        <div id="logout-modal">
+            <div class="warn-card">
+                <i class="fas fa-power-off" style="font-size:50px; color:var(--danger); margin-bottom:20px;"></i>
+                <h3 style="margin-bottom:15px; font-size: 22px;">Terminate?</h3>
+                <p style="color:#888; font-size:14px; margin-bottom:30px;">Your encrypted session will be closed.</p>
+                <button class="btn-blue" style="background:var(--danger); color:white;" onclick="doLogout()">LOGOUT</button>
+                <p style="margin-top:20px; color:#555; cursor:pointer; font-weight: 900;" onclick="hideLogout()">ABORT</p>
+            </div>
+        </div>
+
+        <div class="support-fab" onclick="contactSupport()">
+            <i class="fas fa-headset"></i>
+        </div>
+    </div>
+
+    <script>
+        // ==================== FULL WORKING CODE WITH FIXES ====================
+        const YOUTUBE_API_KEY = "AIzaSyBIpUJaQat1LYezbd3DYfteoVOBHAjxems";
+        let youtubePlayer = null, isYouTubePlaying = false, currentYouTubeId = null, youtubeResults = [];
+        let searchTimeout = null, isPlaying = false, ytDuration = 0, ytCurrentTime = 0, ytTimeInterval = null, ytPlayerReady = false;
+        let playHistory = [], historyIndex = -1, recentlyPlayed = [];
+
+        // ---- MEDIA SESSION (NOTIFICATION) ----
+        function setupMediaSession() {
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.setActionHandler('play', () => togglePlay());
+                navigator.mediaSession.setActionHandler('pause', () => togglePlay());
+                navigator.mediaSession.setActionHandler('previoustrack', () => prevTrack());
+                navigator.mediaSession.setActionHandler('nexttrack', () => nextTrack());
+                navigator.mediaSession.setActionHandler('seekbackward', (d) => {
+                    if (isYouTubePlaying && youtubePlayer && ytPlayerReady) youtubePlayer.seekTo(Math.max(0, ytCurrentTime - (d.seekOffset || 10)), true);
+                    else if (audio.currentTime) audio.currentTime = Math.max(0, audio.currentTime - (d.seekOffset || 10));
+                });
+                navigator.mediaSession.setActionHandler('seekforward', (d) => {
+                    if (isYouTubePlaying && youtubePlayer && ytPlayerReady) youtubePlayer.seekTo(Math.min(ytDuration, ytCurrentTime + (d.seekOffset || 10)), true);
+                    else if (audio.currentTime) audio.currentTime = Math.min(audio.duration, audio.currentTime + (d.seekOffset || 10));
+                });
+            }
+        }
+        function updateMediaSessionMetadata(title, artist, image) {
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: title || 'Adify Music', artist: artist || 'Unknown', album: 'Adify',
+                    artwork: [{ src: image || 'https://files.catbox.moe/0j9stc.jpeg', sizes: '512x512', type: 'image/jpeg' }]
+                });
+                navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
+            }
+        }
+
+        // ---- BACKGROUND PLAYBACK: STRONGER RESUME ----
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && isPlaying) {
+                // If local audio, try to resume immediately
+                if (!isYouTubePlaying && audio.src && audio.paused) {
+                    audio.play().catch(() => {});
+                }
+                // YouTube iframe keeps playing on its own
+            } else if (!document.hidden && isPlaying) {
+                // When coming back, ensure play state is correct
+                if (!isYouTubePlaying && audio.paused && audio.src) {
+                    audio.play().catch(() => {});
                 }
             }
-            return null;
+        });
+
+        // ---- FIREBASE ----
+        const firebaseConfig = {
+            apiKey: "AIzaSyDLBqzimyPQj16sGRC2mJaP5N4ZxjwQvm4",
+            authDomain: "adify-music-9280e.firebaseapp.com",
+            databaseURL: "https://adify-music-9280e-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "adify-music-9280e",
+            storageBucket: "adify-music-9280e.firebasestorage.app",
+            messagingSenderId: "534415071027",
+            appId: "1:534415071027:web:255cb8f8869d87459a5046"
+        };
+        let db = null;
+        try { firebase.initializeApp(firebaseConfig); db = firebase.database(); } catch(e) { console.error("Firebase init error", e); }
+
+        function userPath(email, subPath) {
+            const key = email ? email.replace(/\./g, '_') : 'default';
+            return subPath ? `users/${key}/${subPath}` : `users/${key}`;
         }
-    }
-    async function finalizeLogin(user) {
-        currentUser=user;
-        localStorage.setItem('adify_session_email',user.email);
-        await loadUserPlaylists();
-        await loadYoutubeSongs();
-        await loadRecentlyPlayed();
-        updateProfileUI(user);
-        showPopup(`Welcome ${user.name}!`,"success");
-        setTimeout(()=>{ showScreen('homeScreen'); renderAll(); },500);
-    }
-    async function handleSubmit() {
-        if(!isRegisterMode) {
-            const id=document.getElementById('login-id').value.trim().toLowerCase();
-            const pass=document.getElementById('login-pass').value;
-            if(id==="1" && pass==="1") {
-                currentUser={name:"Master",email:"master@adify.com",phone:"0000000000",gender:"Male",age:21};
-                localStorage.setItem('adify_session_email','master@adify.com');
-                updateProfileUI(currentUser);
-                showScreen('homeScreen'); renderAll();
-                return;
+
+        // ---- SESSION (localStorage for persistence) ----
+        function saveSessionEmail(email) { localStorage.setItem('adify_session_email', email); }
+        function getSessionEmail() { return localStorage.getItem('adify_session_email'); }
+        function clearSessionEmail() { localStorage.removeItem('adify_session_email'); }
+
+        // ---- RECENT SEARCHES (CLOUD) ----
+        async function getRecentSearches() { if(!db||!currentUser||!currentUser.email) return []; try{ const snap=await db.ref(userPath(currentUser.email,'recentSearches')).once('value'); const v=snap.val(); return Array.isArray(v)?v:[]; }catch(e){return[];} }
+        async function saveRecentSearch(query) { if(!query||query.trim().length<2||!db||!currentUser||!currentUser.email) return; const searches=await getRecentSearches(); const clean=query.trim(); const f=searches.filter(s=>s.toLowerCase()!==clean.toLowerCase()); f.unshift(clean); try{ await db.ref(userPath(currentUser.email,'recentSearches')).set(f.slice(0,10)); }catch(e){} renderRecentSearches(); }
+        async function removeRecentSearch(query) { const s=await getRecentSearches(); const upd=s.filter(x=>x!==query); if(db&&currentUser&&currentUser.email) await db.ref(userPath(currentUser.email,'recentSearches')).set(upd); renderRecentSearches(); }
+        async function clearAllRecentSearches() { if(db&&currentUser&&currentUser.email) await db.ref(userPath(currentUser.email,'recentSearches')).remove(); renderRecentSearches(); }
+        async function renderRecentSearches() {
+            const list=document.getElementById('recentSearchesList');
+            const s=await getRecentSearches();
+            if(s.length===0){ list.innerHTML='<div class="no-recent">No recent searches</div>'; return; }
+            let h=''; s.forEach(q=>{ h+=`<div class="recent-search-item" onclick="searchFromRecent('${q.replace(/'/g,"\\'")}')"><div class="recent-search-left"><i class="fas fa-clock recent-search-icon"></i><span class="recent-search-text">${q}</span></div><i class="fas fa-times recent-search-delete" onclick="event.stopPropagation(); removeRecentSearch('${q.replace(/'/g,"\\'")}')"></i></div>`; });
+            list.innerHTML=h;
+        }
+        function searchFromRecent(query) { document.getElementById('searchPageInput').value=query; document.getElementById('searchClearBtn').style.display='block'; executeSearch(); }
+
+        // ---- PLAYLISTS (CLOUD) ----
+        async function saveUserPlaylists() { if(!db||!currentUser||!currentUser.email) return; try{ await db.ref(userPath(currentUser.email,'playlists')).set(userPlaylists); }catch(e){} }
+        async function loadUserPlaylists() { if(!db||!currentUser||!currentUser.email) return; try{ const snap=await db.ref(userPath(currentUser.email,'playlists')).once('value'); const d=snap.val(); if(d&&typeof d==='object'){ Object.keys(userPlaylists).forEach(key=>{ if(d[key]&&Array.isArray(d[key])) userPlaylists[key]=d[key]; }); } }catch(e){} }
+
+        // ---- YOUTUBE SONGS (CLOUD) ----
+        async function saveYoutubeSongs() { if(!db||!currentUser||!currentUser.email) return; try{ await db.ref(userPath(currentUser.email,'youtubeSongs')).set(youtubeSongs); }catch(e){} }
+        async function loadYoutubeSongs() { if(!db||!currentUser||!currentUser.email) return; try{ const snap=await db.ref(userPath(currentUser.email,'youtubeSongs')).once('value'); const v=snap.val(); youtubeSongs=Array.isArray(v)?v:[]; }catch(e){youtubeSongs=[];} }
+
+        // ---- RECENTLY PLAYED (CLOUD) ----
+        async function saveRecentlyPlayed() { if(!db||!currentUser||!currentUser.email) return; try{ await db.ref(userPath(currentUser.email,'recentlyPlayed')).set(recentlyPlayed); }catch(e){} }
+        async function loadRecentlyPlayed() { if(!db||!currentUser||!currentUser.email) return; try{ const snap=await db.ref(userPath(currentUser.email,'recentlyPlayed')).once('value'); const v=snap.val(); recentlyPlayed=Array.isArray(v)?v:[]; }catch(e){recentlyPlayed=[];} }
+        function addToRecentlyPlayed(track) {
+            recentlyPlayed = recentlyPlayed.filter(t => t.url !== track.url && t.videoId !== track.videoId);
+            recentlyPlayed.unshift(track);
+            if (recentlyPlayed.length > 5) recentlyPlayed.pop();
+            saveRecentlyPlayed();
+            renderRecentlyPlayed();
+        }
+        function renderRecentlyPlayed() {
+            const container = document.getElementById('recentlyPlayedContainer');
+            if (!container) return;
+            if (recentlyPlayed.length === 0) { container.innerHTML = '<div class="no-recent">No recently played tracks</div>'; return; }
+            container.innerHTML = recentlyPlayed.map(s => songItemTemplate(s)).join('');
+        }
+
+        // ---- USER & PHONE COUNT ----
+        async function saveUserToCloud(userData) { if(!db) return Promise.reject("DB not initialized"); return db.ref('users/'+userData.email.replace(/\./g,'_')).set(userData); }
+        async function loadUserFromCloud(email) { if(!db) return null; try{ const snap=await db.ref('users/'+email.replace(/\./g,'_')).once('value'); return snap.val(); }catch(e){return null;} }
+        async function updateProfileInCloud(email,updates) { if(!db) return; try{ await db.ref('users/'+email.replace(/\./g,'_')).update(updates); }catch(e){} }
+        async function getPhoneCount(phone) { if(!db) return 0; try{ const snap=await db.ref('phoneCounts/'+phone).once('value'); const v=snap.val(); return typeof v==='number'?v:0; }catch(e){return 0;} }
+        async function incrementPhoneCount(phone) { if(!db) return; const cur=await getPhoneCount(phone); await db.ref('phoneCounts/'+phone).set(cur+1); }
+
+        // ---- AUDIO & DATA ----
+        const audio = document.getElementById("mainAudio");
+        let currentUrl = "", searchQuery = "", activeP = null, isDragging = false, isSelectionMode = false, selectedSongs = new Set(), youtubeSongs = [];
+
+        const userPlaylists = { "Lo-Fi Sleep 😴": [], "Study Focus 📖": [], "Traveling ✈️": [], "My Playlist 💖": [] };
+        const allSongs = [
+            { id: 1, title: "Udariyan", artist: "Aditya", url: "https://www.image2url.com/r2/default/audio/1778420635219-a057d459-d0af-413e-bd2f-5f148740396c.mp3", image: "https://www.image2url.com/r2/default/images/1778699080529-9631eada-0ad1-428f-b943-d42e5ced5f2c.jpg" },
+            { id: 2, title: "BEST SHORT SONG", artist: "Aditya", url: "https://www.image2url.com/r2/default/audio/1778446960362-cacf9cfe-95fa-4724-80cd-79e9e3e38a08.mp3", image: "https://www.image2url.com/r2/default/images/1778699080529-9631eada-0ad1-428f-b943-d42e5ced5f2c.jpg" }
+        ];
+        const playlistsData = [
+            { name: "Lo-Fi Sleep 😴", img: "https://www.image2url.com/r2/default/images/1778699080529-9631eada-0ad1-428f-b943-d42e5ced5f2c.jpg" },
+            { name: "Study Focus 📖", img: "https://www.image2url.com/r2/default/images/1778699302217-816e84ce-a74d-4869-9529-c97d381b61ba.jpg" },
+            { name: "Traveling ✈️", img: "https://www.image2url.com/r2/default/images/1778699378719-2b7a988c-571c-484d-acfe-29ddf4315af0.jpg" },
+            { name: "My Playlist 💖", img: "https://images.unsplash.com/photo-1493225255756-d9584f8606e9?w=300" }
+        ];
+
+        // ---- NAVIGATION ----
+        function showScreen(id) { document.querySelectorAll(".app-screen,.profile-screen").forEach(s=>s.classList.remove("active")); const el=document.getElementById(id); if(el) el.classList.add("active"); }
+        function openHome() { showScreen("homeScreen"); renderAll(); }
+        function openProfile() { document.getElementById("profileScreen").classList.add("active"); if(currentUser) updateProfileUI(currentUser); }
+        function closeProfile() { document.getElementById("profileScreen").classList.remove("active"); }
+
+        async function doLogout() {
+            stopAllPlayback();
+            currentUser = null;
+            clearSessionEmail();
+            hideLogout(); closeProfile();
+            showScreen("loginScreen");
+            document.getElementById("login-id").value = "";
+            document.getElementById("login-pass").value = "";
+            document.getElementById('reg-fields').style.display = 'none';
+            document.getElementById('login-section').style.display = 'block';
+            document.getElementById('main-btn').innerText = "LOG IN";
+            document.getElementById('switch-text').innerHTML = 'New here? <span onclick="toggleAuth(true)">Create Account</span>';
+            isRegisterMode = false;
+        }
+
+        // ---- LOGIN FUNCTIONS (SAME AS BEFORE) ----
+        function togglePass(inputId, icon) { const i=document.getElementById(inputId); i.type=i.type==="password"?"text":"password"; icon.classList.toggle('fa-eye'); icon.classList.toggle('fa-eye-slash'); }
+        function showPopup(msg, type) { const p=document.getElementById('status-popup'); p.innerText=msg; p.style.display='block'; p.style.color=type==='success'?'var(--success)':'var(--danger)'; p.style.background=type==='success'?'rgba(46,213,115,0.1)':'rgba(255,71,87,0.1)'; p.style.border=`1px solid ${type==='success'?'rgba(46,213,115,0.3)':'rgba(255,71,87,0.3)'}`; setTimeout(()=>p.style.display='none',3000); }
+        function handleStrictLength(el,errId,forceEmail,forcePhone) { let val=el.value; const err=document.getElementById(errId); if(val.length>0){ if(forcePhone||(!forceEmail&&!isNaN(val.charAt(0)))){ if(val.length>10)el.value=val.substring(0,10); err.innerText=el.value.length<10?"Must be exactly 10 digits.":""; }else{ if(val.length>30)el.value=val.substring(0,30); err.innerText=!emailRegex.test(el.value)?"Format: abcde1234@gmail.com":""; } err.style.display=err.innerText?'block':'none'; }else{err.style.display='none';} }
+        function validateRegAge() { document.getElementById('reg-age-err').style.display=document.getElementById('reg-age').value>=18?'none':'block'; }
+        function validateRegPass() { document.getElementById('reg-pass-err').style.display=document.getElementById('reg-pass').value.length<8?'block':'none'; }
+        function setGender(el,val) { document.querySelectorAll('#reg-fields .gender-opt').forEach(o=>o.classList.remove('active')); el.classList.add('active'); selectedGender=val; }
+        function toggleAuth(isReg) { isRegisterMode=isReg; document.getElementById('reg-fields').style.display=isReg?'block':'none'; document.getElementById('login-section').style.display=isReg?'none':'block'; document.getElementById('main-btn').innerText=isReg?"SIGN UP":"LOG IN"; document.getElementById('switch-text').innerHTML=isReg?'Already a member? <span onclick="toggleAuth(false)">Log In</span>':'New here? <span onclick="toggleAuth(true)">Create Account</span>'; }
+
+        async function tryFirebaseLogin(lid,lpass) { if(!db) return {error:"FIREBASE NOT CONNECTED"}; try{ if(lid.includes('@')){ const snap=await db.ref('users/'+lid.replace(/\./g,'_')).once('value'); const u=snap.val(); if(!u) return null; if(u.password===lpass) return u; return {error:"WRONG PASSWORD"}; }else{ const snap=await db.ref('users').once('value'); const users=snap.val(); if(!users) return null; for(let k in users){ if(users[k]&&users[k].phone===lid){ if(users[k].password===lpass) return users[k]; return {error:"WRONG PASSWORD"}; } } return null; } }catch(err){ return {error:"FIREBASE ERROR: "+err.message}; } }
+
+        async function finalizeLogin(user) { currentUser=user; saveSessionEmail(user.email); await loadUserPlaylists(); await loadYoutubeSongs(); await loadRecentlyPlayed(); const cd=await loadUserFromCloud(user.email); if(cd){ currentUser=cd; saveSessionEmail(cd.email); } updateProfileUI(currentUser); showPopup(`WELCOME BACK, ${currentUser.name.toUpperCase()}`,"success"); setTimeout(()=>openHome(),1000); }
+
+        async function handleSubmit() {
+            if(!isRegisterMode){
+                const lid=document.getElementById('login-id').value.toLowerCase().trim();
+                const lpass=document.getElementById('login-pass').value;
+                if(lid==="1"&&lpass==="1"){ currentUser={name:'Master',email:'master@adify.com',phone:'0000000000',gender:'Male',age:21}; saveSessionEmail(currentUser.email); setTimeout(()=>openHome(),1000); return; }
+                showPopup("VERIFYING USER...","success");
+                const res=await tryFirebaseLogin(lid,lpass);
+                if(res===null) showPopup("USER NOT FOUND","error");
+                else if(res.error) showPopup(res.error,"error");
+                else await finalizeLogin(res);
+            }else{
+                const name=document.getElementById('full-name').value;
+                const emailInput=document.getElementById('reg-email').value;
+                const email=emailInput.toLowerCase();
+                const phone=document.getElementById('reg-phone').value;
+                const pass=document.getElementById('reg-pass').value;
+                const age=document.getElementById('reg-age').value;
+                if(!name||!emailRegex.test(emailInput)||phone.length!==10||pass.length<8||age<18){ showPopup("PLEASE FIX ALL ERRORS","error"); return; }
+                const existing=await loadUserFromCloud(email);
+                if(existing){ showPopup("EMAIL ALREADY REGISTERED","error"); return; }
+                const pc=await getPhoneCount(phone);
+                if(pc>=3){ showPopup("MAX 3 ACCOUNTS PER NUMBER","error"); return; }
+                const userData={name,email,phone,password:pass,gender:selectedGender,age,photo:null};
+                showPopup("SYNCING TO CLOUD...","success");
+                try{ await saveUserToCloud(userData); await incrementPhoneCount(phone); showPopup("REGISTERED SUCCESSFULLY","success"); }catch(e){ showPopup("REGISTERED - CLOUD SYNC FAILED","error"); }
+                setTimeout(()=>{ toggleAuth(false); showPopup("PLEASE LOG IN WITH YOUR DETAILS","success"); },1500);
             }
-            const res=await tryFirebaseLogin(id,pass);
-            if(!res) showPopup("User not found","error");
-            else if(res.error) showPopup(res.error,"error");
-            else await finalizeLogin(res);
-        } else {
-            if(!pendingOTP || !pendingRegData) { showPopup("Please verify OTP first","error"); return; }
-            const enteredOtp = document.getElementById('otp-code').value;
-            if(enteredOtp !== pendingOTP) { showPopup("Invalid OTP","error"); return; }
-            const {name,email,phone,age,gender,password}=pendingRegData;
-            if(await loadUserFromCloud(email)) { showPopup("Email already exists","error"); return; }
-            if(await getPhoneCount(phone)>=3) { showPopup("Max 3 accounts per phone","error"); return; }
-            const userData={name,email,phone,password,gender,age,photo:null};
-            await saveUserToCloud(userData);
-            await incrementPhoneCount(phone);
-            showPopup("Registered! Please login","success");
-            toggleAuth(false);
-            pendingOTP=null; pendingRegData=null;
-            document.getElementById('otp-code').value="";
         }
-    }
-    // OTP Simulation
-    function sendOTP() {
-        const name=document.getElementById('full-name').value;
-        const email=document.getElementById('reg-email').value;
-        const phone=document.getElementById('reg-phone').value;
-        const age=document.getElementById('reg-age').value;
-        const pass=document.getElementById('reg-pass').value;
-        if(!name || !email.includes('@') || phone.length!==10 || age<18 || pass.length<8) { showPopup("Fill all fields correctly","error"); return; }
-        const otp = Math.floor(100000 + Math.random()*900000).toString();
-        pendingOTP = otp;
-        pendingRegData = { name, email, phone, age, gender:selectedGender, password:pass };
-        const statusDiv = document.getElementById('otp-status');
-        statusDiv.innerText = `OTP sent: ${otp} (simulated)`;
-        statusDiv.style.display='block';
-        statusDiv.style.color = "var(--sky-blue)";
-        showToast(`Demo OTP: ${otp}`);
-    }
-    // Forgot Password
-    function openForgotModal() { document.getElementById('forgot-modal').style.display='flex'; }
-    function closeForgotModal() { document.getElementById('forgot-modal').style.display='none'; }
-    async function resetPassword() {
-        const id = document.getElementById('forgot-identifier').value.trim();
-        if(!id) { showPopup("Enter email or phone","error"); return; }
-        let user = null;
-        if(id.includes('@')) user = await loadUserFromCloud(id);
-        else {
-            const all=await db.ref('users').once('value');
-            const users=all.val();
-            for(let k in users) if(users[k] && users[k].phone===id) { user=users[k]; break; }
+
+        // ---- HOME / MENU / PLAYLIST (FIXED) ----
+        function handleGlobalClick() { document.getElementById('globalPopup').classList.remove('show'); }
+        function showToast(m) { const t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
+        function formatTime(s) { if(!s||isNaN(s)||!isFinite(s)) return "0:00"; let m=Math.floor(s/60), sec=Math.floor(s%60); return `${m}:${sec<10?'0':''}${sec}`; }
+
+        function openMenu(e, id) {
+            e.stopPropagation();
+            const popup = document.getElementById('globalPopup');
+            document.getElementById('playlistOptions').innerHTML = playlistsData.map(p => {
+                const ex = userPlaylists[p.name].some(x => x.id === id);
+                return `<div class="menu-item" onclick="playlistAction(${id},'${p.name}',${ex})"><span>${p.name}</span><span style="color:${ex?'var(--danger)':'var(--primary)'};font-weight:bold;">${ex?'REMOVE':'ADD'}</span></div>`;
+            }).join('');
+            popup.classList.add('show');
         }
-        if(!user) { showPopup("User not found","error"); return; }
-        const tempPass = Math.random().toString(36).slice(-8);
-        await updateProfileInCloud(user.email, { password: tempPass });
-        showPopup(`Temporary password: ${tempPass}`, "success");
-        closeForgotModal();
-    }
-    // Profile
-    function updateProfileUI(user) {
-        document.getElementById('display-name').innerText=user.name;
-        document.getElementById('p-gender').innerText=user.gender||'Male';
-        document.getElementById('p-email').innerText=user.email;
-        document.getElementById('p-phone').innerText=user.phone?`+91 ${user.phone}`:'';
-        document.getElementById('p-age').innerText=(user.age||22)+' Years';
-        const pfp=user.photo||`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`;
-        document.getElementById('main-pfp').src=pfp;
-        document.getElementById('homeProfileImg').src=pfp;
-    }
-    async function saveProfile() {
-        const newName=document.getElementById('edit-name').value;
-        const newAge=document.getElementById('edit-age').value;
-        const newPass=document.getElementById('edit-password').value;
-        if(!newName||!newAge) return;
-        currentUser.name=newName;
-        currentUser.age=newAge;
-        currentUser.gender=selectedGenderProfile;
-        if(currentPhoto) currentUser.photo=currentPhoto;
-        if(newPass.trim().length>=8) currentUser.password=newPass;
-        await updateProfileInCloud(currentUser.email, {name:newName,age:newAge,gender:selectedGenderProfile,photo:currentUser.photo,password:currentUser.password});
-        updateProfileUI(currentUser);
-        closeEdit();
-        showToast("Profile updated");
-    }
-    function openEdit() { document.getElementById('edit-screen').style.display='block'; document.getElementById('edit-name').value=currentUser.name; document.getElementById('edit-age').value=currentUser.age; document.getElementById('edit-password').value=""; }
-    function closeEdit() { document.getElementById('edit-screen').style.display='none'; }
-    function handleImg(e) { const r=new FileReader(); r.onload=()=>{ currentPhoto=r.result; }; if(e.target.files[0]) r.readAsDataURL(e.target.files[0]); }
-    function showLogout() { document.getElementById('logout-modal').style.display='flex'; }
-    function hideLogout() { document.getElementById('logout-modal').style.display='none'; }
-    async function doLogout() { stopAllPlayback(); currentUser=null; localStorage.removeItem('adify_session_email'); hideLogout(); closeProfile(); showScreen('loginScreen'); }
-    function openProfile() { document.getElementById('profileScreen').classList.add('active'); }
-    function closeProfile() { document.getElementById('profileScreen').classList.remove('active'); }
-    function showScreen(id) { document.querySelectorAll('.app-screen,.profile-screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-    function contactSupport() { window.open("https://adityaprofile-rho.vercel.app/","_blank"); }
-    async function detectDevice() { let model="Adify Terminal"; if(navigator.userAgentData){ try{ const info=await navigator.userAgentData.getHighEntropyValues(["model"]); model=info.model||"Mobile Node"; }catch(e){} } document.getElementById('p-device').innerText=model; }
+        function playlistAction(id, pName, ex) {
+            if (ex) {
+                userPlaylists[pName] = userPlaylists[pName].filter(s => s.id !== id);
+            } else {
+                // Try to find in allSongs (local) and youtubeSongs (in case it's a YouTube track with an id)
+                let song = allSongs.find(s => s.id === id);
+                if (!song) song = youtubeSongs.find(s => s.id === id);
+                if (song) userPlaylists[pName].push(song);
+                else return; // not found, do nothing
+            }
+            showToast(ex ? "Removed!" : "Added!");
+            saveUserPlaylists();
+            document.getElementById('globalPopup').classList.remove('show');
+            refreshView();
+        }
 
-    // PLAYLIST & SONGS
-    function songItemTemplate(s) {
-        const isP = currentUrl === s.url || (s.ytId && currentYouTubeId === s.ytId);
-        let clickAction;
-        if(s.ytId) clickAction = `window.playTrackFromUI('${s.ytId}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}','youtube')`;
-        else clickAction = `window.playTrackFromUI('${s.id}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}','local')`;
-        const moreBtn = s.ytId ? `<div class="more-btn" onclick="event.stopPropagation(); window.openYtMenu(event,'${s.ytId}')">⋮</div>` : `<div class="more-btn" onclick="event.stopPropagation(); window.openMenu(event,${s.id})">⋮</div>`;
-        return `<div class="song-item ${isP?'playing-active':''}" onclick="${clickAction}"><div style="display:flex;align-items:center;flex:1"><div class="img-container"><img src="${s.image}" class="song-img"></div><div><h4>${s.title}</h4><p style="font-size:10px;opacity:0.5">${s.artist}</p></div></div>${moreBtn}</div>`;
-    }
-    function openMenu(e,id) { e.stopPropagation(); const popup=document.getElementById('globalPopup'); document.getElementById('playlistOptions').innerHTML=playlistsData.map(p=>{ const ex=userPlaylists[p.name].some(x=>x.id===id); return `<div class="menu-item" onclick="window.playlistAction(${id},'${p.name}',${ex})"><span>${p.name}</span><span>${ex?'REMOVE':'ADD'}</span></div>`; }).join(''); popup.classList.add('show'); }
-    function playlistAction(id,pName,ex) { if(ex) userPlaylists[pName]=userPlaylists[pName].filter(s=>s.id!==id); else { let song=allSongs.find(s=>s.id===id); if(!song) song=youtubeSongs.find(s=>s.id===id); if(song) userPlaylists[pName].push(song); } saveUserPlaylists(); showToast(ex?"Removed":"Added"); document.getElementById('globalPopup').classList.remove('show'); refreshView(); }
-    function openYtMenu(e,videoId) { e.stopPropagation(); const popup=document.getElementById('globalPopup'); document.getElementById('playlistOptions').innerHTML=playlistsData.map(p=>{ const ex=userPlaylists[p.name].some(x=>x.ytId===videoId); return `<div class="menu-item" onclick="window.addYtToPlaylist('${videoId}','${p.name}',${ex})"><span>${p.name}</span><span>${ex?'REMOVE':'ADD'}</span></div>`; }).join(''); popup.classList.add('show'); }
-    async function addYtToPlaylist(videoId,pName,isRemove) { if(isRemove) userPlaylists[pName]=userPlaylists[pName].filter(s=>s.ytId!==videoId); else { const song=youtubeSongs.find(s=>s.ytId===videoId); if(song) userPlaylists[pName].push(song); } await saveUserPlaylists(); showToast(isRemove?"Removed":"Added"); document.getElementById('globalPopup').classList.remove('show'); refreshView(); }
-    function playTrackFromUI(id,title,artist,image,type) { if(type==='youtube') playYouTubeSong(id,title,artist,image); else { const s=allSongs.find(s=>s.id==id); if(s) playSong(s.title,s.artist,s.url,s.image); } }
-    function openPlaylist(n) { activeP=n; document.getElementById('homeView').classList.remove('active'); document.getElementById('playlistView').classList.add('active'); document.getElementById('playlistTitle').innerText=n; document.getElementById('searchToggleBtn').style.display='none'; renderPlaylistSongs(); }
-    function resetToHome() { activeP=null; document.getElementById('playlistView').classList.remove('active'); document.getElementById('homeView').classList.add('active'); document.getElementById('searchToggleBtn').style.display='flex'; renderAll(); }
-    function renderPlaylistSongs() { let list=userPlaylists[activeP]||[]; document.getElementById('songsContainer').innerHTML=list.length?list.map(s=>songItemTemplate(s)).join(''):"<p style='text-align:center;opacity:0.3;padding:20px;'>Empty.</p>"; }
-    function refreshView() { if(activeP) renderPlaylistSongs(); else renderAll(); }
-    function renderAll() {
-        document.getElementById('mainPlaylistGrid').innerHTML=playlistsData.map(p=>`<div class="card" onclick="window.openPlaylist('${p.name}')"><div class="art" style="background:url('${p.img}');"></div><p>${p.name}</p></div>`).join('');
-        const merged=[...allSongs,...youtubeSongs.filter(yt=>!allSongs.some(l=>l.url===yt.url))];
-        document.getElementById('singleTracksContainer').innerHTML=merged.map(s=>songItemTemplate(s)).join('');
-        renderRecentlyPlayed();
-    }
+        function songItemTemplate(s) {
+            const isP = currentUrl === s.url || (s.ytId && currentYouTubeId === s.ytId);
+            const isS = selectedSongs.has(s.id);
+            let clickAction;
+            if (isSelectionMode) clickAction = `toggleSelectSong(${s.id})`;
+            else if (s.ytId) clickAction = `playTrackFromUI('${s.ytId}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}','youtube')`;
+            else clickAction = `playTrackFromUI('${s.id}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}','local')`;
+            const moreBtn = !isSelectionMode
+                ? (s.ytId
+                    ? `<div class="more-btn" onclick="event.stopPropagation(); openYtMenu(event,'${s.ytId}')">⋮</div>`
+                    : `<div class="more-btn" onclick="openMenu(event,${s.id})">⋮</div>`)
+                : `<div style="color:var(--danger);font-weight:bold;margin-right:10px;">${isS?'✓':''}</div>`;
+            return `<div class="song-item ${isP?'playing-active':''} ${isS?'selected-to-remove':''}" onclick="${clickAction}"><div style="display:flex;align-items:center;flex:1"><div class="img-container"><img src="${s.image}" class="song-img"></div><div style="overflow:hidden;flex:1"><h4>${s.title}</h4><p style="font-size:10px;opacity:0.5">${s.artist}</p></div></div>${moreBtn}</div>`;
+        }
 
-    // SEARCH
-    async function getRecentSearches() { if(!currentUser || !db) return []; const snap=await db.ref(userPath(currentUser.email,'recentSearches')).once('value'); return snap.val()||[]; }
-    async function saveRecentSearch(q) { if(!currentUser || !db || q.length<2) return; let s=await getRecentSearches(); s=s.filter(x=>x!==q); s.unshift(q); await db.ref(userPath(currentUser.email,'recentSearches')).set(s.slice(0,10)); renderRecentSearches(); }
-    async function renderRecentSearches() { const list=document.getElementById('recentSearchesList'); const s=await getRecentSearches(); if(s.length===0) { list.innerHTML='<div class="no-recent">No recent searches</div>'; return; } list.innerHTML=s.map(q=>`<div class="recent-search-item" onclick="window.searchFromRecent('${q.replace(/'/g,"\\'")}')"><div class="recent-search-left"><i class="fas fa-clock"></i><span class="recent-search-text">${q}</span></div><i class="fas fa-times recent-search-delete" onclick="event.stopPropagation(); window.removeRecentSearch('${q.replace(/'/g,"\\'")}')"></i></div>`).join(''); }
-    async function removeRecentSearch(q) { let s=await getRecentSearches(); s=s.filter(x=>x!==q); await db.ref(userPath(currentUser.email,'recentSearches')).set(s); renderRecentSearches(); }
-    async function clearAllRecentSearches() { await db.ref(userPath(currentUser.email,'recentSearches')).remove(); renderRecentSearches(); }
-    function searchFromRecent(q) { document.getElementById('searchPageInput').value=q; executeSearch(); }
-    function openSearchScreen(e) { e.stopPropagation(); showScreen('searchScreen'); renderRecentSearches(); setTimeout(()=>document.getElementById('searchPageInput').focus(),100); }
-    function closeSearch() { showScreen('homeScreen'); renderAll(); }
-    function clearSearchInput() { document.getElementById('searchPageInput').value=''; document.getElementById('searchClearBtn').style.display='none'; document.getElementById('recentSearchesSection').style.display='block'; document.getElementById('searchResultsSection').style.display='none'; }
-    function handleSearchPageInput() { const q=document.getElementById('searchPageInput').value.trim(); if(q.length>0) document.getElementById('searchClearBtn').style.display='block'; else { document.getElementById('searchClearBtn').style.display='none'; document.getElementById('recentSearchesSection').style.display='block'; document.getElementById('searchResultsSection').style.display='none'; return; } clearTimeout(searchTimeout); searchTimeout=setTimeout(()=>executeSearch(),500); }
-    async function executeSearch() { const q=document.getElementById('searchPageInput').value.trim(); if(q.length<2) return; await saveRecentSearch(q); document.getElementById('recentSearchesSection').style.display='none'; document.getElementById('searchResultsSection').style.display='block'; const merged=[...allSongs,...youtubeSongs]; const local=merged.filter(s=>s.title.toLowerCase().includes(q.toLowerCase())||s.artist.toLowerCase().includes(q.toLowerCase())); document.getElementById('searchResultsTracks').innerHTML=local.length?local.map(s=>songItemTemplate(s)).join(''):'<div class="no-recent">No tracks</div>'; document.getElementById('ytSearchResultsSection').style.display='block'; document.getElementById('searchResultsYouTube').innerHTML='<div class="yt-loading">Searching YouTube...</div>'; try { const url=`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q+" song")}&type=video&videoCategoryId=10&key=${YOUTUBE_API_KEY}&maxResults=8`; const res=await fetch(url); const data=await res.json(); if(data.items) { const ytItems=data.items.map((item,idx)=>({id:'yt_'+idx, videoId:item.id.videoId, title:item.snippet.title, artist:item.snippet.channelTitle, image:item.snippet.thumbnails.medium?.url||item.snippet.thumbnails.default.url})); ytItems.forEach(yt=>{ if(!youtubeSongs.some(s=>s.videoId===yt.videoId)) youtubeSongs.push({id:'yt_'+Date.now()+'_'+Math.random().toString(36).substr(2,5), ytId:yt.videoId, title:yt.title, artist:yt.artist, url:'youtube://'+yt.videoId, image:yt.image}); }); await saveYoutubeSongs(); document.getElementById('searchResultsYouTube').innerHTML=ytItems.map(s=>ytSongItemTemplate(s)).join(''); } else document.getElementById('searchResultsYouTube').innerHTML='<div class="no-recent">No YouTube results</div>'; } catch(e) { document.getElementById('searchResultsYouTube').innerHTML='<div class="no-recent">Search failed</div>'; } }
-    function ytSongItemTemplate(s) { return `<div class="song-item" onclick="window.playYouTubeSong('${s.videoId}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}')"><div style="display:flex;align-items:center;flex:1"><div class="img-container"><img src="${s.image}" class="song-img"></div><div><h4>${s.title}</h4><p style="font-size:10px;">${s.artist}</p></div></div><div class="more-btn" onclick="event.stopPropagation(); window.openYtMenu(event,'${s.videoId}')">⋮</div></div>`; }
+        function playTrackFromUI(id, title, artist, image, type) {
+            if (type === 'youtube') playYouTubeSong(id, title, artist, image);
+            else {
+                const song = allSongs.find(s => s.id == id);
+                if (song) playSong(song.title, song.artist, song.url, song.image);
+            }
+        }
 
-    // PLAYBACK
-    let isAutoPlayMode=false, youtubeShuffleQueue=[], currentYoutubeQueueIndex=-1;
-    function addToHistory(track) { if(playHistory.length===0 || playHistory[historyIndex].url!==track.url) { if(historyIndex<playHistory.length-1) playHistory=playHistory.slice(0,historyIndex+1); playHistory.push(track); historyIndex=playHistory.length-1; if(playHistory.length>50) playHistory.shift(); } }
-    function prevTrack() { if(historyIndex>0) { historyIndex--; const t=playHistory[historyIndex]; t.ytId?playYouTubeSong(t.ytId,t.title,t.artist,t.image):playSong(t.title,t.artist,t.url,t.image); } else showToast("No previous"); }
-    function nextTrack() { if(historyIndex<playHistory.length-1) { historyIndex++; const t=playHistory[historyIndex]; t.ytId?playYouTubeSong(t.ytId,t.title,t.artist,t.image):playSong(t.title,t.artist,t.url,t.image); } else { const merged=[...allSongs,...youtubeSongs]; if(merged.length) { const r=merged[Math.floor(Math.random()*merged.length)]; r.ytId?playYouTubeSong(r.ytId,r.title,r.artist,r.image):playSong(r.title,r.artist,r.url,r.image); } } }
-    function playSong(t,a,u,i) { if(isYouTubePlaying) stopYouTubePlayer(); isAutoPlayMode=false; currentUrl=u; isPlaying=true; audio.pause(); audio.src=u; audio.load(); audio.play().then(()=>{ document.getElementById('pTitle').innerText=t; document.getElementById('pArtist').innerText=a; const art=document.getElementById('playerImgArt'); art.style.backgroundImage=`url('${i}')`; art.style.backgroundSize='cover'; art.classList.add('music-playing'); updatePlayIcon(true); addToHistory({title:t,artist:a,url:u,image:i}); addToRecentlyPlayed({title:t,artist:a,url:u,image:i}); }).catch(e=>{ updatePlayIcon(false); isPlaying=false; }); refreshView(); }
-    function playYouTubeSong(videoId,title,channel,thumb) { stopLocalAudio(); currentYouTubeId=videoId; isYouTubePlaying=true; currentUrl='youtube://'+videoId; isPlaying=true; document.getElementById('pTitle').innerText=title.substring(0,30); document.getElementById('pArtist').innerText=channel; const art=document.getElementById('playerImgArt'); art.style.backgroundImage=`url('${thumb}')`; art.style.backgroundSize='cover'; art.classList.add('music-playing'); updatePlayIcon(true); document.getElementById('currentTime').innerText="0:00"; document.getElementById('totalDuration').innerText="0:00"; document.getElementById('fill').style.width='0%'; document.getElementById('seekSlider').value=0; loadYouTubePlayer(videoId); isAutoPlayMode=true; startYoutubeAutoPlay(videoId); addToHistory({ytId:videoId,title,artist:channel,url:'youtube://'+videoId,image:thumb}); addToRecentlyPlayed({title,artist:channel,url:'youtube://'+videoId,image:thumb,ytId:videoId}); refreshView(); }
-    function loadYouTubePlayer(videoId) { const w=document.getElementById('yt-player-wrapper'); w.innerHTML=''; if(!window.YT||!YT.Player){ const t=document.createElement('script'); t.src="https://www.youtube.com/iframe_api"; t.onload=()=>{ window._pendingVideoId=videoId; }; document.head.appendChild(t); } else createYouTubePlayer(videoId); }
-    window.onYouTubeIframeAPIReady=()=>{ if(window._pendingVideoId){ createYouTubePlayer(window._pendingVideoId); window._pendingVideoId=null; } };
-    function createYouTubePlayer(videoId) { const w=document.getElementById('yt-player-wrapper'); w.innerHTML='<div id="youtube-player"></div>'; try{ youtubePlayer=new YT.Player('youtube-player',{ height:'1', width:'1', videoId:videoId, playerVars:{autoplay:1,controls:0,disablekb:1,fs:0,modestbranding:1,rel:0,showinfo:0,iv_load_policy:3,playsinline:1}, events:{ onReady:(e)=>{ ytPlayerReady=true; e.target.playVideo(); e.target.unMute(); startYtTimeUpdate(); }, onStateChange:(e)=>{ if(e.data===YT.PlayerState.ENDED){ if(isAutoPlayMode) playNextYoutubeAuto(); else nextTrack(); } if(e.data===YT.PlayerState.PLAYING){ isPlaying=true; updatePlayIcon(true); document.getElementById('playerImgArt').classList.add('music-playing'); ytDuration=youtubePlayer.getDuration(); document.getElementById('totalDuration').innerText=formatTime(ytDuration); } else if(e.data===YT.PlayerState.PAUSED){ isPlaying=false; updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); } }, onError:(e)=>{ console.error(e); } } }); } catch(e){ console.error(e); } }
-    function startYtTimeUpdate() { if(ytTimeInterval) clearInterval(ytTimeInterval); ytTimeInterval=setInterval(()=>{ if(!isYouTubePlaying||!youtubePlayer||!ytPlayerReady) return; try{ ytCurrentTime=youtubePlayer.getCurrentTime(); ytDuration=youtubePlayer.getDuration(); if(ytDuration>0){ const pct=(ytCurrentTime/ytDuration)*100; document.getElementById('fill').style.width=pct+'%'; document.getElementById('seekSlider').value=pct*10; document.getElementById('currentTime').innerText=formatTime(ytCurrentTime); document.getElementById('totalDuration').innerText=formatTime(ytDuration); } }catch(e){} },500); }
-    function stopYtTimeUpdate() { if(ytTimeInterval){ clearInterval(ytTimeInterval); ytTimeInterval=null; } }
-    function stopYouTubePlayer() { stopYtTimeUpdate(); if(youtubePlayer){ try{ youtubePlayer.stopVideo(); youtubePlayer.destroy(); }catch(e){} youtubePlayer=null; } document.getElementById('yt-player-wrapper').innerHTML=''; isYouTubePlaying=false; currentYouTubeId=null; ytPlayerReady=false; }
-    function stopLocalAudio() { audio.pause(); audio.src=""; audio.currentTime=0; isPlaying=false; }
-    function startYoutubeAutoPlay(currentId) { if(youtubeSongs.length===0) return; youtubeShuffleQueue=[...youtubeSongs]; for(let i=youtubeShuffleQueue.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [youtubeShuffleQueue[i],youtubeShuffleQueue[j]]=[youtubeShuffleQueue[j],youtubeShuffleQueue[i]]; } currentYoutubeQueueIndex=youtubeShuffleQueue.findIndex(s=>s.ytId===currentId); if(currentYoutubeQueueIndex===-1) currentYoutubeQueueIndex=0; }
-    function playNextYoutubeAuto() { if(!isAutoPlayMode||youtubeShuffleQueue.length===0) return; currentYoutubeQueueIndex++; if(currentYoutubeQueueIndex>=youtubeShuffleQueue.length){ for(let i=youtubeShuffleQueue.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [youtubeShuffleQueue[i],youtubeShuffleQueue[j]]=[youtubeShuffleQueue[j],youtubeShuffleQueue[i]]; } currentYoutubeQueueIndex=0; } const next=youtubeShuffleQueue[currentYoutubeQueueIndex]; playYouTubeSong(next.ytId,next.title,next.artist,next.image); }
-    function stopAllPlayback() { stopLocalAudio(); stopYouTubePlayer(); updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); document.getElementById('currentTime').innerText="0:00"; document.getElementById('totalDuration').innerText="0:00"; document.getElementById('fill').style.width='0%'; document.getElementById('seekSlider').value=0; }
-    function updatePlayIcon(playing) { const icon=document.getElementById('playIcon'); icon.innerHTML=playing?'<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>':'<path d="M8 5v14l11-7z"/>'; }
-    function togglePlay() { if(isYouTubePlaying&&youtubePlayer&&ytPlayerReady){ if(isPlaying){ youtubePlayer.pauseVideo(); isPlaying=false; updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); }else{ youtubePlayer.playVideo(); isPlaying=true; updatePlayIcon(true); document.getElementById('playerImgArt').classList.add('music-playing'); } return; } if(!audio.src||audio.src===window.location.href){ nextTrack(); return; } if(audio.paused){ audio.play().then(()=>{ isPlaying=true; updatePlayIcon(true); document.getElementById('playerImgArt').classList.add('music-playing'); }).catch(e=>{ isPlaying=false; updatePlayIcon(false); }); }else{ audio.pause(); isPlaying=false; updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); } }
-    function handleSeekInput() { const s=document.getElementById('seekSlider'); const pct=(s.value/s.max)*100; document.getElementById('fill').style.width=pct+'%'; if(!isYouTubePlaying&&audio.duration) document.getElementById('currentTime').innerText=formatTime(audio.duration*(s.value/1000)); else if(isYouTubePlaying&&ytDuration>0) document.getElementById('currentTime').innerText=formatTime(ytDuration*(s.value/1000)); }
-    function handleSeekChange() { const s=document.getElementById('seekSlider'); if(isYouTubePlaying&&youtubePlayer&&ytPlayerReady&&ytDuration>0){ youtubePlayer.seekTo(ytDuration*(s.value/1000),true); } else if(audio.duration){ audio.currentTime=audio.duration*(s.value/1000); } isDragging=false; }
-    audio.ontimeupdate=()=>{ if(!isDragging&&audio.duration&&!isYouTubePlaying){ const p=(audio.currentTime/audio.duration)*100; document.getElementById('fill').style.width=p+'%'; document.getElementById('seekSlider').value=p*10; document.getElementById('currentTime').innerText=formatTime(audio.currentTime); document.getElementById('totalDuration').innerText=formatTime(audio.duration); } };
-    audio.onended=()=>{ isPlaying=false; updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); nextTrack(); };
-    function handleGlobalClick() { document.getElementById('globalPopup').classList.remove('show'); }
+        function renderAll() {
+            try {
+                document.getElementById('mainPlaylistGrid').innerHTML = playlistsData.filter(p=>p.name.toLowerCase().includes(searchQuery)).map(p=>`<div class="card" onclick="openPlaylist('${p.name}')"><div class="art" style="background:url('${p.img}');"></div><p style="font-size:10px;">${p.name}</p></div>`).join('');
+                const merged = [...allSongs];
+                if (youtubeSongs && Array.isArray(youtubeSongs)) {
+                    youtubeSongs.forEach(yt => { if (!merged.some(m=>m.url===yt.url||(yt.ytId&&m.ytId===yt.ytId))) merged.push(yt); });
+                }
+                const container = document.getElementById('singleTracksContainer');
+                if (container) container.innerHTML = merged.filter(s=>s.title.toLowerCase().includes(searchQuery)).map(s=>songItemTemplate(s)).join('');
+                renderRecentlyPlayed();
+            } catch(err) { console.error("renderAll error", err); }
+        }
 
-    // Expose all required functions to window
-    window.togglePass = togglePass;
-    window.setGender = setGender;
-    window.setGenderProfile = setGenderProfile;
-    window.toggleAuth = toggleAuth;
-    window.handleSubmit = handleSubmit;
-    window.sendOTP = sendOTP;
-    window.openForgotModal = openForgotModal;
-    window.closeForgotModal = closeForgotModal;
-    window.resetPassword = resetPassword;
-    window.openEdit = openEdit;
-    window.closeEdit = closeEdit;
-    window.saveProfile = saveProfile;
-    window.handleImg = handleImg;
-    window.showLogout = showLogout;
-    window.hideLogout = hideLogout;
-    window.doLogout = doLogout;
-    window.openProfile = openProfile;
-    window.closeProfile = closeProfile;
-    window.contactSupport = contactSupport;
-    window.openPlaylist = openPlaylist;
-    window.resetToHome = resetToHome;
-    window.openMenu = openMenu;
-    window.playlistAction = playlistAction;
-    window.openYtMenu = openYtMenu;
-    window.addYtToPlaylist = addYtToPlaylist;
-    window.playTrackFromUI = playTrackFromUI;
-    window.playYouTubeSong = playYouTubeSong;
-    window.prevTrack = prevTrack;
-    window.nextTrack = nextTrack;
-    window.togglePlay = togglePlay;
-    window.handleSeekInput = handleSeekInput;
-    window.handleSeekChange = handleSeekChange;
-    window.openSearchScreen = openSearchScreen;
-    window.closeSearch = closeSearch;
-    window.clearSearchInput = clearSearchInput;
-    window.handleSearchPageInput = handleSearchPageInput;
-    window.clearAllRecentSearches = clearAllRecentSearches;
-    window.searchFromRecent = searchFromRecent;
-    window.removeRecentSearch = removeRecentSearch;
-    window.handleGlobalClick = handleGlobalClick;
+        // ---- SEARCH SCREEN ----
+        function openSearchScreen(e) { if(e)e.stopPropagation(); showScreen('searchScreen'); renderRecentSearches(); setTimeout(()=>document.getElementById('searchPageInput').focus(),100); }
+        function closeSearch() { if(searchTimeout)clearTimeout(searchTimeout); document.getElementById('searchPageInput').value=''; document.getElementById('searchClearBtn').style.display='none'; document.getElementById('recentSearchesSection').style.display='block'; document.getElementById('searchResultsSection').style.display='none'; document.getElementById('ytSearchResultsSection').style.display='none'; showScreen('homeScreen'); renderAll(); }
+        function clearSearchInput() { document.getElementById('searchPageInput').value=''; document.getElementById('searchClearBtn').style.display='none'; document.getElementById('recentSearchesSection').style.display='block'; document.getElementById('searchResultsSection').style.display='none'; document.getElementById('ytSearchResultsSection').style.display='none'; document.getElementById('searchPageInput').focus(); }
+        function handleSearchPageInput() { const q=document.getElementById('searchPageInput').value.trim(); const cb=document.getElementById('searchClearBtn'); if(q.length>0){ cb.style.display='block'; }else{ cb.style.display='none'; document.getElementById('recentSearchesSection').style.display='block'; document.getElementById('searchResultsSection').style.display='none'; document.getElementById('ytSearchResultsSection').style.display='none'; return; } if(searchTimeout)clearTimeout(searchTimeout); searchTimeout=setTimeout(()=>executeSearch(),800); }
 
-    // INIT
-    window.addEventListener('load', async () => {
-        try {
-            await detectDevice();
-            const saved = localStorage.getItem('adify_session_email');
-            if(saved && db) {
-                const user = await loadUserFromCloud(saved);
-                if(user) {
+        async function executeSearch() {
+            const query = document.getElementById('searchPageInput').value.trim();
+            if (!query || query.length < 2) return;
+            await saveRecentSearch(query);
+            document.getElementById('recentSearchesSection').style.display = 'none';
+            document.getElementById('searchResultsSection').style.display = 'block';
+            const merged = [...allSongs];
+            if (youtubeSongs && Array.isArray(youtubeSongs)) {
+                youtubeSongs.forEach(yt => { if (!merged.some(m=>m.url===yt.url||(yt.ytId&&m.ytId===yt.ytId))) merged.push(yt); });
+            }
+            const localResults = merged.filter(s => s.title.toLowerCase().includes(query.toLowerCase()) || s.artist.toLowerCase().includes(query.toLowerCase()));
+            const tracksDiv = document.getElementById('searchResultsTracks');
+            tracksDiv.innerHTML = localResults.length ? localResults.map(s=>songItemTemplate(s)).join('') : '<div class="no-recent">No tracks found</div>';
+
+            const ytSection = document.getElementById('ytSearchResultsSection');
+            const ytDiv = document.getElementById('searchResultsYouTube');
+            ytSection.style.display = 'block';
+            ytDiv.innerHTML = '<div class="yt-loading">🔍 Searching YouTube...</div>';
+            try {
+                const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query+" song")}&type=video&videoCategoryId=10&key=${YOUTUBE_API_KEY}&maxResults=10`;
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.error || !data.items || data.items.length === 0) { ytSection.style.display = 'none'; return; }
+                youtubeResults = data.items.map((item, idx) => ({ id: 'yt_'+idx, videoId: item.id.videoId, title: item.snippet.title, artist: item.snippet.channelTitle, image: item.snippet.thumbnails.medium ? item.snippet.thumbnails.medium.url : item.snippet.thumbnails.default.url }));
+                youtubeResults.forEach(yt => { if (!youtubeSongs.some(s=>s.videoId===yt.videoId)) { youtubeSongs.push({ id: 'yt_'+Date.now()+'_'+Math.random().toString(36).substr(2,5), ytId: yt.videoId, title: yt.title, artist: yt.artist, url: 'youtube://'+yt.videoId, image: yt.image }); } });
+                await saveYoutubeSongs();
+                ytDiv.innerHTML = youtubeResults.map(s=>ytSongItemTemplate(s)).join('');
+            } catch(err) { console.error("YouTube search error", err); ytSection.style.display = 'none'; }
+        }
+
+        function ytSongItemTemplate(s) { const isP = currentYouTubeId === s.videoId; return `<div class="song-item ${isP?'playing-active':''}" onclick="playYouTubeSong('${s.videoId}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}')"><div style="display:flex;align-items:center;flex:1"><div class="img-container"><img src="${s.image}" class="song-img"></div><div style="overflow:hidden;flex:1"><h4>${s.title}</h4><p style="font-size:10px;opacity:0.5">${s.artist}</p></div></div><div class="more-btn" onclick="event.stopPropagation(); openYtMenu(event,'${s.videoId}')">⋮</div></div>`; }
+
+        // ---- YOUTUBE MENU FIX: USE youtubeSongs INSTEAD OF youtubeResults ----
+        function openYtMenu(e, videoId) {
+            e.stopPropagation();
+            const popup = document.getElementById('globalPopup');
+            document.getElementById('playlistOptions').innerHTML = playlistsData.map(p => {
+                const ex = userPlaylists[p.name].some(x => x.ytId === videoId);
+                return `<div class="menu-item" onclick="addYtToPlaylist('${videoId}','${p.name}',${ex})"><span>${p.name}</span><span style="color:${ex?'var(--danger)':'var(--primary)'};font-weight:bold;">${ex?'REMOVE':'ADD'}</span></div>`;
+            }).join('');
+            popup.classList.add('show');
+        }
+        async function addYtToPlaylist(videoId, pName, isRemove) {
+            if (isRemove) {
+                userPlaylists[pName] = userPlaylists[pName].filter(s => s.ytId !== videoId);
+                showToast("Removed!");
+            } else {
+                // Try to find the song in youtubeSongs (permanent list)
+                const song = youtubeSongs.find(s => s.ytId === videoId);
+                if (song) {
+                    userPlaylists[pName].push(song);
+                    showToast("Added!");
+                } else {
+                    // fallback: if not found, create minimal object (should not happen)
+                    showToast("Song not found");
+                    return;
+                }
+            }
+            await saveUserPlaylists();
+            document.getElementById('globalPopup').classList.remove('show');
+            refreshView();
+        }
+
+        // ---- PLAYBACK & HISTORY (FIXED PREV/NEXT) ----
+        function addToHistory(track) {
+            if (playHistory.length === 0 || playHistory[historyIndex].url !== track.url) {
+                if (historyIndex < playHistory.length - 1) playHistory = playHistory.slice(0, historyIndex + 1);
+                playHistory.push(track);
+                historyIndex = playHistory.length - 1;
+                if (playHistory.length > 50) { playHistory.shift(); historyIndex--; }
+            }
+        }
+        function prevTrack() {
+            if (historyIndex > 0) {
+                historyIndex--;
+                const track = playHistory[historyIndex];
+                if (track.ytId) playYouTubeSong(track.ytId, track.title, track.artist, track.image);
+                else playSong(track.title, track.artist, track.url, track.image);
+            } else showToast("No previous track");
+        }
+        function nextTrack() {
+            if (historyIndex < playHistory.length - 1) {
+                historyIndex++;
+                const track = playHistory[historyIndex];
+                if (track.ytId) playYouTubeSong(track.ytId, track.title, track.artist, track.image);
+                else playSong(track.title, track.artist, track.url, track.image);
+            } else {
+                // auto random
+                const merged = [...allSongs, ...youtubeSongs.filter(yt => !allSongs.some(l => l.url === yt.url))];
+                if (merged.length) {
+                    const r = merged[Math.floor(Math.random() * merged.length)];
+                    if (r.ytId) playYouTubeSong(r.ytId, r.title, r.artist, r.image);
+                    else playSong(r.title, r.artist, r.url, r.image);
+                }
+            }
+        }
+
+        function playSong(t, a, u, i) {
+            if (isYouTubePlaying) stopYouTubePlayer();
+            isAutoPlayMode = false;
+            currentTrackData = { title: t, artist: a, url: u, image: i };
+            currentUrl = u;
+            isPlaying = true;
+            audio.pause();
+            audio.src = u;
+            audio.load();
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    document.getElementById('pTitle').innerText = t;
+                    document.getElementById('pArtist').innerText = a;
+                    const art = document.getElementById('playerImgArt');
+                    art.style.backgroundImage = "url('" + i + "')";
+                    art.style.backgroundSize = 'cover';
+                    art.classList.add('music-playing');
+                    updatePlayIcon(true);
+                    updateMediaSessionMetadata(t, a, i);
+                    addToHistory({ title: t, artist: a, url: u, image: i });
+                    addToRecentlyPlayed({ title: t, artist: a, url: u, image: i });
+                }).catch(err => {
+                    document.getElementById('pTitle').innerText = t;
+                    document.getElementById('pArtist').innerText = a;
+                    const art = document.getElementById('playerImgArt');
+                    art.style.backgroundImage = "url('" + i + "')";
+                    art.style.backgroundSize = 'cover';
+                    updatePlayIcon(false);
+                    isPlaying = false;
+                });
+            } else {
+                document.getElementById('pTitle').innerText = t;
+                document.getElementById('pArtist').innerText = a;
+                const art = document.getElementById('playerImgArt');
+                art.style.backgroundImage = "url('" + i + "')";
+                art.style.backgroundSize = 'cover';
+                art.classList.add('music-playing');
+                updatePlayIcon(true);
+                updateMediaSessionMetadata(t, a, i);
+                addToHistory({ title: t, artist: a, url: u, image: i });
+                addToRecentlyPlayed({ title: t, artist: a, url: u, image: i });
+            }
+            refreshView();
+        }
+
+        function playYouTubeSong(videoId, title, channel, thumbUrl) {
+            stopLocalAudio();
+            currentYouTubeId = videoId;
+            isYouTubePlaying = true;
+            currentUrl = 'youtube://' + videoId;
+            isPlaying = true;
+            document.getElementById('pTitle').innerText = title.substring(0, 30);
+            document.getElementById('pArtist').innerText = channel;
+            const art = document.getElementById('playerImgArt');
+            art.style.backgroundImage = "url('" + thumbUrl + "')";
+            art.style.backgroundSize = 'cover';
+            art.classList.add('music-playing');
+            updatePlayIcon(true);
+            document.getElementById('currentTime').innerText = "0:00";
+            document.getElementById('totalDuration').innerText = "0:00";
+            document.getElementById('fill').style.width = '0%';
+            document.getElementById('seekSlider').value = 0;
+            loadYouTubePlayer(videoId);
+            isAutoPlayMode = true;
+            startYoutubeAutoPlay(videoId);
+            updateMediaSessionMetadata(title, channel, thumbUrl);
+            addToHistory({ ytId: videoId, title, artist: channel, url: 'youtube://'+videoId, image: thumbUrl });
+            addToRecentlyPlayed({ title, artist: channel, url: 'youtube://'+videoId, image: thumbUrl, ytId: videoId });
+            showPopup("▶ PLAYING", "success");
+            refreshView();
+        }
+
+        // ---- YOUTUBE PLAYER ----
+        function loadYouTubePlayer(videoId) { const w=document.getElementById('yt-player-wrapper'); w.innerHTML=''; if(!window.YT||!YT.Player){ const t=document.createElement('script'); t.src="https://www.youtube.com/iframe_api"; t.onload=function(){window._pendingVideoId=videoId;}; document.head.appendChild(t); }else createYouTubePlayer(videoId); }
+        window.onYouTubeIframeAPIReady = function() { if(window._pendingVideoId){ createYouTubePlayer(window._pendingVideoId); window._pendingVideoId=null; } };
+        function createYouTubePlayer(videoId) { const w=document.getElementById('yt-player-wrapper'); w.innerHTML='<div id="youtube-player"></div>'; try{ youtubePlayer = new YT.Player('youtube-player',{ height:'1', width:'1', videoId:videoId, playerVars:{autoplay:1,controls:0,disablekb:1,fs:0,modestbranding:1,rel:0,showinfo:0,iv_load_policy:3,playsinline:1}, events:{ onReady:function(e){ ytPlayerReady=true; e.target.playVideo(); e.target.unMute(); startYtTimeUpdate(); }, onStateChange:function(e){ if(e.data===YT.PlayerState.ENDED){ if(isAutoPlayMode) playNextYoutubeAuto(); else nextTrack(); } if(e.data===YT.PlayerState.PLAYING){ isPlaying=true; updatePlayIcon(true); document.getElementById('playerImgArt').classList.add('music-playing'); try{ ytDuration=youtubePlayer.getDuration(); document.getElementById('totalDuration').innerText=formatTime(ytDuration); }catch(e){} } else if(e.data===YT.PlayerState.PAUSED){ isPlaying=false; updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); } }, onError:function(e){ console.error("YouTube error",e.data); showPopup("PLAYBACK ERROR","error"); } } }); }catch(e){ console.error("Player init failed",e); } }
+        function startYtTimeUpdate() { if(ytTimeInterval)clearInterval(ytTimeInterval); ytTimeInterval=setInterval(()=>{ if(!isYouTubePlaying||!youtubePlayer||!ytPlayerReady) return; try{ ytCurrentTime=youtubePlayer.getCurrentTime(); ytDuration=youtubePlayer.getDuration(); if(ytDuration>0){ const pct=(ytCurrentTime/ytDuration)*100; document.getElementById('fill').style.width=pct+'%'; document.getElementById('seekSlider').value=pct*10; document.getElementById('currentTime').innerText=formatTime(ytCurrentTime); document.getElementById('totalDuration').innerText=formatTime(ytDuration); } }catch(e){} },500); }
+        function stopYtTimeUpdate() { if(ytTimeInterval){ clearInterval(ytTimeInterval); ytTimeInterval=null; } }
+        function stopYouTubePlayer() { stopYtTimeUpdate(); if(youtubePlayer){ try{youtubePlayer.stopVideo();}catch(e){} try{youtubePlayer.destroy();}catch(e){} youtubePlayer=null; } document.getElementById('yt-player-wrapper').innerHTML=''; isYouTubePlaying=false; currentYouTubeId=null; ytPlayerReady=false; ytDuration=0; ytCurrentTime=0; }
+        function stopLocalAudio() { audio.pause(); audio.src=""; audio.currentTime=0; isPlaying=false; }
+        let isAutoPlayMode = false;
+        let youtubeShuffleQueue = [];
+        let currentYoutubeQueueIndex = -1;
+        function startYoutubeAutoPlay(currentVideoId) { if(youtubeSongs.length===0) return; youtubeShuffleQueue=[...youtubeSongs]; for(let i=youtubeShuffleQueue.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [youtubeShuffleQueue[i],youtubeShuffleQueue[j]]=[youtubeShuffleQueue[j],youtubeShuffleQueue[i]]; } currentYoutubeQueueIndex=youtubeShuffleQueue.findIndex(s=>s.ytId===currentVideoId); if(currentYoutubeQueueIndex===-1) currentYoutubeQueueIndex=0; }
+        function playNextYoutubeAuto() { if(!isAutoPlayMode||youtubeShuffleQueue.length===0) return; currentYoutubeQueueIndex++; if(currentYoutubeQueueIndex>=youtubeShuffleQueue.length){ for(let i=youtubeShuffleQueue.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [youtubeShuffleQueue[i],youtubeShuffleQueue[j]]=[youtubeShuffleQueue[j],youtubeShuffleQueue[i]]; } currentYoutubeQueueIndex=0; } const next=youtubeShuffleQueue[currentYoutubeQueueIndex]; playYouTubeSong(next.ytId,next.title,next.artist,next.image); }
+        function stopAllPlayback() { stopLocalAudio(); stopYouTubePlayer(); updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); document.getElementById('currentTime').innerText="0:00"; document.getElementById('totalDuration').innerText="0:00"; document.getElementById('fill').style.width='0%'; document.getElementById('seekSlider').value=0; if('mediaSession' in navigator){ navigator.mediaSession.metadata=null; navigator.mediaSession.playbackState='none'; } }
+        function updatePlayIcon(playing) { const icon=document.getElementById('playIcon'); icon.innerHTML=playing?'<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>':'<path d="M8 5v14l11-7z"/>'; }
+        function togglePlay() { if(isYouTubePlaying&&youtubePlayer&&ytPlayerReady){ try{ if(isPlaying){ youtubePlayer.pauseVideo(); isPlaying=false; updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); }else{ youtubePlayer.playVideo(); isPlaying=true; updatePlayIcon(true); document.getElementById('playerImgArt').classList.add('music-playing'); } }catch(e){} if('mediaSession' in navigator) navigator.mediaSession.playbackState=isPlaying?'playing':'paused'; return; } if(!audio.src||audio.src===window.location.href){ nextTrack(); return; } if(audio.paused){ audio.play().then(()=>{ isPlaying=true; updatePlayIcon(true); document.getElementById('playerImgArt').classList.add('music-playing'); if('mediaSession' in navigator) navigator.mediaSession.playbackState='playing'; }).catch(e=>{ isPlaying=false; updatePlayIcon(false); }); }else{ audio.pause(); isPlaying=false; updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); if('mediaSession' in navigator) navigator.mediaSession.playbackState='paused'; } }
+        function handleSeekInput() { const s=document.getElementById('seekSlider'); const pct=(s.value/s.max)*100; document.getElementById('fill').style.width=pct+'%'; if(!isYouTubePlaying&&audio.duration&&isFinite(audio.duration)){ isDragging=true; document.getElementById('currentTime').innerText=formatTime(audio.duration*(s.value/1000)); }else if(isYouTubePlaying&&ytDuration>0){ isDragging=true; document.getElementById('currentTime').innerText=formatTime(ytDuration*(s.value/1000)); } }
+        function handleSeekChange() { const s=document.getElementById('seekSlider'); if(isYouTubePlaying&&youtubePlayer&&ytPlayerReady&&ytDuration>0){ try{ youtubePlayer.seekTo(ytDuration*(s.value/1000),true); }catch(e){} isDragging=false; }else if(audio.duration&&isFinite(audio.duration)){ audio.currentTime=audio.duration*(s.value/1000); isDragging=false; } }
+        audio.ontimeupdate = () => { if(!isDragging&&audio.duration&&isFinite(audio.duration)&&!isYouTubePlaying){ const p=(audio.currentTime/audio.duration)*100; document.getElementById('fill').style.width=p+'%'; document.getElementById('seekSlider').value=p*10; document.getElementById('currentTime').innerText=formatTime(audio.currentTime); document.getElementById('totalDuration').innerText=formatTime(audio.duration); } };
+        audio.onended = () => { isPlaying=false; updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); if('mediaSession' in navigator) navigator.mediaSession.playbackState='none'; nextTrack(); };
+        audio.onloadedmetadata = () => { if(!isYouTubePlaying&&audio.duration&&isFinite(audio.duration)) document.getElementById('totalDuration').innerText=formatTime(audio.duration); };
+        audio.onerror = () => { console.error("Audio error",audio.error); isPlaying=false; updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); };
+
+        // ---- PLAYLIST REMOVE (FIXED & TESTED) ----
+        function openPlaylist(n) { activeP=n; document.getElementById('homeView').classList.remove('active'); document.getElementById('playlistView').classList.add('active'); document.getElementById('playlistTitle').innerText=n; document.getElementById('searchToggleBtn').style.display='none'; renderPlaylistSongs(); }
+        function resetToHome() { activeP=null; document.getElementById('playlistView').classList.remove('active'); document.getElementById('homeView').classList.add('active'); document.getElementById('searchToggleBtn').style.display='flex'; renderAll(); }
+        function enableSelectionMode() { isSelectionMode=true; selectedSongs.clear(); document.getElementById('modeBtn').style.display='none'; document.getElementById('confirmBtn').style.display='block'; document.getElementById('cancelBtn').style.display='block'; renderPlaylistSongs(); }
+        function disableSelectionMode() { isSelectionMode=false; selectedSongs.clear(); document.getElementById('modeBtn').style.display='block'; document.getElementById('confirmBtn').style.display='none'; document.getElementById('cancelBtn').style.display='none'; renderPlaylistSongs(); }
+        function toggleSelectSong(id) { selectedSongs.has(id)?selectedSongs.delete(id):selectedSongs.add(id); renderPlaylistSongs(); }
+        async function confirmRemoval() {
+            if (!activeP) return;
+            userPlaylists[activeP] = userPlaylists[activeP].filter(s => !selectedSongs.has(s.id));
+            await saveUserPlaylists();
+            showToast("Songs Removed!");
+            disableSelectionMode();
+        }
+        function renderPlaylistSongs() {
+            let list = userPlaylists[activeP] || [];
+            document.getElementById('songsContainer').innerHTML = list.length ? list.map(s => songItemTemplate(s)).join('') : "<p style='text-align:center;opacity:0.3;padding:20px;'>Empty.</p>";
+        }
+        function refreshView() { if(activeP) renderPlaylistSongs(); else renderAll(); }
+
+        // ---- PROFILE ----
+        function updateProfileUI(user) {
+            document.getElementById("display-name").innerText=user.name||"Adify User";
+            document.getElementById("p-gender").innerText=user.gender||"Male";
+            document.getElementById("p-email").innerText=user.email||"user@adify.com";
+            document.getElementById("p-phone").innerText=user.phone?"+91 "+user.phone:"+91 98765 43210";
+            document.getElementById("p-age").innerText=(user.age||22)+" Years";
+            const pfp=user.photo||"https://api.dicebear.com/7.x/avataaars/svg?seed="+(user.name||"User");
+            document.getElementById('main-pfp').src=pfp;
+            document.getElementById('homeProfileImg').src=pfp;
+        }
+        async function detectDevice() { let model="Adify Terminal"; if(navigator.userAgentData){ try{ const info=await navigator.userAgentData.getHighEntropyValues(["model"]); model=info.model||"Mobile Node"; }catch(e){} } document.getElementById('p-device').innerText=model; }
+        function contactSupport() { window.open("https://adityaprofile-rho.vercel.app/","_blank"); }
+        function setGenderProfile(el,val) { const parent=el.parentElement; if(parent) parent.querySelectorAll('.gender-opt').forEach(o=>o.classList.remove('active')); el.classList.add('active'); selectedGenderProfile=val; }
+        function openEdit() { document.getElementById('edit-screen').style.display='block'; document.getElementById('edit-name').value=document.getElementById('display-name').innerText; document.getElementById('edit-age').value=parseInt(document.getElementById('p-age').innerText)||22; }
+        function closeEdit() { document.getElementById('edit-screen').style.display='none'; }
+        function handleImg(e) { const reader=new FileReader(); reader.onload=()=>{ currentPhoto=reader.result; }; if(e.target.files[0]) reader.readAsDataURL(e.target.files[0]); }
+        async function saveProfile() { const newName=document.getElementById('edit-name').value; const newAge=document.getElementById('edit-age').value; if(newName&&newAge){ currentUser.name=newName; currentUser.age=newAge; currentUser.gender=selectedGenderProfile; if(currentPhoto) currentUser.photo=currentPhoto; await updateProfileInCloud(currentUser.email,{name:newName,age:newAge,gender:selectedGenderProfile,photo:currentUser.photo}); updateProfileUI(currentUser); closeEdit(); showToast("PROFILE UPDATED SUCCESSFULLY"); } }
+        function showLogout() { document.getElementById('logout-modal').style.display='flex'; }
+        function hideLogout() { document.getElementById('logout-modal').style.display='none'; }
+
+        let isRegisterMode = false;
+        let selectedGender = "Male";
+        let currentPhoto = null;
+        let selectedGenderProfile = "Male";
+        let currentUser = null;
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+
+        // ---- BACK BUTTON HANDLER ----
+        let isHandlingBack = false, backPressCount = 0, backPressTimer = null;
+        function handleBackButton(e) { if(isHandlingBack) return; isHandlingBack=true; setTimeout(()=>isHandlingBack=false,300); if(e&&e.preventDefault) e.preventDefault(); if(document.getElementById('searchScreen').classList.contains('active')){ closeSearch(); return; } if(document.getElementById('profileScreen').classList.contains('active')){ closeProfile(); return; } if(document.getElementById('playlistView').classList.contains('active')){ resetToHome(); return; } if(document.getElementById('homeScreen').classList.contains('active')){ backPressCount++; if(backPressCount===1){ showToast("Press back again to exit"); if(backPressTimer)clearTimeout(backPressTimer); backPressTimer=setTimeout(()=>backPressCount=0,2000); }else{ backPressCount=0; if(backPressTimer)clearTimeout(backPressTimer); if(navigator.app&&navigator.app.exitApp) navigator.app.exitApp(); else showToast("Use app switcher to close"); } return; } if(document.getElementById('loginScreen').classList.contains('active')){ if(navigator.app&&navigator.app.exitApp) navigator.app.exitApp(); else showToast("Use app switcher to close"); } }
+        function setupBackButton() { if(window.history&&window.history.pushState) window.history.pushState({page:'app'},'',window.location.href); window.addEventListener('popstate',function(e){ e.preventDefault(); handleBackButton(e); if(window.history&&window.history.pushState) window.history.pushState({page:'app'},'',window.location.href); }); document.addEventListener('backbutton',function(e){ e.preventDefault(); handleBackButton(e); },false); }
+
+        // ---- INIT ----
+        window.onload = async function() {
+            setupMediaSession();
+            const savedEmail = getSessionEmail();
+            if (savedEmail && db) {
+                const user = await loadUserFromCloud(savedEmail);
+                if (user) {
                     currentUser = user;
                     await loadUserPlaylists();
                     await loadYoutubeSongs();
                     await loadRecentlyPlayed();
                     updateProfileUI(currentUser);
-                    showScreen('homeScreen');
+                    document.getElementById('loginScreen').classList.remove('active');
+                    document.getElementById('homeScreen').classList.add('active');
                     renderAll();
-                } else {
-                    showScreen('loginScreen');
-                }
-            } else {
-                showScreen('loginScreen');
+                    detectDevice();
+                    document.getElementById('loadingOverlay').classList.add('hidden');
+                    setTimeout(()=>showPopup("WELCOME BACK, "+(currentUser.name||"USER").toUpperCase(),"success"),500);
+                    setupBackButton();
+                    return;
+                } else { clearSessionEmail(); }
             }
-        } catch(err) {
-            console.error("Init error", err);
-            showScreen('loginScreen');
-        } finally {
+            document.getElementById('homeScreen').classList.remove('active');
+            document.getElementById('loginScreen').classList.add('active');
+            detectDevice();
             document.getElementById('loadingOverlay').classList.add('hidden');
-            setTimeout(() => { document.getElementById('loadingOverlay').classList.add('hidden'); }, 1000);
-        }
-    });
-})();
-</script>
+            setupBackButton();
+        };
+    </script>
 </body>
 </html>
