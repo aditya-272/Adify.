@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Inter:wght@400;600&family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        /* ... sab CSS same rahega ... */
+        /* ... sab CSS same as before ... */
         :root {
             --sky-blue: #00BFFF;
             --deep-blue: #001529;
@@ -193,9 +193,8 @@
         <div id="playlistOptions"></div>
     </div>
 
-    <!-- LOGIN SCREEN -->
+    <!-- LOGIN SCREEN (unchanged) -->
     <div id="loginScreen" class="app-screen active">
-        <!-- ... login screen same as before ... -->
         <div class="auth-card">
             <div class="logo-area">
                 <i class="fas fa-headphones-alt"></i>
@@ -259,7 +258,7 @@
         </div>
     </div>
 
-    <!-- HOME SCREEN -->
+    <!-- HOME SCREEN (unchanged except playlist-actions empty) -->
     <div id="homeScreen" class="app-screen">
         <div class="home-header">
             <div class="logo" onclick="resetToHome()">ADIFY</div>
@@ -283,14 +282,11 @@
                 <button style="background:var(--glass); color:white; border:1px solid var(--border); padding:10px 18px; border-radius:10px; font-size:11px; cursor:pointer;" onclick="resetToHome()">🏠 HOME</button>
             </div>
             <h2 id="playlistTitle" style="font-size:24px; margin-bottom:15px; color:var(--primary);"></h2>
-            <!-- 👇 "Select songs to remove" button row HATA DIYA GAYA -->
-            <!-- playlist-actions div ab empty hai, hata bhi sakte the but rakha hai kyunki styling mein gap tha -->
             <div class="playlist-actions"></div>
             <div id="songsContainer"></div>
         </div>
 
         <div class="player">
-            <!-- ... player same ... -->
             <div class="player-main">
                 <div class="player-info">
                     <div class="player-art" id="playerImgArt"></div>
@@ -325,9 +321,8 @@
         <div class="watermark">Made by Aditya</div>
     </div>
 
-    <!-- SEARCH SCREEN -->
+    <!-- SEARCH SCREEN (unchanged) -->
     <div id="searchScreen" class="app-screen">
-        <!-- ... search screen same ... -->
         <div class="search-header">
             <div class="search-back-btn" onclick="closeSearch()">
                 <i class="fas fa-arrow-left" style="color: #fff; font-size: 18px;"></i>
@@ -359,9 +354,8 @@
         </div>
     </div>
 
-    <!-- PROFILE SCREEN -->
+    <!-- PROFILE SCREEN (unchanged) -->
     <div id="profileScreen" class="profile-screen">
-        <!-- ... profile screen same ... -->
         <div class="profile-back-btn" onclick="closeProfile()">
             <i class="fas fa-arrow-left" style="color: #fff; font-size: 18px;"></i>
         </div>
@@ -394,7 +388,6 @@
         </div>
 
         <div id="edit-screen">
-            <!-- edit screen same -->
             <div style="display:flex; justify-content:space-between; margin-bottom:40px; align-items: center;">
                 <h2 style="font-size: 26px; font-weight: 900;">Update Node</h2>
                 <div onclick="closeEdit()" style="width:40px; height:40px; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; border-radius:50%; cursor:pointer;">
@@ -437,37 +430,77 @@
     </div>
 
     <script>
-        // ==================== FULL WORKING CODE WITH BACKGROUND PLAYBACK FIX & REMOVED SELECT MODE ====================
+        // ==================== FULL CODE WITH IMPROVED BACKGROUND PLAYBACK ====================
         const YOUTUBE_API_KEY = "AIzaSyBIpUJaQat1LYezbd3DYfteoVOBHAjxems";
         let youtubePlayer = null, isYouTubePlaying = false, currentYouTubeId = null, youtubeResults = [];
         let searchTimeout = null, isPlaying = false, ytDuration = 0, ytCurrentTime = 0, ytTimeInterval = null, ytPlayerReady = false;
         let playHistory = [], historyIndex = -1, recentlyPlayed = [];
 
-        // ---- BACKGROUND KEEP-ALIVE (prevents browser from suspending page) ----
-        let keepAliveCtx = null, keepAliveOsc = null, keepAliveGain = null;
+        // ---- IMPROVED KEEP-ALIVE (looped silent buffer, never suspends) ----
+        let keepAliveCtx = null, keepAliveSrc = null, keepAliveGain = null, keepAliveRunning = false;
         function startKeepAlive() {
-            if (keepAliveCtx && keepAliveCtx.state === 'running') return;
+            if (keepAliveRunning) return;
             try {
-                keepAliveCtx = new (window.AudioContext || window.webkitAudioContext)();
-                keepAliveOsc = keepAliveCtx.createOscillator();
+                if (!keepAliveCtx) {
+                    keepAliveCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (keepAliveCtx.state === 'suspended') {
+                    keepAliveCtx.resume();
+                }
+                // Create a short silent buffer (1 sec)
+                const buffer = keepAliveCtx.createBuffer(1, keepAliveCtx.sampleRate * 1, keepAliveCtx.sampleRate);
+                const src = keepAliveCtx.createBufferSource();
+                src.buffer = buffer;
+                src.loop = true; // loop forever silently
                 keepAliveGain = keepAliveCtx.createGain();
-                keepAliveGain.gain.value = 0; // completely silent
-                keepAliveOsc.connect(keepAliveGain);
+                keepAliveGain.gain.value = 0; // silence
+                src.connect(keepAliveGain);
                 keepAliveGain.connect(keepAliveCtx.destination);
-                keepAliveOsc.start();
-            } catch(e) { console.log("Keep-alive failed", e); }
+                src.start();
+                keepAliveSrc = src;
+                keepAliveRunning = true;
+            } catch(e) {
+                console.log("Keep-alive (silent loop) failed", e);
+                // Fallback to old oscillator
+                try {
+                    if (!keepAliveCtx) keepAliveCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    keepAliveOsc = keepAliveCtx.createOscillator();
+                    keepAliveGain = keepAliveCtx.createGain();
+                    keepAliveGain.gain.value = 0;
+                    keepAliveOsc.connect(keepAliveGain);
+                    keepAliveGain.connect(keepAliveCtx.destination);
+                    keepAliveOsc.start();
+                    keepAliveSrc = keepAliveOsc;
+                    keepAliveRunning = true;
+                } catch(e2) { console.error("Fallback keep-alive failed", e2); }
+            }
         }
         function stopKeepAlive() {
-            if (keepAliveOsc) {
-                try { keepAliveOsc.stop(); } catch(e) {}
-                keepAliveOsc = null;
+            if (keepAliveSrc) {
+                try { keepAliveSrc.stop(); } catch(e) {}
+                keepAliveSrc = null;
             }
-            if (keepAliveCtx) {
-                keepAliveCtx.close().catch(()=>{});
-                keepAliveCtx = null;
+            if (keepAliveGain) {
+                try { keepAliveGain.disconnect(); } catch(e) {}
+                keepAliveGain = null;
             }
-            keepAliveGain = null;
+            keepAliveRunning = false;
+            // Don't close ctx, reuse
         }
+
+        // Ensure AudioContext is resumed when tab comes back
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && isPlaying) {
+                if (keepAliveCtx && keepAliveCtx.state === 'suspended') {
+                    keepAliveCtx.resume();
+                }
+                if (isYouTubePlaying && youtubePlayer && ytPlayerReady) {
+                    try { youtubePlayer.playVideo(); } catch(e) {}
+                } else if (!isYouTubePlaying && audio.paused && audio.src) {
+                    audio.play().catch(()=>{});
+                }
+            }
+        });
 
         // ---- MEDIA SESSION (NOTIFICATION) ----
         function setupMediaSession() {
@@ -495,22 +528,6 @@
                 navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
             }
         }
-
-        // ---- BACKGROUND PLAYBACK: STRONGER RESUME ----
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden && isPlaying) {
-                // If local audio, try to resume immediately
-                if (!isYouTubePlaying && audio.src && audio.paused) {
-                    audio.play().catch(() => {});
-                }
-                // YouTube iframe keeps playing on its own
-            } else if (!document.hidden && isPlaying) {
-                // When coming back, ensure play state is correct
-                if (!isYouTubePlaying && audio.paused && audio.src) {
-                    audio.play().catch(() => {});
-                }
-            }
-        });
 
         // ---- FIREBASE ----
         const firebaseConfig = {
@@ -660,7 +677,7 @@
             }
         }
 
-        // ---- HOME / MENU / PLAYLIST (FIXED) ----
+        // ---- HOME / MENU / PLAYLIST ----
         function handleGlobalClick() { document.getElementById('globalPopup').classList.remove('show'); }
         function showToast(m) { const t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
         function formatTime(s) { if(!s||isNaN(s)||!isFinite(s)) return "0:00"; let m=Math.floor(s/60), sec=Math.floor(s%60); return `${m}:${sec<10?'0':''}${sec}`; }
@@ -689,10 +706,8 @@
             refreshView();
         }
 
-        // Since selection mode removed, we simplify the template: no selection logic
         function songItemTemplate(s) {
             const isP = currentUrl === s.url || (s.ytId && currentYouTubeId === s.ytId);
-            // Always show more button, no selection check
             let clickAction;
             if (s.ytId) clickAction = `playTrackFromUI('${s.ytId}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}','youtube')`;
             else clickAction = `playTrackFromUI('${s.id}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}','local')`;
@@ -761,7 +776,7 @@
 
         function ytSongItemTemplate(s) { const isP = currentYouTubeId === s.videoId; return `<div class="song-item ${isP?'playing-active':''}" onclick="playYouTubeSong('${s.videoId}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}')"><div style="display:flex;align-items:center;flex:1"><div class="img-container"><img src="${s.image}" class="song-img"></div><div style="overflow:hidden;flex:1"><h4>${s.title}</h4><p style="font-size:10px;opacity:0.5">${s.artist}</p></div></div><div class="more-btn" onclick="event.stopPropagation(); openYtMenu(event,'${s.videoId}')">⋮</div></div>`; }
 
-        // ---- YOUTUBE MENU FIX: USE youtubeSongs INSTEAD OF youtubeResults ----
+        // ---- YOUTUBE MENU ----
         function openYtMenu(e, videoId) {
             e.stopPropagation();
             const popup = document.getElementById('globalPopup');
@@ -790,7 +805,7 @@
             refreshView();
         }
 
-        // ---- PLAYBACK & HISTORY (FIXED PREV/NEXT) ----
+        // ---- PLAYBACK & HISTORY ----
         function addToHistory(track) {
             if (playHistory.length === 0 || playHistory[historyIndex].url !== track.url) {
                 if (historyIndex < playHistory.length - 1) playHistory = playHistory.slice(0, historyIndex + 1);
@@ -835,7 +850,7 @@
             const playPromise = audio.play();
             if (playPromise !== undefined) {
                 playPromise.then(() => {
-                    startKeepAlive();
+                    startKeepAlive(); // keep page alive
                     document.getElementById('pTitle').innerText = t;
                     document.getElementById('pArtist').innerText = a;
                     const art = document.getElementById('playerImgArt');
@@ -951,7 +966,7 @@
         audio.onloadedmetadata = () => { if(!isYouTubePlaying&&audio.duration&&isFinite(audio.duration)) document.getElementById('totalDuration').innerText=formatTime(audio.duration); };
         audio.onerror = () => { console.error("Audio error",audio.error); isPlaying=false; updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); stopKeepAlive(); };
 
-        // ---- PLAYLIST VIEW (selection mode removed) ----
+        // ---- PLAYLIST VIEW ----
         function openPlaylist(n) { activeP=n; document.getElementById('homeView').classList.remove('active'); document.getElementById('playlistView').classList.add('active'); document.getElementById('playlistTitle').innerText=n; document.getElementById('searchToggleBtn').style.display='none'; renderPlaylistSongs(); }
         function resetToHome() { activeP=null; document.getElementById('playlistView').classList.remove('active'); document.getElementById('homeView').classList.add('active'); document.getElementById('searchToggleBtn').style.display='flex'; renderAll(); }
         function renderPlaylistSongs() {
@@ -1023,4 +1038,4 @@
         };
     </script>
 </body>
-            </html>
+    </html>
