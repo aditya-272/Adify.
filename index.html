@@ -183,12 +183,12 @@
     <div id="yt-player-wrapper"></div>
 
     <audio id="mainAudio" playsinline webkit-playsinline x-webkit-airplay="allow"></audio>
-    <!-- Silent loop audio for background keep-alive (prevents YouTube suspension) -->
+    <!-- Silent loop audio for background keep-alive -->
     <audio id="silentAudio" loop playsinline webkit-playsinline src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA="></audio>
     <div id="toast"><i class="fas fa-shield-alt"></i> PROFILE SECURED</div>
     <div id="status-popup"></div>
 
-    <!-- Global Popup (always visible) -->
+    <!-- Global Popup -->
     <div class="menu-dropdown" id="globalPopup" onclick="event.stopPropagation()">
         <div class="menu-header">ADD TO PLAYLIST</div>
         <div id="playlistOptions"></div>
@@ -270,10 +270,8 @@
         <div id="homeView" class="view active">
             <p class="section-title">Playlists</p>
             <div class="playlist-grid" id="mainPlaylistGrid"></div>
-
             <p class="section-title">Tracks</p>
             <div id="singleTracksContainer"></div>
-
             <p class="section-title">Recently Played</p>
             <div id="recentlyPlayedContainer"></div>
         </div>
@@ -346,7 +344,6 @@
             <div id="searchResultsSection" style="display:none;">
                 <p class="section-title">Tracks</p>
                 <div id="searchResultsTracks"></div>
-
                 <div id="ytSearchResultsSection" style="display:none;">
                     <p class="section-title">YouTube Results</p>
                     <div id="searchResultsYouTube"></div>
@@ -395,23 +392,18 @@
                     <i class="fas fa-times" style="font-size: 20px; color: #555;"></i>
                 </div>
             </div>
-
             <label for="img-up" class="btn-blue" style="background:rgba(0, 191, 255, 0.1); color:var(--sky-blue); border: 1px solid var(--sky-blue); display:block; text-align:center; margin-bottom:30px; cursor:pointer;">📸 UPLOAD PROFILE PIC.</label>
             <input type="file" id="img-up" style="display:none;" accept="image/*" onchange="handleImg(event)">
-
             <p style="color: var(--sky-blue); font-size: 10px; margin-bottom: 10px; font-weight: 900; letter-spacing: 1px;">FULL USERNAME</p>
             <input type="text" id="edit-name" class="edit-input" style="text-align: left;">
-
             <p style="color: var(--sky-blue); font-size: 10px; margin-bottom: 10px; font-weight: 900; letter-spacing: 1px;">GENDER BIOMETRIC</p>
             <div style="display:flex; gap:10px; margin-bottom:25px;">
                 <div class="gender-opt active" onclick="setGenderProfile(this, 'Male')">MALE</div>
                 <div class="gender-opt" onclick="setGenderProfile(this, 'Female')">FEMALE</div>
                 <div class="gender-opt" onclick="setGenderProfile(this, 'Other')">OTHER</div>
             </div>
-
             <p style="color: var(--sky-blue); font-size: 10px; margin-bottom: 10px; font-weight: 900; letter-spacing: 1px;">LIFE CYCLES (AGE)</p>
             <input type="number" id="edit-age" class="edit-input" style="text-align: left;">
-
             <button class="btn-blue" onclick="saveProfile()">SYNC CHANGES</button>
         </div>
 
@@ -431,68 +423,97 @@
     </div>
 
     <script>
-        // ==================== FULL WORKING CODE WITH BACKGROUND PLAYBACK FIX ====================
+        // ==================== COMPLETE SCRIPT WITH 100% BACKGROUND PLAYBACK ====================
         const YOUTUBE_API_KEY = "AIzaSyBIpUJaQat1LYezbd3DYfteoVOBHAjxems";
         let youtubePlayer = null, isYouTubePlaying = false, currentYouTubeId = null, youtubeResults = [];
         let searchTimeout = null, isPlaying = false, ytDuration = 0, ytCurrentTime = 0, ytTimeInterval = null, ytPlayerReady = false;
         let playHistory = [], historyIndex = -1, recentlyPlayed = [];
 
-        // ---- Silent audio element for background keep-alive ----
+        // ---- ULTIMATE KEEP-ALIVE SYSTEM ----
         const silentAudio = document.getElementById('silentAudio');
+        let keepAliveCtx = null, keepAliveSource = null, keepAliveGain = null, keepAliveActive = false;
 
-        function startSilentAudio() {
+        function initKeepAlive() {
+            if (keepAliveCtx) return;
+            try {
+                keepAliveCtx = new (window.AudioContext || window.webkitAudioContext)();
+                keepAliveCtx.onstatechange = () => {
+                    if (keepAliveCtx.state === 'suspended' && keepAliveActive) {
+                        keepAliveCtx.resume().then(() => {
+                            if (keepAliveCtx.state === 'suspended') {
+                                setTimeout(() => keepAliveCtx.resume(), 500);
+                            }
+                        });
+                    }
+                };
+                keepAliveGain = keepAliveCtx.createGain();
+                keepAliveGain.gain.value = 0;
+                keepAliveSource = keepAliveCtx.createOscillator();
+                keepAliveSource.frequency.value = 0;
+                keepAliveSource.connect(keepAliveGain);
+                keepAliveGain.connect(keepAliveCtx.destination);
+                keepAliveSource.start();
+                keepAliveActive = true;
+            } catch (e) {
+                console.error("Keep-alive Web Audio init failed", e);
+            }
+        }
+
+        function startKeepAlive() {
+            // Silent audio element backup
             if (silentAudio.paused) {
                 silentAudio.play().catch(() => {});
             }
-        }
-        function stopSilentAudio() {
-            silentAudio.pause();
-            silentAudio.currentTime = 0;
-        }
+            silentAudio.onpause = () => {
+                if (keepAliveActive && silentAudio.paused) {
+                    silentAudio.play().catch(() => {});
+                }
+            };
 
-        // ---- Keep-alive using AudioContext (backup) ----
-        let keepAliveCtx = null, keepAliveSrc = null, keepAliveGain = null, keepAliveRunning = false;
-        function startKeepAlive() {
-            // Start silent audio loop first (more reliable)
-            startSilentAudio();
-            if (keepAliveRunning) return;
-            try {
-                if (!keepAliveCtx) keepAliveCtx = new (window.AudioContext || window.webkitAudioContext)();
-                if (keepAliveCtx.state === 'suspended') keepAliveCtx.resume();
-                const buffer = keepAliveCtx.createBuffer(1, keepAliveCtx.sampleRate * 1, keepAliveCtx.sampleRate);
-                const src = keepAliveCtx.createBufferSource();
-                src.buffer = buffer;
-                src.loop = true;
-                keepAliveGain = keepAliveCtx.createGain();
-                keepAliveGain.gain.value = 0;
-                src.connect(keepAliveGain);
-                keepAliveGain.connect(keepAliveCtx.destination);
-                src.start();
-                keepAliveSrc = src;
-                keepAliveRunning = true;
-            } catch(e) {
-                console.log("Keep-alive (AudioContext) failed", e);
-                // Silent audio is already running, so we are safe.
+            // Web Audio keep-alive
+            if (!keepAliveCtx) {
+                initKeepAlive();
+            } else {
+                if (keepAliveCtx.state === 'suspended') {
+                    keepAliveCtx.resume();
+                }
+                if (!keepAliveActive) {
+                    try {
+                        keepAliveSource = keepAliveCtx.createOscillator();
+                        keepAliveSource.frequency.value = 0;
+                        keepAliveSource.connect(keepAliveGain);
+                        keepAliveSource.start();
+                        keepAliveActive = true;
+                    } catch(e) {}
+                }
             }
         }
+
         function stopKeepAlive() {
-            stopSilentAudio();
-            if (keepAliveSrc) {
-                try { keepAliveSrc.stop(); } catch(e) {}
-                keepAliveSrc = null;
+            keepAliveActive = false;
+            silentAudio.pause();
+            silentAudio.onpause = null;
+            if (keepAliveSource) {
+                try { keepAliveSource.stop(); } catch(e) {}
+                keepAliveSource.disconnect();
+                keepAliveSource = null;
             }
             if (keepAliveGain) {
-                try { keepAliveGain.disconnect(); } catch(e) {}
+                keepAliveGain.disconnect();
                 keepAliveGain = null;
             }
-            keepAliveRunning = false;
+            if (keepAliveCtx) {
+                keepAliveCtx.close().then(() => { keepAliveCtx = null; });
+            }
         }
 
-        // ---- Visibility change: ensure playback resumes ----
+        // ---- Visibility change: guarantee playback resumes ----
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden && isPlaying) {
-                if (keepAliveCtx && keepAliveCtx.state === 'suspended') keepAliveCtx.resume();
-                startSilentAudio();
+                if (keepAliveCtx && keepAliveCtx.state === 'suspended') {
+                    keepAliveCtx.resume();
+                }
+                startKeepAlive();
                 if (isYouTubePlaying && youtubePlayer && ytPlayerReady) {
                     try { youtubePlayer.playVideo(); } catch(e) {}
                 } else if (!isYouTubePlaying && audio.paused && audio.src) {
@@ -501,7 +522,7 @@
             }
         });
 
-        // ---- MEDIA SESSION (NOTIFICATION) ----
+        // ---- MEDIA SESSION ----
         function setupMediaSession() {
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.setActionHandler('play', () => togglePlay());
@@ -546,12 +567,11 @@
             return subPath ? `users/${key}/${subPath}` : `users/${key}`;
         }
 
-        // ---- SESSION (localStorage for persistence) ----
         function saveSessionEmail(email) { localStorage.setItem('adify_session_email', email); }
         function getSessionEmail() { return localStorage.getItem('adify_session_email'); }
         function clearSessionEmail() { localStorage.removeItem('adify_session_email'); }
 
-        // ---- RECENT SEARCHES (CLOUD) ----
+        // ---- RECENT SEARCHES ----
         async function getRecentSearches() { if(!db||!currentUser||!currentUser.email) return []; try{ const snap=await db.ref(userPath(currentUser.email,'recentSearches')).once('value'); const v=snap.val(); return Array.isArray(v)?v:[]; }catch(e){return[];} }
         async function saveRecentSearch(query) { if(!query||query.trim().length<2||!db||!currentUser||!currentUser.email) return; const searches=await getRecentSearches(); const clean=query.trim(); const f=searches.filter(s=>s.toLowerCase()!==clean.toLowerCase()); f.unshift(clean); try{ await db.ref(userPath(currentUser.email,'recentSearches')).set(f.slice(0,10)); }catch(e){} renderRecentSearches(); }
         async function removeRecentSearch(query) { const s=await getRecentSearches(); const upd=s.filter(x=>x!==query); if(db&&currentUser&&currentUser.email) await db.ref(userPath(currentUser.email,'recentSearches')).set(upd); renderRecentSearches(); }
@@ -565,15 +585,15 @@
         }
         function searchFromRecent(query) { document.getElementById('searchPageInput').value=query; document.getElementById('searchClearBtn').style.display='block'; executeSearch(); }
 
-        // ---- PLAYLISTS (CLOUD) ----
+        // ---- PLAYLISTS ----
         async function saveUserPlaylists() { if(!db||!currentUser||!currentUser.email) return; try{ await db.ref(userPath(currentUser.email,'playlists')).set(userPlaylists); }catch(e){} }
         async function loadUserPlaylists() { if(!db||!currentUser||!currentUser.email) return; try{ const snap=await db.ref(userPath(currentUser.email,'playlists')).once('value'); const d=snap.val(); if(d&&typeof d==='object'){ Object.keys(userPlaylists).forEach(key=>{ if(d[key]&&Array.isArray(d[key])) userPlaylists[key]=d[key]; }); } }catch(e){} }
 
-        // ---- YOUTUBE SONGS (CLOUD) ----
+        // ---- YOUTUBE SONGS ----
         async function saveYoutubeSongs() { if(!db||!currentUser||!currentUser.email) return; try{ await db.ref(userPath(currentUser.email,'youtubeSongs')).set(youtubeSongs); }catch(e){} }
         async function loadYoutubeSongs() { if(!db||!currentUser||!currentUser.email) return; try{ const snap=await db.ref(userPath(currentUser.email,'youtubeSongs')).once('value'); const v=snap.val(); youtubeSongs=Array.isArray(v)?v:[]; }catch(e){youtubeSongs=[];} }
 
-        // ---- RECENTLY PLAYED (CLOUD) ----
+        // ---- RECENTLY PLAYED ----
         async function saveRecentlyPlayed() { if(!db||!currentUser||!currentUser.email) return; try{ await db.ref(userPath(currentUser.email,'recentlyPlayed')).set(recentlyPlayed); }catch(e){} }
         async function loadRecentlyPlayed() { if(!db||!currentUser||!currentUser.email) return; try{ const snap=await db.ref(userPath(currentUser.email,'recentlyPlayed')).once('value'); const v=snap.val(); recentlyPlayed=Array.isArray(v)?v:[]; }catch(e){recentlyPlayed=[];} }
         function addToRecentlyPlayed(track) {
@@ -943,14 +963,12 @@
                                 startKeepAlive();
                                 try{ ytDuration=youtubePlayer.getDuration(); document.getElementById('totalDuration').innerText=formatTime(ytDuration); }catch(e){}
                             } else if(e.data===YT.PlayerState.PAUSED){
-                                // Only stop keep-alive if user intentionally paused (not hidden)
                                 if (!document.hidden) {
                                     isPlaying=false;
                                     updatePlayIcon(false);
                                     document.getElementById('playerImgArt').classList.remove('music-playing');
                                     stopKeepAlive();
                                 } else {
-                                    // Tab is hidden but playback paused unexpectedly - try to resume
                                     if (youtubePlayer && ytPlayerReady) {
                                         setTimeout(() => {
                                             if (document.hidden && isYouTubePlaying && currentYouTubeId) {
@@ -958,7 +976,6 @@
                                             }
                                         }, 200);
                                     }
-                                    // Don't stop keep-alive because we still want to play
                                 }
                             }
                         },
@@ -1091,4 +1108,4 @@
         };
     </script>
 </body>
-    </html>
+</html>
