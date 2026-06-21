@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Inter:wght@400;600&family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
+        /* ... sab CSS same rahega ... */
         :root {
             --sky-blue: #00BFFF;
             --deep-blue: #001529;
@@ -194,6 +195,7 @@
 
     <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="app-screen active">
+        <!-- ... login screen same as before ... -->
         <div class="auth-card">
             <div class="logo-area">
                 <i class="fas fa-headphones-alt"></i>
@@ -281,15 +283,14 @@
                 <button style="background:var(--glass); color:white; border:1px solid var(--border); padding:10px 18px; border-radius:10px; font-size:11px; cursor:pointer;" onclick="resetToHome()">🏠 HOME</button>
             </div>
             <h2 id="playlistTitle" style="font-size:24px; margin-bottom:15px; color:var(--primary);"></h2>
-            <div class="playlist-actions">
-                <button id="modeBtn" class="action-btn btn-remove-mode" onclick="enableSelectionMode()">Select songs to remove</button>
-                <button id="confirmBtn" class="action-btn" style="display:none; background:var(--success); color:white; border:none;" onclick="confirmRemoval()">Confirm Remove Selected</button>
-                <button id="cancelBtn" class="action-btn" style="display:none; background:var(--glass); color:white; border:1px solid var(--border);" onclick="disableSelectionMode()">Cancel</button>
-            </div>
+            <!-- 👇 "Select songs to remove" button row HATA DIYA GAYA -->
+            <!-- playlist-actions div ab empty hai, hata bhi sakte the but rakha hai kyunki styling mein gap tha -->
+            <div class="playlist-actions"></div>
             <div id="songsContainer"></div>
         </div>
 
         <div class="player">
+            <!-- ... player same ... -->
             <div class="player-main">
                 <div class="player-info">
                     <div class="player-art" id="playerImgArt"></div>
@@ -326,6 +327,7 @@
 
     <!-- SEARCH SCREEN -->
     <div id="searchScreen" class="app-screen">
+        <!-- ... search screen same ... -->
         <div class="search-header">
             <div class="search-back-btn" onclick="closeSearch()">
                 <i class="fas fa-arrow-left" style="color: #fff; font-size: 18px;"></i>
@@ -359,6 +361,7 @@
 
     <!-- PROFILE SCREEN -->
     <div id="profileScreen" class="profile-screen">
+        <!-- ... profile screen same ... -->
         <div class="profile-back-btn" onclick="closeProfile()">
             <i class="fas fa-arrow-left" style="color: #fff; font-size: 18px;"></i>
         </div>
@@ -391,6 +394,7 @@
         </div>
 
         <div id="edit-screen">
+            <!-- edit screen same -->
             <div style="display:flex; justify-content:space-between; margin-bottom:40px; align-items: center;">
                 <h2 style="font-size: 26px; font-weight: 900;">Update Node</h2>
                 <div onclick="closeEdit()" style="width:40px; height:40px; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; border-radius:50%; cursor:pointer;">
@@ -433,7 +437,7 @@
     </div>
 
     <script>
-        // ==================== FULL WORKING CODE WITH BACKGROUND PLAYBACK FIX ====================
+        // ==================== FULL WORKING CODE WITH BACKGROUND PLAYBACK FIX & REMOVED SELECT MODE ====================
         const YOUTUBE_API_KEY = "AIzaSyBIpUJaQat1LYezbd3DYfteoVOBHAjxems";
         let youtubePlayer = null, isYouTubePlaying = false, currentYouTubeId = null, youtubeResults = [];
         let searchTimeout = null, isPlaying = false, ytDuration = 0, ytCurrentTime = 0, ytTimeInterval = null, ytPlayerReady = false;
@@ -685,19 +689,17 @@
             refreshView();
         }
 
+        // Since selection mode removed, we simplify the template: no selection logic
         function songItemTemplate(s) {
             const isP = currentUrl === s.url || (s.ytId && currentYouTubeId === s.ytId);
-            const isS = selectedSongs.has(s.id);
+            // Always show more button, no selection check
             let clickAction;
-            if (isSelectionMode) clickAction = `toggleSelectSong(${s.id})`;
-            else if (s.ytId) clickAction = `playTrackFromUI('${s.ytId}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}','youtube')`;
+            if (s.ytId) clickAction = `playTrackFromUI('${s.ytId}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}','youtube')`;
             else clickAction = `playTrackFromUI('${s.id}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.image}','local')`;
-            const moreBtn = !isSelectionMode
-                ? (s.ytId
-                    ? `<div class="more-btn" onclick="event.stopPropagation(); openYtMenu(event,'${s.ytId}')">⋮</div>`
-                    : `<div class="more-btn" onclick="openMenu(event,${s.id})">⋮</div>`)
-                : `<div style="color:var(--danger);font-weight:bold;margin-right:10px;">${isS?'✓':''}</div>`;
-            return `<div class="song-item ${isP?'playing-active':''} ${isS?'selected-to-remove':''}" onclick="${clickAction}"><div style="display:flex;align-items:center;flex:1"><div class="img-container"><img src="${s.image}" class="song-img"></div><div style="overflow:hidden;flex:1"><h4>${s.title}</h4><p style="font-size:10px;opacity:0.5">${s.artist}</p></div></div>${moreBtn}</div>`;
+            const moreBtn = s.ytId
+                ? `<div class="more-btn" onclick="event.stopPropagation(); openYtMenu(event,'${s.ytId}')">⋮</div>`
+                : `<div class="more-btn" onclick="openMenu(event,${s.id})">⋮</div>`;
+            return `<div class="song-item ${isP?'playing-active':''}" onclick="${clickAction}"><div style="display:flex;align-items:center;flex:1"><div class="img-container"><img src="${s.image}" class="song-img"></div><div style="overflow:hidden;flex:1"><h4>${s.title}</h4><p style="font-size:10px;opacity:0.5">${s.artist}</p></div></div>${moreBtn}</div>`;
         }
 
         function playTrackFromUI(id, title, artist, image, type) {
@@ -833,7 +835,7 @@
             const playPromise = audio.play();
             if (playPromise !== undefined) {
                 playPromise.then(() => {
-                    startKeepAlive(); // keep page alive
+                    startKeepAlive();
                     document.getElementById('pTitle').innerText = t;
                     document.getElementById('pArtist').innerText = a;
                     const art = document.getElementById('playerImgArt');
@@ -893,7 +895,7 @@
             updateMediaSessionMetadata(title, channel, thumbUrl);
             addToHistory({ ytId: videoId, title, artist: channel, url: 'youtube://'+videoId, image: thumbUrl });
             addToRecentlyPlayed({ title, artist: channel, url: 'youtube://'+videoId, image: thumbUrl, ytId: videoId });
-            startKeepAlive(); // keep page alive while playing YouTube
+            startKeepAlive();
             showPopup("▶ PLAYING", "success");
             refreshView();
         }
@@ -949,19 +951,9 @@
         audio.onloadedmetadata = () => { if(!isYouTubePlaying&&audio.duration&&isFinite(audio.duration)) document.getElementById('totalDuration').innerText=formatTime(audio.duration); };
         audio.onerror = () => { console.error("Audio error",audio.error); isPlaying=false; updatePlayIcon(false); document.getElementById('playerImgArt').classList.remove('music-playing'); stopKeepAlive(); };
 
-        // ---- PLAYLIST REMOVE (FIXED & TESTED) ----
+        // ---- PLAYLIST VIEW (selection mode removed) ----
         function openPlaylist(n) { activeP=n; document.getElementById('homeView').classList.remove('active'); document.getElementById('playlistView').classList.add('active'); document.getElementById('playlistTitle').innerText=n; document.getElementById('searchToggleBtn').style.display='none'; renderPlaylistSongs(); }
         function resetToHome() { activeP=null; document.getElementById('playlistView').classList.remove('active'); document.getElementById('homeView').classList.add('active'); document.getElementById('searchToggleBtn').style.display='flex'; renderAll(); }
-        function enableSelectionMode() { isSelectionMode=true; selectedSongs.clear(); document.getElementById('modeBtn').style.display='none'; document.getElementById('confirmBtn').style.display='block'; document.getElementById('cancelBtn').style.display='block'; renderPlaylistSongs(); }
-        function disableSelectionMode() { isSelectionMode=false; selectedSongs.clear(); document.getElementById('modeBtn').style.display='block'; document.getElementById('confirmBtn').style.display='none'; document.getElementById('cancelBtn').style.display='none'; renderPlaylistSongs(); }
-        function toggleSelectSong(id) { selectedSongs.has(id)?selectedSongs.delete(id):selectedSongs.add(id); renderPlaylistSongs(); }
-        async function confirmRemoval() {
-            if (!activeP) return;
-            userPlaylists[activeP] = userPlaylists[activeP].filter(s => !selectedSongs.has(s.id));
-            await saveUserPlaylists();
-            showToast("Songs Removed!");
-            disableSelectionMode();
-        }
         function renderPlaylistSongs() {
             let list = userPlaylists[activeP] || [];
             document.getElementById('songsContainer').innerHTML = list.length ? list.map(s => songItemTemplate(s)).join('') : "<p style='text-align:center;opacity:0.3;padding:20px;'>Empty.</p>";
@@ -1031,4 +1023,4 @@
         };
     </script>
 </body>
-                        </html>
+            </html>
